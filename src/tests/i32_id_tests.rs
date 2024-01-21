@@ -135,12 +135,27 @@ fn eq_test() {
     let id_1 = id!(MTest; 2);
     let id_2 = id!(MTest; 1);
 
-    let actual = id_0 == id_1;
+    let actual = id_0.eq(&id_1);
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_0 == id_2;
+    let actual = id_0.eq(&id_2);
     let expected = true;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn ne_test() {
+    let id_0 = id!(MTest; 1);
+    let id_1 = id!(MTest; 2);
+    let id_2 = id!(MTest; 1);
+
+    let actual = id_0.ne(&id_1);
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual = id_0.ne(&id_2);
+    let expected = false;
     assert_eq!(actual, expected);
 }
 

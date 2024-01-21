@@ -1,5 +1,6 @@
 use crate::{IdSlice, IdSliceIndex, UsizeId};
 use std::{
+    borrow::{Borrow, BorrowMut},
     marker::PhantomData,
     mem::transmute,
     ops::{Index, IndexMut},
@@ -7,7 +8,7 @@ use std::{
 
 #[derive(Debug)]
 pub struct IdVec<TMarker: ?Sized, TValue> {
-    repr: Vec<TValue>,
+    pub(crate) repr: Vec<TValue>,
     phantom: PhantomData<TMarker>,
 }
 
@@ -74,6 +75,18 @@ impl<TMarker, TValue> AsRef<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue>
 impl<TMarker, TValue> AsMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn as_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
         self.as_mut_id_slice()
+    }
+}
+
+impl<TMarker, TValue> Borrow<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+    fn borrow(&self) -> &IdSlice<TMarker, TValue> {
+        IdSlice::from_slice(self.repr.borrow())
+    }
+}
+
+impl<TMarker, TValue> BorrowMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+    fn borrow_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
+        IdSlice::from_mut_slice(self.repr.borrow_mut())
     }
 }
 

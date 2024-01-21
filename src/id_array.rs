@@ -15,7 +15,7 @@ pub struct IdArray<TMarker: ?Sized, TValue, const N: usize> {
 
 impl<TMarker, TValue, const N: usize> IdArray<TMarker, TValue, N> {
     pub const fn from_array(repr: [TValue; N]) -> Self {
-        IdArray {
+        Self {
             phantom: PhantomData,
             repr,
         }
@@ -75,7 +75,7 @@ where
     [TValue; N]: Clone,
 {
     fn clone(&self) -> Self {
-        IdArray::from_array(self.repr.clone())
+        Self::from_array(self.repr.clone())
     }
 }
 
@@ -86,7 +86,7 @@ where
     [TValue; N]: Default,
 {
     fn default() -> Self {
-        IdArray::from_array(Default::default())
+        Self::from_array(Default::default())
     }
 }
 
@@ -95,7 +95,7 @@ impl<TMarker, TValue, const N: usize> Eq for IdArray<TMarker, TValue, N> where [
 
 impl<TMarker, TValue, const N: usize> From<[TValue; N]> for IdArray<TMarker, TValue, N> {
     fn from(value: [TValue; N]) -> Self {
-        IdArray::from_array(value)
+        Self::from_array(value)
     }
 }
 
@@ -112,7 +112,7 @@ where
         H: Hasher,
     {
         let data = unsafe { transmute(data) };
-        <[TValue; N] as Hash>::hash_slice(data, state)
+        <[TValue; N]>::hash_slice(data, state)
     }
 }
 
@@ -141,5 +141,10 @@ where
 {
     fn eq(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
         self.repr.eq(&other.repr)
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+        self.repr.ne(&other.repr)
     }
 }
