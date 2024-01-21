@@ -2,6 +2,7 @@ use std::{
     cmp::Ordering,
     hash::{Hash, Hasher},
     marker::PhantomData,
+    mem::transmute,
 };
 
 #[derive(Debug)]
@@ -49,6 +50,14 @@ impl<TMarker> Hash for I32Id<TMarker> {
         H: Hasher,
     {
         self.i32.hash(state)
+    }
+
+    fn hash_slice<H>(data: &[Self], state: &mut H)
+    where
+        H: Hasher,
+    {
+        let data = unsafe { transmute(data) };
+        i32::hash_slice(data, state)
     }
 }
 

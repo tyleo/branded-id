@@ -99,11 +99,11 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     }
 }
 
-impl<TMarker, TValue> PartialEq for IdSlice<TMarker, TValue>
+impl<TMarker, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>> for IdSlice<TMarker, TValueA>
 where
-    [TValue]: PartialEq,
+    [TValueA]: PartialEq<[TValueB]>,
 {
-    fn eq(&self, other: &Self) -> bool {
-        self.repr == other.repr
+    fn eq(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
+        self.repr.eq(&other.repr)
     }
 }

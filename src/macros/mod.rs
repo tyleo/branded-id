@@ -1,5 +1,6 @@
 mod i32_id;
 mod id_array;
+mod id_ptr;
 mod id_slice;
 mod id_vec;
 mod isize_id;

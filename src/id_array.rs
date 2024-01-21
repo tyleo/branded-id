@@ -1,5 +1,6 @@
 use crate::{IdSlice, IdSliceIndex};
 use std::{
+    hash::{Hash, Hasher},
     marker::PhantomData,
     mem::transmute,
     ops::{Index, IndexMut},
@@ -61,6 +62,23 @@ impl<TMarker, TValue, const N: usize> From<[TValue; N]> for IdArray<TMarker, TVa
     }
 }
 
+impl<TMarker, TValue, const N: usize> Hash for IdArray<TMarker, TValue, N>
+where
+    [TValue; N]: Hash,
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.repr.hash(state)
+    }
+
+    fn hash_slice<H>(data: &[Self], state: &mut H)
+    where
+        H: Hasher,
+    {
+        let data = unsafe { transmute(data) };
+        <[TValue; N] as Hash>::hash_slice(data, state)
+    }
+}
+
 impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize> Index<I>
     for IdArray<TMarker, TValue, N>
 {
@@ -79,11 +97,12 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize>
     }
 }
 
-impl<TMarker, TValue, const N: usize> PartialEq for IdArray<TMarker, TValue, N>
+impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
+    for IdArray<TMarker, TValueA, N>
 where
-    [TValue; N]: PartialEq,
+    [TValueA; N]: PartialEq<[TValueB; N]>,
 {
-    fn eq(&self, other: &Self) -> bool {
-        self.repr == other.repr
+    fn eq(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+        self.repr.eq(&other.repr)
     }
 }

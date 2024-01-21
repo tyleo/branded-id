@@ -1,4 +1,8 @@
-use crate::{id_array, id_slice, tests::MTest, usize_id as id, IdArray};
+use crate::{id_array, id_slice, tests::util::MTest, usize_id as id, IdArray, IdSlice};
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+};
 
 #[test]
 fn from_array_test() {
@@ -33,7 +37,7 @@ fn from_mut_array_test() {
 fn as_mut_id_slice() {
     let id_array = &mut id_array![1];
 
-    let actual = id_array.as_mut_id_slice();
+    let actual: &mut IdSlice<MTest, i32> = id_array.as_mut_id_slice();
     actual[id!(0)] = 2;
 
     let expected = id_slice![MTest; i32; 2];
@@ -44,7 +48,7 @@ fn as_mut_id_slice() {
 fn as_id_slice() {
     let id_array = &id_array![1];
 
-    let actual = id_array.as_id_slice();
+    let actual: &IdSlice<MTest, i32> = id_array.as_id_slice();
     let expected = id_slice![MTest; i32; 1];
     assert_eq!(actual, expected);
 }
@@ -53,7 +57,7 @@ fn as_id_slice() {
 fn as_ref_test() {
     let id_array = id_array![1];
 
-    let actual = id_array.as_ref();
+    let actual: &IdSlice<MTest, i32> = id_array.as_ref();
     let expected = id_slice![MTest; 1];
     assert_eq!(actual, expected);
 }
@@ -62,7 +66,7 @@ fn as_ref_test() {
 fn as_mut_test() {
     let mut id_array = id_array![1];
 
-    let actual = id_array.as_mut();
+    let actual: &mut IdSlice<MTest, i32> = id_array.as_mut();
     actual[id!(0)] = 2;
 
     let expected = id_slice![MTest; 2];
@@ -75,6 +79,36 @@ fn from_test() {
 
     let actual: IdArray<MTest, i32, 1> = From::from(array);
     let expected = id_array![MTest; i32; 1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn hash_test() {
+    let id_array = id_array!(MTest; 1);
+    let mut hasher_0 = DefaultHasher::new();
+    id_array.hash(&mut hasher_0);
+
+    let array = [1];
+    let mut hasher_1 = DefaultHasher::new();
+    array.hash(&mut hasher_1);
+
+    let actual = hasher_0.finish();
+    let expected = hasher_1.finish();
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn hash_slice_test() {
+    let id_arrays = [id_array!(MTest; 1), id_array!(MTest; 2)];
+    let mut hasher_0 = DefaultHasher::new();
+    IdArray::hash_slice(&id_arrays, &mut hasher_0);
+
+    let arrays = [[1], [2]];
+    let mut hasher_1 = DefaultHasher::new();
+    <[i32; 1] as Hash>::hash_slice(&arrays, &mut hasher_1);
+
+    let actual = hasher_0.finish();
+    let expected = hasher_1.finish();
     assert_eq!(actual, expected);
 }
 

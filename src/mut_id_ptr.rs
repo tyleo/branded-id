@@ -18,6 +18,18 @@ impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
     }
 
     /// # Safety
+    /// The same rules apply as dereferencing a raw pointer.
+    pub unsafe fn deref_ptr<'a>(self) -> &'a mut TValue {
+        &mut *self.repr
+    }
+
+    /// # Safety
+    /// The same rules apply as dereferencing a raw pointer.
+    pub unsafe fn deref_ptr_mut<'a>(self) -> &'a mut TValue {
+        &mut *self.repr
+    }
+
+    /// # Safety
     /// This function should ensure that the offset results in a slice which
     /// shares memory with the original slice.
     pub const unsafe fn offset(self, offset: IsizeId<TMarker>) -> Self {
@@ -34,8 +46,19 @@ impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
     }
 }
 
+impl<TMarker, TValue> Eq for MutIdPtr<TMarker, TValue> where *mut TValue: PartialEq {}
+
 impl<TMarker, TValue> From<*mut TValue> for MutIdPtr<TMarker, TValue> {
     fn from(value: *mut TValue) -> Self {
         Self::from_mut_ptr(value)
+    }
+}
+
+impl<TMarker, TValue> PartialEq for MutIdPtr<TMarker, TValue>
+where
+    *mut TValue: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.repr == other.repr
     }
 }
