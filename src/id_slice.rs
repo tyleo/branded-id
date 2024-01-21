@@ -1,4 +1,4 @@
-use crate::{IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId};
+use crate::{IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId};
 use std::{
     cmp::Ordering,
     fmt::Arguments,
@@ -18,14 +18,6 @@ pub struct IdSlice<TMarker: ?Sized, TValue> {
 }
 
 impl<TMarker, TValue> IdSlice<TMarker, TValue> {
-    pub fn from_mut_slice(repr: &mut [TValue]) -> &mut Self {
-        unsafe { transmute(repr) }
-    }
-
-    pub const fn from_slice(repr: &[TValue]) -> &Self {
-        unsafe { transmute(repr) }
-    }
-
     pub fn as_mut_id_ptr(&mut self) -> MutIdPtr<TMarker, TValue> {
         MutIdPtr::from_mut_ptr(self.as_mut_slice().as_mut_ptr())
     }
@@ -46,20 +38,28 @@ impl<TMarker, TValue> IdSlice<TMarker, TValue> {
         UsizeId::from_usize(self.len())
     }
 
+    pub fn from_mut_slice(repr: &mut [TValue]) -> &mut Self {
+        unsafe { transmute(repr) }
+    }
+
+    pub const fn from_slice(repr: &[TValue]) -> &Self {
+        unsafe { transmute(repr) }
+    }
+
     pub const fn is_empty(&self) -> bool {
-        self.repr.is_empty()
+        self.as_slice().is_empty()
     }
 
     pub fn iter(&self) -> Iter<'_, TValue> {
-        self.repr.iter()
+        self.as_slice().iter()
     }
 
     pub fn iter_mut(&mut self) -> IterMut<'_, TValue> {
-        self.repr.iter_mut()
+        self.as_mut_slice().iter_mut()
     }
 
     pub const fn len(&self) -> usize {
-        self.repr.len()
+        self.as_slice().len()
     }
 }
 
@@ -134,7 +134,7 @@ where
     [TValue]: Hash,
 {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.repr.hash(state)
+        self.as_slice().hash(state)
     }
 }
 
@@ -162,7 +162,7 @@ impl<'a, TMarker, TValue> IntoIterator for &'a IdSlice<TMarker, TValue> {
     type IntoIter = <&'a [TValue] as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.repr.into_iter()
+        self.as_slice().into_iter()
     }
 }
 
@@ -172,7 +172,7 @@ impl<'a, TMarker, TValue> IntoIterator for &'a mut IdSlice<TMarker, TValue> {
     type IntoIter = <&'a mut [TValue] as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
-        <&'a mut [TValue] as IntoIterator>::into_iter(&mut self.repr)
+        <&'a mut [TValue] as IntoIterator>::into_iter(self.as_mut_slice())
     }
 }
 
@@ -181,7 +181,7 @@ where
     [TValue]: Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.repr.cmp(&other.repr)
+        self.as_slice().cmp(other.as_slice())
     }
 }
 
@@ -190,12 +190,41 @@ where
     [TValueA]: PartialEq<[TValueB]>,
 {
     fn eq(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
-        self.repr.eq(&other.repr)
+        self.as_slice().eq(other.as_slice())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
     fn ne(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
-        self.repr.ne(&other.repr)
+        self.as_slice().ne(other.as_slice())
+    }
+}
+
+impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
+    for IdSlice<TMarker, TValueA>
+where
+    [TValueA]: PartialEq<[TValueB; N]>,
+{
+    fn eq(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+        self.repr.eq(other.as_array())
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+        self.repr.ne(other.as_array())
+    }
+}
+
+impl<TMarker, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>> for IdSlice<TMarker, TValueA>
+where
+    [TValueA]: PartialEq<Vec<TValueB>>,
+{
+    fn eq(&self, other: &IdVec<TMarker, TValueB>) -> bool {
+        self.repr.eq(other.as_vec())
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &IdVec<TMarker, TValueB>) -> bool {
+        self.repr.ne(other.as_vec())
     }
 }
 
@@ -204,23 +233,23 @@ where
     [TValue]: PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.repr.partial_cmp(&other.repr)
+        self.as_slice().partial_cmp(other.as_slice())
     }
 
     fn lt(&self, other: &Self) -> bool {
-        self.repr.lt(&other.repr)
+        self.as_slice().lt(other.as_slice())
     }
 
     fn le(&self, other: &Self) -> bool {
-        self.repr.le(&other.repr)
+        self.as_slice().le(other.as_slice())
     }
 
     fn gt(&self, other: &Self) -> bool {
-        self.repr.gt(&other.repr)
+        self.as_slice().gt(other.as_slice())
     }
 
     fn ge(&self, other: &Self) -> bool {
-        self.repr.ge(&other.repr)
+        self.as_slice().ge(other.as_slice())
     }
 }
 
@@ -253,7 +282,7 @@ impl<TMarker> Read for &IdSlice<TMarker, u8> {
 
 impl<TMarker, TValue> ToOwned for IdSlice<TMarker, TValue>
 where
-    TValue: Clone,
+    [TValue]: ToOwned<Owned = Vec<TValue>>,
 {
     type Owned = IdVec<TMarker, TValue>;
 
@@ -262,7 +291,7 @@ where
     }
 
     fn clone_into(&self, target: &mut IdVec<TMarker, TValue>) {
-        self.repr.clone_into(&mut target.repr);
+        self.as_slice().clone_into(target.as_mut_vec());
     }
 }
 

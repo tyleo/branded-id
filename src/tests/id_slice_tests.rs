@@ -16,29 +16,6 @@ use std::{
 };
 
 #[test]
-fn from_mut_slice() {
-    let array = &mut [1];
-    let mut_slice = array.as_mut_slice();
-
-    let actual: &mut IdSlice<MTest, i32> = IdSlice::from_mut_slice(mut_slice);
-    actual[id!(0)] = 2;
-
-    let mut id_array = id_array![MTest; i32; 2];
-    let expected = id_array.as_mut();
-
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_slice_test() {
-    let slice = [1].as_slice();
-
-    let actual: &IdSlice<MTest, i32> = IdSlice::from_slice(slice);
-    let expected = id_slice![MTest; i32; 1];
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn as_mut_id_ptr_test() {
     let mut_slice = &mut [1];
 
@@ -87,6 +64,29 @@ fn end_test() {
 
     let actual: UsizeId<MTest> = id_slice.end();
     let expected = id!(1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn from_mut_slice() {
+    let array = &mut [1];
+    let mut_slice = array.as_mut_slice();
+
+    let actual: &mut IdSlice<MTest, i32> = IdSlice::from_mut_slice(mut_slice);
+    actual[id!(0)] = 2;
+
+    let mut id_array = id_array![MTest; i32; 2];
+    let expected = id_array.as_mut();
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn from_slice_test() {
+    let slice = [1].as_slice();
+
+    let actual: &IdSlice<MTest, i32> = IdSlice::from_slice(slice);
+    let expected = id_slice![MTest; i32; 1];
     assert_eq!(actual, expected);
 }
 
@@ -407,6 +407,66 @@ fn ne_test() {
     assert_eq!(actual, expected);
 
     let actual: bool = id_slice_0.ne(id_slice_2);
+    let expected = true;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn eq_array_test() {
+    let id_slice_0 = id_slice![MTest; 1];
+    let id_array_1 = id_array![1];
+    let id_array_2 = id_array![2];
+
+    let actual: bool = id_slice_0.eq(&id_array_1);
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_slice_0.eq(&id_array_2);
+    let expected = false;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn ne_array_test() {
+    let id_slice_0 = id_slice![MTest; 1];
+    let id_array_1 = id_array![1];
+    let id_array_2 = id_array![2];
+
+    let actual: bool = id_slice_0.ne(&id_array_1);
+    let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_slice_0.ne(&id_array_2);
+    let expected = true;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn eq_vec_test() {
+    let id_slice_0 = id_slice![MTest; 1];
+    let id_vec_1 = id_vec![1];
+    let id_vec_2 = id_vec![2];
+
+    let actual: bool = id_slice_0.eq(&id_vec_1);
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_slice_0.eq(&id_vec_2);
+    let expected = false;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn ne_vec_test() {
+    let id_slice_0 = id_slice![MTest; 1];
+    let id_vec_1 = id_vec![1];
+    let id_vec_2 = id_vec![2];
+
+    let actual: bool = id_slice_0.ne(&id_vec_1);
+    let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_slice_0.ne(&id_vec_2);
     let expected = true;
     assert_eq!(actual, expected);
 }

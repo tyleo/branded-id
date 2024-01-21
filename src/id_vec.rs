@@ -8,7 +8,7 @@ use std::{
 
 #[derive(Debug)]
 pub struct IdVec<TMarker: ?Sized, TValue> {
-    pub(crate) repr: Vec<TValue>,
+    repr: Vec<TValue>,
     phantom: PhantomData<TMarker>,
 }
 
@@ -36,8 +36,16 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
         IdSlice::from_mut_slice(&mut self.repr)
     }
 
+    pub fn as_mut_vec(&mut self) -> &mut Vec<TValue> {
+        &mut self.repr
+    }
+
     pub fn as_id_slice(&self) -> &IdSlice<TMarker, TValue> {
         IdSlice::from_slice(&self.repr)
+    }
+
+    pub fn as_vec(&self) -> &Vec<TValue> {
+        &self.repr
     }
 
     pub fn is_empty(&self) -> bool {

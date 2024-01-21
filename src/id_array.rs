@@ -29,6 +29,14 @@ impl<TMarker, TValue, const N: usize> IdArray<TMarker, TValue, N> {
         unsafe { transmute(repr) }
     }
 
+    pub fn as_array(&self) -> &[TValue; N] {
+        &self.repr
+    }
+
+    pub fn as_mut_array(&mut self) -> &mut [TValue; N] {
+        &mut self.repr
+    }
+
     pub fn as_mut_id_slice(&mut self) -> &mut IdSlice<TMarker, TValue> {
         IdSlice::from_mut_slice(&mut self.repr)
     }
