@@ -1,5 +1,6 @@
 use crate::{IdSlice, IdSliceIndex};
 use std::{
+    borrow::{Borrow, BorrowMut},
     hash::{Hash, Hasher},
     marker::PhantomData,
     mem::transmute,
@@ -50,6 +51,42 @@ impl<TMarker, TValue, const N: usize> AsMut<IdSlice<TMarker, TValue>>
 {
     fn as_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
         self.as_mut_id_slice()
+    }
+}
+
+impl<TMarker, TValue, const N: usize> Borrow<IdSlice<TMarker, TValue>>
+    for IdArray<TMarker, TValue, N>
+{
+    fn borrow(&self) -> &IdSlice<TMarker, TValue> {
+        IdSlice::from_slice(self.repr.borrow())
+    }
+}
+
+impl<TMarker, TValue, const N: usize> BorrowMut<IdSlice<TMarker, TValue>>
+    for IdArray<TMarker, TValue, N>
+{
+    fn borrow_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
+        IdSlice::from_mut_slice(self.repr.borrow_mut())
+    }
+}
+
+impl<TMarker, TValue, const N: usize> Clone for IdArray<TMarker, TValue, N>
+where
+    [TValue; N]: Clone,
+{
+    fn clone(&self) -> Self {
+        IdArray::from_array(self.repr.clone())
+    }
+}
+
+impl<TMarker, TValue, const N: usize> Copy for IdArray<TMarker, TValue, N> where [TValue; N]: Copy {}
+
+impl<TMarker, TValue, const N: usize> Default for IdArray<TMarker, TValue, N>
+where
+    [TValue; N]: Default,
+{
+    fn default() -> Self {
+        IdArray::from_array(Default::default())
     }
 }
 

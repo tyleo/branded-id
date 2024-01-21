@@ -61,7 +61,7 @@ impl<TMarker> UsizeId<TMarker> {
 
     pub const fn usize_range_to_inclusive_from_usize_id_range_to_inclusive(
         usize_id_range_to_inclusive: RangeToInclusive<UsizeId<TMarker>>,
-    ) -> RangeTo<usize> {
+    ) -> RangeToInclusive<usize> {
         unsafe { transmute(usize_id_range_to_inclusive) }
     }
 }

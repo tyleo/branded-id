@@ -1,5 +1,6 @@
 use crate::{id_array, id_slice, tests::util::MTest, usize_id as id, IdArray, IdSlice};
 use std::{
+    borrow::{Borrow, BorrowMut},
     collections::hash_map::DefaultHasher,
     hash::{Hash, Hasher},
 };
@@ -70,6 +71,43 @@ fn as_mut_test() {
     actual[id!(0)] = 2;
 
     let expected = id_slice![MTest; 2];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn borrow_test() {
+    let id_array = id_array![1];
+
+    let actual: &IdSlice<MTest, i32> = id_array.borrow();
+    let expected = id_slice![MTest; 1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn borrow_mut_test() {
+    let mut id_array = id_array![1];
+
+    let actual: &mut IdSlice<MTest, i32> = id_array.borrow_mut();
+    actual[id!(0)] = 2;
+
+    let expected = id_slice![MTest; 2];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+#[allow(clippy::clone_on_copy)]
+fn clone_test() {
+    let id_array = id_array!(MTest; 1);
+
+    let actual: IdArray<MTest, i32, 1> = id_array.clone();
+    let expected = id_array![MTest; i32; 1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn default_test() {
+    let actual: IdArray<MTest, i32, 1> = <IdArray<MTest, i32, 1> as Default>::default();
+    let expected = id_array![MTest; i32; 0];
     assert_eq!(actual, expected);
 }
 
