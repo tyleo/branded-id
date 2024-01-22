@@ -82,14 +82,13 @@ impl<TMarker> Binary for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+#b}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-#b}", i32)
-                } else {
-                    write!(str, "{:#b}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#b}", i32),
+                (true, _, true) => write!(str, "{:-#b}", i32),
+                (true, _, _) => write!(str, "{:#b}", i32),
+                (false, true, _) => write!(str, "{:+b}", i32),
+                (false, _, true) => write!(str, "{:-b}", i32),
+                (false, _, _) => write!(str, "{:b}", i32),
             },
             |_| Ok(()),
         )
@@ -109,14 +108,13 @@ impl<TMarker> Debug for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |str| write!(str, "\""),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+?}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-?}", i32)
-                } else {
-                    write!(str, "{:?}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#?}", i32),
+                (true, _, true) => write!(str, "{:-#?}", i32),
+                (true, _, _) => write!(str, "{:#?}", i32),
+                (false, true, _) => write!(str, "{:+?}", i32),
+                (false, _, true) => write!(str, "{:-?}", i32),
+                (false, _, _) => write!(str, "{:?}", i32),
             },
             |str| write!(str, "\""),
         )
@@ -128,14 +126,13 @@ impl<TMarker> Display for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-}", i32)
-                } else {
-                    write!(str, "{}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#}", i32),
+                (true, _, true) => write!(str, "{:-#}", i32),
+                (true, _, _) => write!(str, "{:#}", i32),
+                (false, true, _) => write!(str, "{:+}", i32),
+                (false, _, true) => write!(str, "{:-}", i32),
+                (false, _, _) => write!(str, "{:}", i32),
             },
             |_| Ok(()),
         )
@@ -180,14 +177,13 @@ impl<TMarker> LowerExp for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+#e}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-#e}", i32)
-                } else {
-                    write!(str, "{:#e}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#e}", i32),
+                (true, _, true) => write!(str, "{:-#e}", i32),
+                (true, _, _) => write!(str, "{:#e}", i32),
+                (false, true, _) => write!(str, "{:+e}", i32),
+                (false, _, true) => write!(str, "{:-e}", i32),
+                (false, _, _) => write!(str, "{:e}", i32),
             },
             |_| Ok(()),
         )
@@ -199,14 +195,13 @@ impl<TMarker> LowerHex for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+#x}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-#x}", i32)
-                } else {
-                    write!(str, "{:#x}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#x}", i32),
+                (true, _, true) => write!(str, "{:-#x}", i32),
+                (true, _, _) => write!(str, "{:#x}", i32),
+                (false, true, _) => write!(str, "{:+x}", i32),
+                (false, _, true) => write!(str, "{:-x}", i32),
+                (false, _, _) => write!(str, "{:x}", i32),
             },
             |_| Ok(()),
         )
@@ -218,14 +213,13 @@ impl<TMarker> Octal for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+#o}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-#o}", i32)
-                } else {
-                    write!(str, "{:#o}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#o}", i32),
+                (true, _, true) => write!(str, "{:-#o}", i32),
+                (true, _, _) => write!(str, "{:#o}", i32),
+                (false, true, _) => write!(str, "{:+o}", i32),
+                (false, _, true) => write!(str, "{:-o}", i32),
+                (false, _, _) => write!(str, "{:o}", i32),
             },
             |_| Ok(()),
         )
@@ -299,14 +293,13 @@ impl<TMarker> UpperExp for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+#E}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-#E}", i32)
-                } else {
-                    write!(str, "{:#E}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#E}", i32),
+                (true, _, true) => write!(str, "{:-#E}", i32),
+                (true, _, _) => write!(str, "{:#E}", i32),
+                (false, true, _) => write!(str, "{:+E}", i32),
+                (false, _, true) => write!(str, "{:-E}", i32),
+                (false, _, _) => write!(str, "{:E}", i32),
             },
             |_| Ok(()),
         )
@@ -318,14 +311,13 @@ impl<TMarker> UpperHex for I32Id<TMarker> {
         self.fmt_helper(
             f,
             |_| Ok(()),
-            |i32, str, f| {
-                if f.sign_plus() {
-                    write!(str, "{:+#X}", i32)
-                } else if f.sign_minus() {
-                    write!(str, "{:-#X}", i32)
-                } else {
-                    write!(str, "{:#X}", i32)
-                }
+            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+                (true, true, _) => write!(str, "{:+#X}", i32),
+                (true, _, true) => write!(str, "{:-#X}", i32),
+                (true, _, _) => write!(str, "{:#X}", i32),
+                (false, true, _) => write!(str, "{:+X}", i32),
+                (false, _, true) => write!(str, "{:-X}", i32),
+                (false, _, _) => write!(str, "{:X}", i32),
             },
             |_| Ok(()),
         )
