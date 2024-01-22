@@ -1,4 +1,4 @@
-use crate::{i32_id as id, tests::util::MTest, I32Id};
+use crate::{i32_id as id, isize_id, tests::util::MTest, u32_id, usize_id, I32Id};
 use std::{
     cmp::Ordering,
     collections::hash_map::DefaultHasher,
@@ -19,6 +19,33 @@ fn to_i32_test() {
 
     let actual = id.to_i32();
     let expected = 1;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_isize_id_test() {
+    let id = id!(MTest; 1);
+
+    let actual = id.to_isize_id();
+    let expected = isize_id!(MTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_u32_id_test() {
+    let id = id!(MTest; 1);
+
+    let actual = id.to_u32_id();
+    let expected = u32_id!(MTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_usize_id_test() {
+    let id = id!(MTest; 1);
+
+    let actual = id.to_usize_id();
+    let expected = usize_id!(MTest; 1);
     assert_eq!(actual, expected);
 }
 
