@@ -1,9 +1,14 @@
-use crate::{IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId};
+use crate::{
+    internal::unqualified_type_name, IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId,
+};
 use std::{
+    any::type_name,
     cmp::Ordering,
-    fmt::Arguments,
+    fmt,
+    fmt::{Arguments, Debug, Formatter},
     hash::{Hash, Hasher},
-    io::{BufRead, IoSlice, IoSliceMut, Read, Write},
+    io,
+    io::{BufRead, IoSlice, IoSliceMut, Read},
     marker::PhantomData,
     mem::transmute,
     net::{SocketAddr, ToSocketAddrs},
@@ -11,7 +16,6 @@ use std::{
     slice::{Iter, IterMut},
 };
 
-#[derive(Debug)]
 pub struct IdSlice<TMarker: ?Sized, TValue> {
     phantom: PhantomData<TMarker>,
     repr: [TValue],
@@ -76,7 +80,7 @@ impl<TMarker, TValue> AsRef<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValu
 }
 
 impl<TMarker> BufRead for &IdSlice<TMarker, u8> {
-    fn fill_buf(&mut self) -> std::io::Result<&[u8]> {
+    fn fill_buf(&mut self) -> io::Result<&[u8]> {
         let repr: &mut &[u8] = unsafe { transmute(self) };
         repr.fill_buf()
     }
@@ -86,14 +90,66 @@ impl<TMarker> BufRead for &IdSlice<TMarker, u8> {
         repr.consume(amt)
     }
 
-    fn read_until(&mut self, byte: u8, buf: &mut Vec<u8>) -> std::io::Result<usize> {
+    fn read_until(&mut self, byte: u8, buf: &mut Vec<u8>) -> io::Result<usize> {
         let repr: &mut &[u8] = unsafe { transmute(self) };
         repr.read_until(byte, buf)
     }
 
-    fn read_line(&mut self, buf: &mut String) -> std::io::Result<usize> {
+    fn read_line(&mut self, buf: &mut String) -> io::Result<usize> {
         let repr: &mut &[u8] = unsafe { transmute(self) };
         repr.read_line(buf)
+    }
+}
+
+impl<TMarker, TValue: Debug> Debug for IdSlice<TMarker, TValue> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        if f.alternate() {
+            write!(f, "<{}>", type_name::<TMarker>())?;
+        } else {
+            write!(f, "<{}>", unqualified_type_name::<TMarker>())?;
+        }
+
+        println!("{:?}", f.width());
+
+        self.as_slice().fmt(f)
+
+        // if f.alternate() {
+        //     f.write_str("[")?;
+        //     f.write_str("\n    ")?;
+        //     f.pad_str(type_name::<TMarker>())?;
+
+        //     let mut iter = self.iter();
+
+        //     if let Some(entry) = iter.next() {
+        //         f.write_str(";\n    ")?;
+        //         let new_width = f.width().unwrap_or(0) + 4;
+        //         write!(f, "{:#new_width$?}", entry)?;
+        //         //entry.fmt(f)?;
+        //     }
+
+        //     for entry in iter {
+        //         f.write_str(",\n    ")?;
+        //         entry.fmt(f)?;
+        //     }
+
+        //     f.write_char('\n')?;
+        //     f.write_str("]")
+        // } else {
+        //     f.write_str("[")?;
+        //     f.pad_str(&unqualified_type_name::<TMarker>())?;
+        //     let mut iter = self.iter();
+
+        //     if let Some(entry) = iter.next() {
+        //         f.write_str("; ")?;
+        //         entry.fmt(f)?;
+        //     }
+
+        //     for entry in iter {
+        //         f.write_str(", ")?;
+        //         entry.fmt(f)?;
+        //     }
+        //     f.write_str("]")
+        // }
     }
 }
 
@@ -254,27 +310,27 @@ where
 }
 
 impl<TMarker> Read for &IdSlice<TMarker, u8> {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read(buf)
     }
 
-    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> std::io::Result<usize> {
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read_vectored(bufs)
     }
 
-    fn read_exact(&mut self, buf: &mut [u8]) -> std::io::Result<()> {
+    fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read_exact(buf)
     }
 
-    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> std::io::Result<usize> {
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read_to_end(buf)
     }
 
-    fn read_to_string(&mut self, buf: &mut String) -> std::io::Result<usize> {
+    fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read_to_string(buf)
     }
@@ -298,33 +354,33 @@ where
 impl<'a, TMarker> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
     type Iter = <&'a [SocketAddr] as ToSocketAddrs>::Iter;
 
-    fn to_socket_addrs(&self) -> std::io::Result<Self::Iter> {
+    fn to_socket_addrs(&self) -> io::Result<Self::Iter> {
         self.as_slice().to_socket_addrs()
     }
 }
 
-impl<'a, TMarker> Write for &'a mut IdSlice<TMarker, u8> {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+impl<'a, TMarker> io::Write for &'a mut IdSlice<TMarker, u8> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write(buf)
     }
 
-    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> std::io::Result<usize> {
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write_vectored(bufs)
     }
 
-    fn write_all(&mut self, data: &[u8]) -> std::io::Result<()> {
+    fn write_all(&mut self, data: &[u8]) -> io::Result<()> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write_all(data)
     }
 
-    fn flush(&mut self) -> std::io::Result<()> {
+    fn flush(&mut self) -> io::Result<()> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.flush()
     }
 
-    fn write_fmt(&mut self, fmt: Arguments<'_>) -> std::io::Result<()> {
+    fn write_fmt(&mut self, fmt: Arguments<'_>) -> io::Result<()> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write_fmt(fmt)
     }

@@ -226,6 +226,66 @@ fn read_line_test() {
 }
 
 #[test]
+fn debug_test() {
+    let empty_id_slice = id_slice![MTest; i32];
+    let actual = format!("{:?}", empty_id_slice);
+    let expected = "<MTest>[]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:10?}", empty_id_slice);
+    let expected = "<MTest>[]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:>10?}", empty_id_slice);
+    let expected = "<MTest>[]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:^10?}", empty_id_slice);
+    let expected = "<MTest>[]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:.1?}", empty_id_slice);
+    let expected = "<MTest>[]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:#?}", empty_id_slice);
+    let expected = "<id_sys::tests::util::m_test::MTest>[]";
+    assert_eq!(actual, expected);
+
+    let nested_id_slice = IdSlice::<MTest, _>::from_slice(&[["Hello"], ["Hi"]]);
+
+    let actual = format!("{:#?}", nested_id_slice);
+    let expected = "<id_sys::tests::util::m_test::MTest>[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
+    assert_eq!(actual, expected);
+
+    let id_slice = id_slice![MTest; "Hello", "Hi"];
+
+    let actual = format!("{:?}", id_slice);
+    let expected = "<MTest>[\"Hello\", \"Hi\"]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:10?}", id_slice);
+    let expected = "<MTest>[\"Hello\", \"Hi\"]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:>10?}", id_slice);
+    let expected = "<MTest>[\"Hello\", \"Hi\"]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:^10?}", id_slice);
+    let expected = "<MTest>[\"Hello\", \"Hi\"]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:.1?}", id_slice);
+    let expected = "<MTest>[\"Hello\", \"Hi\"]";
+    assert_eq!(actual, expected);
+
+    let actual = format!("{:#?}", id_slice);
+    let expected = "<id_sys::tests::util::m_test::MTest>[\n    \"Hello\",\n    \"Hi\",\n]";
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn default_test() {
     let actual: &IdSlice<MTest, i32> = <&IdSlice<MTest, i32>>::default();
     let expected = id_slice![MTest; i32];

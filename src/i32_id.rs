@@ -1,8 +1,8 @@
 use crate::{internal::unqualified_type_name, IsizeId, U32Id, UsizeId};
-use core::fmt;
 use std::{
     any::type_name,
     cmp::Ordering,
+    fmt,
     fmt::{
         Alignment, Binary, Debug, Display, Formatter, LowerExp, LowerHex, Octal, UpperExp,
         UpperHex, Write,
@@ -14,21 +14,17 @@ use std::{
 };
 
 pub struct I32Id<TMarker: ?Sized> {
-    repr: i32,
     phantom: PhantomData<TMarker>,
+    repr: i32,
 }
 
 impl<TMarker> I32Id<TMarker> {
     fn fmt_helper(
         self,
         f: &mut Formatter,
-        prefix: impl FnOnce(&mut String) -> fmt::Result,
         integer: impl FnOnce(i32, &mut String, &Formatter) -> fmt::Result,
-        suffix: impl FnOnce(&mut String) -> fmt::Result,
-    ) -> std::fmt::Result {
+    ) -> fmt::Result {
         let mut str = String::new();
-
-        prefix(&mut str)?;
 
         if f.alternate() {
             write!(str, "I32Id({}; ", type_name::<TMarker>())?;
@@ -40,13 +36,12 @@ impl<TMarker> I32Id<TMarker> {
 
         write!(str, ")")?;
 
-        suffix(&mut str)?;
-
         if let Some(width) = f.width() {
             match f.align() {
                 Some(Alignment::Center) => write!(f, "{:^width$}", str),
+                Some(Alignment::Left) => write!(f, "{:<width$}", str),
                 Some(Alignment::Right) => write!(f, "{:>width$}", str),
-                _ => write!(f, "{:<width$}", str),
+                _ => write!(f, "{:width$}", str),
             }
         } else {
             write!(f, "{}", str)
@@ -78,20 +73,17 @@ impl<TMarker> I32Id<TMarker> {
 }
 
 impl<TMarker> Binary for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#b}", i32),
                 (true, _, true) => write!(str, "{:-#b}", i32),
                 (true, _, _) => write!(str, "{:#b}", i32),
                 (false, true, _) => write!(str, "{:+b}", i32),
                 (false, _, true) => write!(str, "{:-b}", i32),
                 (false, _, _) => write!(str, "{:b}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
 
@@ -104,38 +96,32 @@ impl<TMarker> Clone for I32Id<TMarker> {
 impl<TMarker> Copy for I32Id<TMarker> {}
 
 impl<TMarker> Debug for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |str| write!(str, "\""),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#?}", i32),
                 (true, _, true) => write!(str, "{:-#?}", i32),
                 (true, _, _) => write!(str, "{:#?}", i32),
                 (false, true, _) => write!(str, "{:+?}", i32),
                 (false, _, true) => write!(str, "{:-?}", i32),
                 (false, _, _) => write!(str, "{:?}", i32),
-            },
-            |str| write!(str, "\""),
-        )
+            }
+        })
     }
 }
 
 impl<TMarker> Display for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#}", i32),
                 (true, _, true) => write!(str, "{:-#}", i32),
                 (true, _, _) => write!(str, "{:#}", i32),
                 (false, true, _) => write!(str, "{:+}", i32),
                 (false, _, true) => write!(str, "{:-}", i32),
                 (false, _, _) => write!(str, "{:}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
 
@@ -173,56 +159,47 @@ impl<TMarker> Hash for I32Id<TMarker> {
 }
 
 impl<TMarker> LowerExp for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#e}", i32),
                 (true, _, true) => write!(str, "{:-#e}", i32),
                 (true, _, _) => write!(str, "{:#e}", i32),
                 (false, true, _) => write!(str, "{:+e}", i32),
                 (false, _, true) => write!(str, "{:-e}", i32),
                 (false, _, _) => write!(str, "{:e}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
 
 impl<TMarker> LowerHex for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#x}", i32),
                 (true, _, true) => write!(str, "{:-#x}", i32),
                 (true, _, _) => write!(str, "{:#x}", i32),
                 (false, true, _) => write!(str, "{:+x}", i32),
                 (false, _, true) => write!(str, "{:-x}", i32),
                 (false, _, _) => write!(str, "{:x}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
 
 impl<TMarker> Octal for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#o}", i32),
                 (true, _, true) => write!(str, "{:-#o}", i32),
                 (true, _, _) => write!(str, "{:#o}", i32),
                 (false, true, _) => write!(str, "{:+o}", i32),
                 (false, _, true) => write!(str, "{:-o}", i32),
                 (false, _, _) => write!(str, "{:o}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
 
@@ -289,37 +266,31 @@ impl<TMarker> PartialOrd for I32Id<TMarker> {
 }
 
 impl<TMarker> UpperExp for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#E}", i32),
                 (true, _, true) => write!(str, "{:-#E}", i32),
                 (true, _, _) => write!(str, "{:#E}", i32),
                 (false, true, _) => write!(str, "{:+E}", i32),
                 (false, _, true) => write!(str, "{:-E}", i32),
                 (false, _, _) => write!(str, "{:E}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
 
 impl<TMarker> UpperHex for I32Id<TMarker> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.fmt_helper(
-            f,
-            |_| Ok(()),
-            |i32, str, f| match (f.alternate(), f.sign_plus(), f.sign_minus()) {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(f, |i32, str, f| {
+            match (f.alternate(), f.sign_plus(), f.sign_minus()) {
                 (true, true, _) => write!(str, "{:+#X}", i32),
                 (true, _, true) => write!(str, "{:-#X}", i32),
                 (true, _, _) => write!(str, "{:#X}", i32),
                 (false, true, _) => write!(str, "{:+X}", i32),
                 (false, _, true) => write!(str, "{:-X}", i32),
                 (false, _, _) => write!(str, "{:X}", i32),
-            },
-            |_| Ok(()),
-        )
+            }
+        })
     }
 }
