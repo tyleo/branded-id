@@ -109,22 +109,23 @@ impl<TMarker, TValue: Debug> Debug for IdSlice<TMarker, TValue> {
             write!(f, "<{}>", unqualified_type_name::<TMarker>())?;
         }
 
-        println!("{:?}", f.width());
-
         self.as_slice().fmt(f)
 
+        // Formatting like this is more ideal but it doesn't work with
+        // pretty-print padding :(
+        //
         // if f.alternate() {
         //     f.write_str("[")?;
         //     f.write_str("\n    ")?;
+        //     // This shouldn't be padded for str :(
         //     f.pad_str(type_name::<TMarker>())?;
 
         //     let mut iter = self.iter();
 
         //     if let Some(entry) = iter.next() {
         //         f.write_str(";\n    ")?;
-        //         let new_width = f.width().unwrap_or(0) + 4;
-        //         write!(f, "{:#new_width$?}", entry)?;
-        //         //entry.fmt(f)?;
+        //         // This breaks down and padding isn't correct :(
+        //         entry.fmt(f)?;
         //     }
 
         //     for entry in iter {
