@@ -8,17 +8,17 @@ pub struct IdPtr<TMarker: ?Sized, TValue: ?Sized> {
 }
 
 impl<TMarker, TValue> IdPtr<TMarker, TValue> {
+    /// # Safety
+    /// The same rules apply as dereferencing a raw pointer.
+    pub const unsafe fn deref_ptr<'a>(self) -> &'a TValue {
+        &*self.repr
+    }
+
     pub const fn from_ptr(repr: *const TValue) -> Self {
         Self {
             phantom: PhantomData,
             repr,
         }
-    }
-
-    /// # Safety
-    /// The same rules apply as dereferencing a raw pointer.
-    pub const unsafe fn deref_ptr<'a>(self) -> &'a TValue {
-        &*self.repr
     }
 
     /// # Safety

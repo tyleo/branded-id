@@ -54,35 +54,35 @@ fn binary_fmt_test() {
     let id = id!(MTest; 2);
 
     let actual = format!("{:b}", id);
-    let expected = "I32Id(MTest; 10)";
+    let expected = "MTest(10)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+b}", id);
-    let expected = "I32Id(MTest; +10)";
+    let expected = "MTest(+10)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-b}", id);
-    let expected = "I32Id(MTest; 10)";
+    let expected = "MTest(10)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#b}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 0b10)";
+    let expected = "id_sys::tests::util::m_test::MTest(0b10)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25b}", id);
-    let expected = "I32Id(MTest; 10)         ";
+    let expected = "MTest(                       10)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25b}", id);
-    let expected = "I32Id(MTest; 10)         ";
+    let expected = "MTest(10                       )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25b}", id);
-    let expected = "         I32Id(MTest; 10)";
+    let expected = "MTest(                       10)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25b}", id);
-    let expected = "    I32Id(MTest; 10)     ";
+    let expected = "MTest(           10            )";
     assert_eq!(actual, expected);
 }
 
@@ -99,35 +99,35 @@ fn debug_test() {
     let id = id!(MTest; 1);
 
     let actual = format!("{:?}", id);
-    let expected = "I32Id(MTest; 1)";
+    let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+?}", id);
-    let expected = "I32Id(MTest; +1)";
+    let expected = "MTest(+1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-?}", id);
-    let expected = "I32Id(MTest; 1)";
+    let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#?}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 1)";
+    let expected = "id_sys::tests::util::m_test::MTest(1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25?}", id);
-    let expected = "I32Id(MTest; 1)          ";
+    let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25?}", id);
-    let expected = "I32Id(MTest; 1)          ";
+    let expected = "MTest(1                        )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25?}", id);
-    let expected = "          I32Id(MTest; 1)";
+    let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25?}", id);
-    let expected = "     I32Id(MTest; 1)     ";
+    let expected = "MTest(            1            )";
     assert_eq!(actual, expected);
 }
 
@@ -135,36 +135,36 @@ fn debug_test() {
 fn display_test() {
     let id = id!(MTest; 1);
 
-    let actual = format!("{:}", id);
-    let expected = "I32Id(MTest; 1)";
+    let actual = format!("{}", id);
+    let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+}", id);
-    let expected = "I32Id(MTest; +1)";
+    let expected = "MTest(+1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-}", id);
-    let expected = "I32Id(MTest; 1)";
+    let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 1)";
+    let expected = "id_sys::tests::util::m_test::MTest(1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25}", id);
-    let expected = "I32Id(MTest; 1)          ";
+    let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25}", id);
-    let expected = "I32Id(MTest; 1)          ";
+    let expected = "MTest(1                        )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25}", id);
-    let expected = "          I32Id(MTest; 1)";
+    let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25}", id);
-    let expected = "     I32Id(MTest; 1)     ";
+    let expected = "MTest(            1            )";
     assert_eq!(actual, expected);
 }
 
@@ -236,35 +236,35 @@ fn lower_exp_fmt_test() {
     let id = id!(MTest; 2);
 
     let actual = format!("{:e}", id);
-    let expected = "I32Id(MTest; 2e0)";
+    let expected = "MTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+e}", id);
-    let expected = "I32Id(MTest; +2e0)";
+    let expected = "MTest(+2e0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-e}", id);
-    let expected = "I32Id(MTest; 2e0)";
+    let expected = "MTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#e}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 2e0)";
+    let expected = "id_sys::tests::util::m_test::MTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25e}", id);
-    let expected = "I32Id(MTest; 2e0)        ";
+    let expected = "MTest(                      2e0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25e}", id);
-    let expected = "I32Id(MTest; 2e0)        ";
+    let expected = "MTest(2e0                      )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25e}", id);
-    let expected = "        I32Id(MTest; 2e0)";
+    let expected = "MTest(                      2e0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25e}", id);
-    let expected = "    I32Id(MTest; 2e0)    ";
+    let expected = "MTest(           2e0           )";
     assert_eq!(actual, expected);
 }
 
@@ -273,35 +273,35 @@ fn lower_hex_fmt_test() {
     let id = id!(MTest; 10);
 
     let actual = format!("{:x}", id);
-    let expected = "I32Id(MTest; a)";
+    let expected = "MTest(a)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+x}", id);
-    let expected = "I32Id(MTest; +a)";
+    let expected = "MTest(+a)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-x}", id);
-    let expected = "I32Id(MTest; a)";
+    let expected = "MTest(a)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#x}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 0xa)";
+    let expected = "id_sys::tests::util::m_test::MTest(0xa)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25x}", id);
-    let expected = "I32Id(MTest; a)          ";
+    let expected = "MTest(                        a)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25x}", id);
-    let expected = "I32Id(MTest; a)          ";
+    let expected = "MTest(a                        )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25x}", id);
-    let expected = "          I32Id(MTest; a)";
+    let expected = "MTest(                        a)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25x}", id);
-    let expected = "     I32Id(MTest; a)     ";
+    let expected = "MTest(            a            )";
     assert_eq!(actual, expected);
 }
 
@@ -310,35 +310,35 @@ fn octal_fmt_test() {
     let id = id!(MTest; 10);
 
     let actual = format!("{:o}", id);
-    let expected = "I32Id(MTest; 12)";
+    let expected = "MTest(12)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+o}", id);
-    let expected = "I32Id(MTest; +12)";
+    let expected = "MTest(+12)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-o}", id);
-    let expected = "I32Id(MTest; 12)";
+    let expected = "MTest(12)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#o}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 0o12)";
+    let expected = "id_sys::tests::util::m_test::MTest(0o12)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25o}", id);
-    let expected = "I32Id(MTest; 12)         ";
+    let expected = "MTest(                       12)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25o}", id);
-    let expected = "I32Id(MTest; 12)         ";
+    let expected = "MTest(12                       )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25o}", id);
-    let expected = "         I32Id(MTest; 12)";
+    let expected = "MTest(                       12)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25o}", id);
-    let expected = "    I32Id(MTest; 12)     ";
+    let expected = "MTest(           12            )";
     assert_eq!(actual, expected);
 }
 
@@ -498,35 +498,35 @@ fn upper_exp_fmt_test() {
     let id = id!(MTest; 2);
 
     let actual = format!("{:E}", id);
-    let expected = "I32Id(MTest; 2E0)";
+    let expected = "MTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+E}", id);
-    let expected = "I32Id(MTest; +2E0)";
+    let expected = "MTest(+2E0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-E}", id);
-    let expected = "I32Id(MTest; 2E0)";
+    let expected = "MTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#E}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 2E0)";
+    let expected = "id_sys::tests::util::m_test::MTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25E}", id);
-    let expected = "I32Id(MTest; 2E0)        ";
+    let expected = "MTest(                      2E0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25E}", id);
-    let expected = "I32Id(MTest; 2E0)        ";
+    let expected = "MTest(2E0                      )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25E}", id);
-    let expected = "        I32Id(MTest; 2E0)";
+    let expected = "MTest(                      2E0)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25E}", id);
-    let expected = "    I32Id(MTest; 2E0)    ";
+    let expected = "MTest(           2E0           )";
     assert_eq!(actual, expected);
 }
 
@@ -535,34 +535,34 @@ fn upper_hex_fmt_test() {
     let id = id!(MTest; 10);
 
     let actual = format!("{:X}", id);
-    let expected = "I32Id(MTest; A)";
+    let expected = "MTest(A)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:+X}", id);
-    let expected = "I32Id(MTest; +A)";
+    let expected = "MTest(+A)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:-X}", id);
-    let expected = "I32Id(MTest; A)";
+    let expected = "MTest(A)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:#X}", id);
-    let expected = "I32Id(id_sys::tests::util::m_test::MTest; 0xA)";
+    let expected = "id_sys::tests::util::m_test::MTest(0xA)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:25X}", id);
-    let expected = "I32Id(MTest; A)          ";
+    let expected = "MTest(                        A)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:<25X}", id);
-    let expected = "I32Id(MTest; A)          ";
+    let expected = "MTest(A                        )";
     assert_eq!(actual, expected);
 
     let actual = format!("{:>25X}", id);
-    let expected = "          I32Id(MTest; A)";
+    let expected = "MTest(                        A)";
     assert_eq!(actual, expected);
 
     let actual = format!("{:^25X}", id);
-    let expected = "     I32Id(MTest; A)     ";
+    let expected = "MTest(            A            )";
     assert_eq!(actual, expected);
 }

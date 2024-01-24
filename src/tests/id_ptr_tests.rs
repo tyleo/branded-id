@@ -1,15 +1,6 @@
 use crate::{id_ptr, isize_id, tests::util::MTest, IdPtr};
 
 #[test]
-fn from_ptr_test() {
-    let ptr: *const _ = &1;
-
-    let actual: IdPtr<MTest, i32> = IdPtr::from_ptr(ptr);
-    let expected = id_ptr!(MTest; &1i32);
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn deref_ptr_test() {
     unsafe {
         let ptr: *const _ = &1;
@@ -19,6 +10,15 @@ fn deref_ptr_test() {
         let expected = &*ptr;
         assert_eq!(actual, expected);
     }
+}
+
+#[test]
+fn from_ptr_test() {
+    let ptr: *const _ = &1;
+
+    let actual: IdPtr<MTest, i32> = IdPtr::from_ptr(ptr);
+    let expected = id_ptr!(MTest; &1i32);
+    assert_eq!(actual, expected);
 }
 
 #[test]

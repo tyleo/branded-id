@@ -1,8 +1,5 @@
-use crate::{
-    internal::unqualified_type_name, IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId,
-};
+use crate::{internal::fmt_marker_name, IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId};
 use std::{
-    any::type_name,
     cmp::Ordering,
     fmt,
     fmt::{Arguments, Debug, Formatter},
@@ -30,7 +27,7 @@ impl<TMarker, TValue> IdSlice<TMarker, TValue> {
         &mut self.repr
     }
 
-    pub fn as_id_ptr(&self) -> IdPtr<TMarker, TValue> {
+    pub const fn as_id_ptr(&self) -> IdPtr<TMarker, TValue> {
         IdPtr::from_ptr(self.as_slice().as_ptr())
     }
 
@@ -103,54 +100,8 @@ impl<TMarker> BufRead for &IdSlice<TMarker, u8> {
 
 impl<TMarker, TValue: Debug> Debug for IdSlice<TMarker, TValue> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if f.alternate() {
-            write!(f, "<{}>", type_name::<TMarker>())?;
-        } else {
-            write!(f, "<{}>", unqualified_type_name::<TMarker>())?;
-        }
-
-        self.as_slice().fmt(f)
-
-        // Formatting like this is more ideal but it doesn't work with
-        // pretty-print padding :(
-        //
-        // if f.alternate() {
-        //     f.write_str("[")?;
-        //     f.write_str("\n    ")?;
-        //     // This shouldn't be padded for str :(
-        //     f.pad_str(type_name::<TMarker>())?;
-
-        //     let mut iter = self.iter();
-
-        //     if let Some(entry) = iter.next() {
-        //         f.write_str(";\n    ")?;
-        //         // This breaks down and padding isn't correct :(
-        //         entry.fmt(f)?;
-        //     }
-
-        //     for entry in iter {
-        //         f.write_str(",\n    ")?;
-        //         entry.fmt(f)?;
-        //     }
-
-        //     f.write_char('\n')?;
-        //     f.write_str("]")
-        // } else {
-        //     f.write_str("[")?;
-        //     f.pad_str(&unqualified_type_name::<TMarker>())?;
-        //     let mut iter = self.iter();
-
-        //     if let Some(entry) = iter.next() {
-        //         f.write_str("; ")?;
-        //         entry.fmt(f)?;
-        //     }
-
-        //     for entry in iter {
-        //         f.write_str(", ")?;
-        //         entry.fmt(f)?;
-        //     }
-        //     f.write_str("]")
-        // }
+        fmt_marker_name::<TMarker>(f)?;
+        Debug::fmt(self.as_slice(), f)
     }
 }
 
@@ -262,12 +213,12 @@ where
     [TValueA]: PartialEq<[TValueB; N]>,
 {
     fn eq(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
-        self.repr.eq(other.as_array())
+        self.as_slice().eq(other.as_array())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
     fn ne(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
-        self.repr.ne(other.as_array())
+        self.as_slice().ne(other.as_array())
     }
 }
 
@@ -276,12 +227,12 @@ where
     [TValueA]: PartialEq<Vec<TValueB>>,
 {
     fn eq(&self, other: &IdVec<TMarker, TValueB>) -> bool {
-        self.repr.eq(other.as_vec())
+        self.as_slice().eq(other.as_vec())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
     fn ne(&self, other: &IdVec<TMarker, TValueB>) -> bool {
-        self.repr.ne(other.as_vec())
+        self.as_slice().ne(other.as_vec())
     }
 }
 
@@ -316,7 +267,7 @@ impl<TMarker> Read for &IdSlice<TMarker, u8> {
         this.read(buf)
     }
 
-    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut]) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read_vectored(bufs)
     }
@@ -366,7 +317,7 @@ impl<'a, TMarker> io::Write for &'a mut IdSlice<TMarker, u8> {
         this.write(buf)
     }
 
-    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+    fn write_vectored(&mut self, bufs: &[IoSlice]) -> io::Result<usize> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write_vectored(bufs)
     }
@@ -381,7 +332,7 @@ impl<'a, TMarker> io::Write for &'a mut IdSlice<TMarker, u8> {
         this.flush()
     }
 
-    fn write_fmt(&mut self, fmt: Arguments<'_>) -> io::Result<()> {
+    fn write_fmt(&mut self, fmt: Arguments) -> io::Result<()> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write_fmt(fmt)
     }
