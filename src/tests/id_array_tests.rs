@@ -138,62 +138,62 @@ fn clone_test() {
 }
 
 #[test]
-fn debug_test() {
+fn debug_fmt_test() {
     let empty_id_array = id_array![MTest; i32];
-    let actual = format!("{:?}", empty_id_array);
+    let actual: String = format!("{:?}", empty_id_array);
     let expected = "MTest[]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:10?}", empty_id_array);
+    let actual: String = format!("{:10?}", empty_id_array);
     let expected = "MTest[]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>10?}", empty_id_array);
+    let actual: String = format!("{:>10?}", empty_id_array);
     let expected = "MTest[]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^10?}", empty_id_array);
+    let actual: String = format!("{:^10?}", empty_id_array);
     let expected = "MTest[]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:.1?}", empty_id_array);
+    let actual: String = format!("{:.1?}", empty_id_array);
     let expected = "MTest[]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#?}", empty_id_array);
+    let actual: String = format!("{:#?}", empty_id_array);
     let expected = "id_sys::tests::util::m_test::MTest[]";
     assert_eq!(actual, expected);
 
     let array_0 = ["Hello"];
     let nested_id_array = id_array![MTest; array_0, ["Hi"]];
 
-    let actual = format!("{:#?}", nested_id_array);
+    let actual: String = format!("{:#?}", nested_id_array);
     let expected = "id_sys::tests::util::m_test::MTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
     assert_eq!(actual, expected);
 
     let id_array = id_array![MTest; "Hello", "Hi"];
 
-    let actual = format!("{:?}", id_array);
+    let actual: String = format!("{:?}", id_array);
     let expected = "MTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:10?}", id_array);
+    let actual: String = format!("{:10?}", id_array);
     let expected = "MTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>10?}", id_array);
+    let actual: String = format!("{:>10?}", id_array);
     let expected = "MTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^10?}", id_array);
+    let actual: String = format!("{:^10?}", id_array);
     let expected = "MTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:.1?}", id_array);
+    let actual: String = format!("{:.1?}", id_array);
     let expected = "MTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#?}", id_array);
+    let actual: String = format!("{:#?}", id_array);
     let expected = "id_sys::tests::util::m_test::MTest[\n    \"Hello\",\n    \"Hi\",\n]";
     assert_eq!(actual, expected);
 }
@@ -224,7 +224,7 @@ fn hash_test() {
     let mut hasher_1 = DefaultHasher::new();
     array.hash(&mut hasher_1);
 
-    let actual = hasher_0.finish();
+    let actual: u64 = hasher_0.finish();
     let expected = hasher_1.finish();
     assert_eq!(actual, expected);
 }
@@ -239,7 +239,7 @@ fn hash_slice_test() {
     let mut hasher_1 = DefaultHasher::new();
     <[i32; 1] as Hash>::hash_slice(&arrays, &mut hasher_1);
 
-    let actual = hasher_0.finish();
+    let actual: u64 = hasher_0.finish();
     let expected = hasher_1.finish();
     assert_eq!(actual, expected);
 }
@@ -279,40 +279,40 @@ fn index_test() {
 
 #[test]
 fn index_mut_test() {
-    let mut id_array_mut = id_array![MTest; 0, 1, 2, 3];
+    let mut id_array = id_array![MTest; 0, 1, 2, 3];
 
-    let actual: &mut i32 = id_array_mut.index_mut(id!(1));
+    let actual: &mut i32 = id_array.index_mut(id!(1));
     let expected = &1;
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_array_mut.index_mut(id!(1)..id!(3));
+    let actual: &mut IdSlice<MTest, i32> = id_array.index_mut(id!(1)..id!(3));
     let expected = id_slice![1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_array_mut.index_mut(id!(1)..);
+    let actual: &mut IdSlice<MTest, i32> = id_array.index_mut(id!(1)..);
     let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_array_mut.index_mut(..);
+    let actual: &mut IdSlice<MTest, i32> = id_array.index_mut(..);
     let expected = id_slice![0, 1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_array_mut.index_mut(id!(1)..=id!(3));
+    let actual: &mut IdSlice<MTest, i32> = id_array.index_mut(id!(1)..=id!(3));
     let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_array_mut.index_mut(..id!(3));
+    let actual: &mut IdSlice<MTest, i32> = id_array.index_mut(..id!(3));
     let expected = id_slice![0, 1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_array_mut.index_mut(..=id!(3));
+    let actual: &mut IdSlice<MTest, i32> = id_array.index_mut(..=id!(3));
     let expected = id_slice![0, 1, 2, 3];
     assert_eq!(actual, expected);
 }
 
 #[test]
 #[allow(clippy::into_iter_on_ref)]
-fn into_iter_ref_test() {
+fn into_ref_iter_test() {
     let id_array = &id_array![MTest; 0, 1, 2];
 
     let actual: Iter<'_, i32> = id_array.into_iter();
@@ -322,7 +322,7 @@ fn into_iter_ref_test() {
 
 #[test]
 #[allow(clippy::into_iter_on_ref)]
-fn into_iter_mut_test() {
+fn into_mut_iter_test() {
     let id_array = &mut id_array![MTest; 0, 1, 2];
 
     let mut expected = [0, 1, 2];
@@ -346,8 +346,16 @@ fn cmp_test() {
     let array_0 = id_array![MTest; 1];
     let array_1 = id_array![MTest; 2];
 
+    let actual: Ordering = array_0.cmp(&array_0);
+    let expected = Ordering::Equal;
+    assert_eq!(actual, expected);
+
     let actual: Ordering = array_0.cmp(&array_1);
     let expected = Ordering::Less;
+    assert_eq!(actual, expected);
+
+    let actual: Ordering = array_1.cmp(&array_0);
+    let expected = Ordering::Greater;
     assert_eq!(actual, expected);
 }
 
@@ -391,95 +399,95 @@ fn clamp_test() {
 }
 
 #[test]
-fn ref_slice_eq_test() {
+fn eq_ref_id_slice_test() {
     let id_array = id_array![MTest; 1];
     let id_slice_0 = id_slice![1];
     let id_slice_1 = id_slice![2];
 
-    let actual = id_array.eq(&id_slice_0);
+    let actual: bool = id_array.eq(&id_slice_0);
     let expected = true;
     assert_eq!(actual, expected);
 
-    let actual = id_array.eq(&id_slice_1);
+    let actual: bool = id_array.eq(&id_slice_1);
     let expected = false;
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn ref_slice_ne_test() {
+fn ne_ref_id_slice_test() {
     let id_array = id_array![MTest; 1];
     let id_slice_0 = id_slice![1];
     let id_slice_1 = id_slice![2];
 
-    let actual = id_array.ne(&id_slice_0);
+    let actual: bool = id_array.ne(&id_slice_0);
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_array.ne(&id_slice_1);
+    let actual: bool = id_array.ne(&id_slice_1);
     let expected = true;
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn mut_slice_eq_test() {
+fn eq_mut_id_slice_test() {
     let id_array = id_array![MTest; 1];
-    let mut_slice_0 = &mut [1];
-    let id_slice_0 = IdSlice::<MTest, _>::from_mut_slice(mut_slice_0);
-    let mut_slice_1 = &mut [2];
-    let id_slice_1 = IdSlice::<MTest, _>::from_mut_slice(mut_slice_1);
+    let slice_0 = &mut [1];
+    let id_slice_0 = IdSlice::<MTest, _>::from_mut_slice(slice_0);
+    let slice_1 = &mut [2];
+    let id_slice_1 = IdSlice::<MTest, _>::from_mut_slice(slice_1);
 
-    let actual = id_array.eq(&id_slice_0);
+    let actual: bool = id_array.eq(&id_slice_0);
     let expected = true;
     assert_eq!(actual, expected);
 
-    let actual = id_array.eq(&id_slice_1);
+    let actual: bool = id_array.eq(&id_slice_1);
     let expected = false;
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn mut_slice_ne_test() {
+fn ne_mut_id_slice_test() {
     let id_array = id_array![MTest; 1];
-    let mut_slice_0 = &mut [1];
-    let id_slice_0 = IdSlice::<MTest, _>::from_mut_slice(mut_slice_0);
-    let mut_slice_1 = &mut [2];
-    let id_slice_1 = IdSlice::<MTest, _>::from_mut_slice(mut_slice_1);
+    let slice_0 = &mut [1];
+    let id_slice_0 = IdSlice::<MTest, _>::from_mut_slice(slice_0);
+    let slice_1 = &mut [2];
+    let id_slice_1 = IdSlice::<MTest, _>::from_mut_slice(slice_1);
 
-    let actual = id_array.ne(&id_slice_0);
+    let actual: bool = id_array.ne(&id_slice_0);
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_array.ne(&id_slice_1);
+    let actual: bool = id_array.ne(&id_slice_1);
     let expected = true;
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn slice_eq_test() {
-    let id_array = id_array![MTest; 1];
-    let id_slice_0 = id_slice![1];
-    let id_slice_1 = id_slice![2];
-
-    let actual = id_array.eq(id_slice_0);
-    let expected = true;
-    assert_eq!(actual, expected);
-
-    let actual = id_array.eq(id_slice_1);
-    let expected = false;
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn slice_ne_test() {
+fn eq_id_slice_test() {
     let id_array = id_array![MTest; 1];
     let id_slice_0 = id_slice![1];
     let id_slice_1 = id_slice![2];
 
-    let actual = id_array.ne(id_slice_0);
+    let actual: bool = id_array.eq(id_slice_0);
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array.eq(id_slice_1);
+    let expected = false;
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn ne_id_slice_test() {
+    let id_array = id_array![MTest; 1];
+    let id_slice_0 = id_slice![1];
+    let id_slice_1 = id_slice![2];
+
+    let actual: bool = id_array.ne(id_slice_0);
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_array.ne(id_slice_1);
+    let actual: bool = id_array.ne(id_slice_1);
     let expected = true;
     assert_eq!(actual, expected);
 }
@@ -487,14 +495,13 @@ fn slice_ne_test() {
 #[test]
 fn eq_test() {
     let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![1];
-    let id_array_2 = id_array![2];
+    let id_array_1 = id_array![2];
 
-    let actual = id_array_0.eq(&id_array_1);
+    let actual: bool = id_array_0.eq(&id_array_0);
     let expected = true;
     assert_eq!(actual, expected);
 
-    let actual = id_array_0.eq(&id_array_2);
+    let actual: bool = id_array_0.eq(&id_array_1);
     let expected = false;
     assert_eq!(actual, expected);
 }
@@ -502,64 +509,103 @@ fn eq_test() {
 #[test]
 fn ne_test() {
     let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![1];
-    let id_array_2 = id_array![2];
+    let id_array_1 = id_array![2];
 
-    let actual = id_array_0.ne(&id_array_1);
+    let actual: bool = id_array_0.ne(&id_array_0);
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_array_0.ne(&id_array_2);
+    let actual: bool = id_array_0.ne(&id_array_1);
     let expected = true;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn partial_cmp_test() {
-    let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![MTest; 2];
+    let id_array_0 = id_array!(MTest; 1);
+    let id_array_1 = id_array!(MTest; 2);
+
+    let actual: Option<Ordering> = id_array_0.partial_cmp(&id_array_0);
+    let expected = Some(Ordering::Equal);
+    assert_eq!(actual, expected);
 
     let actual: Option<Ordering> = id_array_0.partial_cmp(&id_array_1);
     let expected = Some(Ordering::Less);
+    assert_eq!(actual, expected);
+
+    let actual: Option<Ordering> = id_array_1.partial_cmp(&id_array_0);
+    let expected = Some(Ordering::Greater);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn lt_test() {
-    let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![MTest; 2];
+    let id_array_0 = id_array!(MTest; 1);
+    let id_array_1 = id_array!(MTest; 2);
 
-    let actual: bool = id_array_0.lt(&id_array_1);
+    let actual: bool = id_array_0 < id_array_0;
+    let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_0 < id_array_1;
     let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_1 < id_array_0;
+    let expected = false;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn le_test() {
-    let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![MTest; 2];
+    let id_array_0 = id_array!(MTest; 1);
+    let id_array_1 = id_array!(MTest; 2);
 
-    let actual: bool = id_array_0.le(&id_array_1);
+    let actual: bool = id_array_0 <= id_array_0;
     let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_0 <= id_array_1;
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_1 <= id_array_0;
+    let expected = false;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn gt_test() {
-    let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![MTest; 2];
+    let id_array_0 = id_array!(MTest; 1);
+    let id_array_1 = id_array!(MTest; 2);
 
-    let actual: bool = id_array_0.gt(&id_array_1);
+    let actual: bool = id_array_0 > id_array_0;
     let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_0 > id_array_1;
+    let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_1 > id_array_0;
+    let expected = true;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn ge_test() {
-    let id_array_0 = id_array![MTest; 1];
-    let id_array_1 = id_array![MTest; 2];
+    let id_array_0 = id_array!(MTest; 1);
+    let id_array_1 = id_array!(MTest; 2);
 
-    let actual: bool = id_array_0.ge(&id_array_1);
+    let actual: bool = id_array_0 >= id_array_0;
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_0 >= id_array_1;
     let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_array_1 >= id_array_0;
+    let expected = true;
     assert_eq!(actual, expected);
 }

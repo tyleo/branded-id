@@ -1,4 +1,4 @@
-use crate::{i32_id as id, isize_id, tests::util::MTest, u32_id, usize_id, I32Id};
+use crate::{i32_id as id, isize_id, tests::util::MTest, u32_id, usize_id, I32Id, IsizeId, U32Id};
 use std::{
     cmp::Ordering,
     collections::hash_map::DefaultHasher,
@@ -8,7 +8,7 @@ use std::{
 
 #[test]
 fn from_i32_test() {
-    let actual = I32Id::<MTest>::from_i32(1);
+    let actual: I32Id<MTest> = I32Id::<MTest>::from_i32(1);
     let expected = id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -17,7 +17,7 @@ fn from_i32_test() {
 fn to_i32_test() {
     let id = id!(MTest; 1);
 
-    let actual = id.to_i32();
+    let actual: i32 = id.to_i32();
     let expected = 1;
     assert_eq!(actual, expected);
 }
@@ -26,7 +26,7 @@ fn to_i32_test() {
 fn to_isize_id_test() {
     let id = id!(MTest; 1);
 
-    let actual = id.to_isize_id();
+    let actual: IsizeId<MTest> = id.to_isize_id();
     let expected = isize_id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -35,7 +35,7 @@ fn to_isize_id_test() {
 fn to_u32_id_test() {
     let id = id!(MTest; 1);
 
-    let actual = id.to_u32_id();
+    let actual: U32Id<MTest> = id.to_u32_id();
     let expected = u32_id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -44,7 +44,7 @@ fn to_u32_id_test() {
 fn to_usize_id_test() {
     let id = id!(MTest; 1);
 
-    let actual = id.to_usize_id();
+    let actual: crate::UsizeId<MTest> = id.to_usize_id();
     let expected = usize_id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -53,35 +53,35 @@ fn to_usize_id_test() {
 fn binary_fmt_test() {
     let id = id!(MTest; 2);
 
-    let actual = format!("{:b}", id);
+    let actual: String = format!("{:b}", id);
     let expected = "MTest(10)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+b}", id);
+    let actual: String = format!("{:+b}", id);
     let expected = "MTest(+10)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-b}", id);
+    let actual: String = format!("{:-b}", id);
     let expected = "MTest(10)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#b}", id);
+    let actual: String = format!("{:#b}", id);
     let expected = "id_sys::tests::util::m_test::MTest(0b10)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25b}", id);
+    let actual: String = format!("{:25b}", id);
     let expected = "MTest(                       10)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25b}", id);
+    let actual: String = format!("{:<25b}", id);
     let expected = "MTest(10                       )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25b}", id);
+    let actual: String = format!("{:>25b}", id);
     let expected = "MTest(                       10)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25b}", id);
+    let actual: String = format!("{:^25b}", id);
     let expected = "MTest(           10            )";
     assert_eq!(actual, expected);
 }
@@ -89,81 +89,83 @@ fn binary_fmt_test() {
 #[test]
 #[allow(clippy::clone_on_copy)]
 fn clone_test() {
-    let actual = id!(MTest; 1);
-    let expected = actual.clone();
+    let id = id!(MTest; 1);
+
+    let actual: I32Id<MTest> = id.clone();
+    let expected = id!(MTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn debug_test() {
+fn debug_fmt_test() {
     let id = id!(MTest; 1);
 
-    let actual = format!("{:?}", id);
+    let actual: String = format!("{:?}", id);
     let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+?}", id);
+    let actual: String = format!("{:+?}", id);
     let expected = "MTest(+1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-?}", id);
+    let actual: String = format!("{:-?}", id);
     let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#?}", id);
+    let actual: String = format!("{:#?}", id);
     let expected = "id_sys::tests::util::m_test::MTest(1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25?}", id);
+    let actual: String = format!("{:25?}", id);
     let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25?}", id);
+    let actual: String = format!("{:<25?}", id);
     let expected = "MTest(1                        )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25?}", id);
+    let actual: String = format!("{:>25?}", id);
     let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25?}", id);
+    let actual: String = format!("{:^25?}", id);
     let expected = "MTest(            1            )";
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn display_test() {
+fn display_fmt_test() {
     let id = id!(MTest; 1);
 
-    let actual = format!("{}", id);
+    let actual: String = format!("{}", id);
     let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+}", id);
+    let actual: String = format!("{:+}", id);
     let expected = "MTest(+1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-}", id);
+    let actual: String = format!("{:-}", id);
     let expected = "MTest(1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#}", id);
+    let actual: String = format!("{:#}", id);
     let expected = "id_sys::tests::util::m_test::MTest(1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25}", id);
+    let actual: String = format!("{:25}", id);
     let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25}", id);
+    let actual: String = format!("{:<25}", id);
     let expected = "MTest(1                        )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25}", id);
+    let actual: String = format!("{:>25}", id);
     let expected = "MTest(                        1)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25}", id);
+    let actual: String = format!("{:^25}", id);
     let expected = "MTest(            1            )";
     assert_eq!(actual, expected);
 }
@@ -192,7 +194,7 @@ fn hash_test() {
     let mut hasher_1 = DefaultHasher::new();
     int.hash(&mut hasher_1);
 
-    let actual = hasher_0.finish();
+    let actual: u64 = hasher_0.finish();
     let expected = hasher_1.finish();
     assert_eq!(actual, expected);
 }
@@ -207,27 +209,8 @@ fn hash_slice_test() {
     let mut hasher_1 = DefaultHasher::new();
     ints.hash(&mut hasher_1);
 
-    let actual = hasher_0.finish();
+    let actual: u64 = hasher_0.finish();
     let expected = hasher_1.finish();
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn cmp_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
-
-    let actual = id_0.cmp(&id_1);
-    let expected = Ordering::Less;
-    assert_eq!(actual, expected);
-
-    let actual = id_1.cmp(&id_0);
-    let expected = Ordering::Greater;
-    assert_eq!(actual, expected);
-
-    let actual = id_0.cmp(&id_2);
-    let expected = Ordering::Equal;
     assert_eq!(actual, expected);
 }
 
@@ -235,35 +218,35 @@ fn cmp_test() {
 fn lower_exp_fmt_test() {
     let id = id!(MTest; 2);
 
-    let actual = format!("{:e}", id);
+    let actual: String = format!("{:e}", id);
     let expected = "MTest(2e0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+e}", id);
+    let actual: String = format!("{:+e}", id);
     let expected = "MTest(+2e0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-e}", id);
+    let actual: String = format!("{:-e}", id);
     let expected = "MTest(2e0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#e}", id);
+    let actual: String = format!("{:#e}", id);
     let expected = "id_sys::tests::util::m_test::MTest(2e0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25e}", id);
+    let actual: String = format!("{:25e}", id);
     let expected = "MTest(                      2e0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25e}", id);
+    let actual: String = format!("{:<25e}", id);
     let expected = "MTest(2e0                      )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25e}", id);
+    let actual: String = format!("{:>25e}", id);
     let expected = "MTest(                      2e0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25e}", id);
+    let actual: String = format!("{:^25e}", id);
     let expected = "MTest(           2e0           )";
     assert_eq!(actual, expected);
 }
@@ -272,35 +255,35 @@ fn lower_exp_fmt_test() {
 fn lower_hex_fmt_test() {
     let id = id!(MTest; 10);
 
-    let actual = format!("{:x}", id);
+    let actual: String = format!("{:x}", id);
     let expected = "MTest(a)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+x}", id);
+    let actual: String = format!("{:+x}", id);
     let expected = "MTest(+a)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-x}", id);
+    let actual: String = format!("{:-x}", id);
     let expected = "MTest(a)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#x}", id);
+    let actual: String = format!("{:#x}", id);
     let expected = "id_sys::tests::util::m_test::MTest(0xa)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25x}", id);
+    let actual: String = format!("{:25x}", id);
     let expected = "MTest(                        a)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25x}", id);
+    let actual: String = format!("{:<25x}", id);
     let expected = "MTest(a                        )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25x}", id);
+    let actual: String = format!("{:>25x}", id);
     let expected = "MTest(                        a)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25x}", id);
+    let actual: String = format!("{:^25x}", id);
     let expected = "MTest(            a            )";
     assert_eq!(actual, expected);
 }
@@ -309,36 +292,54 @@ fn lower_hex_fmt_test() {
 fn octal_fmt_test() {
     let id = id!(MTest; 10);
 
-    let actual = format!("{:o}", id);
+    let actual: String = format!("{:o}", id);
     let expected = "MTest(12)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+o}", id);
+    let actual: String = format!("{:+o}", id);
     let expected = "MTest(+12)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-o}", id);
+    let actual: String = format!("{:-o}", id);
     let expected = "MTest(12)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#o}", id);
+    let actual: String = format!("{:#o}", id);
     let expected = "id_sys::tests::util::m_test::MTest(0o12)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25o}", id);
+    let actual: String = format!("{:25o}", id);
     let expected = "MTest(                       12)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25o}", id);
+    let actual: String = format!("{:<25o}", id);
     let expected = "MTest(12                       )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25o}", id);
+    let actual: String = format!("{:>25o}", id);
     let expected = "MTest(                       12)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25o}", id);
+    let actual: String = format!("{:^25o}", id);
     let expected = "MTest(           12            )";
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn cmp_test() {
+    let id_0 = id!(MTest; 1);
+    let id_1 = id!(MTest; 2);
+
+    let actual: Ordering = id_0.cmp(&id_0);
+    let expected = Ordering::Equal;
+    assert_eq!(actual, expected);
+
+    let actual: Ordering = id_0.cmp(&id_1);
+    let expected = Ordering::Less;
+    assert_eq!(actual, expected);
+
+    let actual: Ordering = id_1.cmp(&id_0);
+    let expected = Ordering::Greater;
     assert_eq!(actual, expected);
 }
 
@@ -347,7 +348,7 @@ fn max_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
 
-    let actual = id_0.max(id_1);
+    let actual: I32Id<MTest> = id_0.max(id_1);
     let expected = id!(2);
     assert_eq!(actual, expected);
 }
@@ -357,7 +358,7 @@ fn min_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
 
-    let actual = id_0.min(id_1);
+    let actual: I32Id<MTest> = id_0.min(id_1);
     let expected = id!(1);
     assert_eq!(actual, expected);
 }
@@ -368,11 +369,11 @@ fn clamp_test() {
     let id_1 = id!(MTest; 2);
     let id_2 = id!(MTest; 3);
 
-    let actual = id_0.clamp(id_1, id_2);
+    let actual: I32Id<MTest> = id_0.clamp(id_1, id_2);
     let expected = id!(2);
     assert_eq!(actual, expected);
 
-    let actual = id_2.clamp(id_0, id_1);
+    let actual: I32Id<MTest> = id_2.clamp(id_0, id_1);
     let expected = id!(2);
     assert_eq!(actual, expected);
 }
@@ -381,14 +382,13 @@ fn clamp_test() {
 fn eq_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
 
-    let actual = id_0.eq(&id_1);
-    let expected = false;
+    let actual: bool = id_0.eq(&id_0);
+    let expected = true;
     assert_eq!(actual, expected);
 
-    let actual = id_0.eq(&id_2);
-    let expected = true;
+    let actual: bool = id_0.eq(&id_1);
+    let expected = false;
     assert_eq!(actual, expected);
 }
 
@@ -396,24 +396,31 @@ fn eq_test() {
 fn ne_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
 
-    let actual = id_0.ne(&id_1);
-    let expected = true;
+    let actual: bool = id_0.ne(&id_0);
+    let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_0.ne(&id_2);
-    let expected = false;
+    let actual: bool = id_0.ne(&id_1);
+    let expected = true;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn partial_cmp_test() {
     let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 1);
+    let id_1 = id!(MTest; 2);
 
-    let actual = id_0.partial_cmp(&id_1);
+    let actual: Option<Ordering> = id_0.partial_cmp(&id_0);
     let expected = Some(Ordering::Equal);
+    assert_eq!(actual, expected);
+
+    let actual: Option<Ordering> = id_0.partial_cmp(&id_1);
+    let expected = Some(Ordering::Less);
+    assert_eq!(actual, expected);
+
+    let actual: Option<Ordering> = id_1.partial_cmp(&id_0);
+    let expected = Some(Ordering::Greater);
     assert_eq!(actual, expected);
 }
 
@@ -421,17 +428,16 @@ fn partial_cmp_test() {
 fn lt_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
 
-    let actual = id_0 < id_1;
-    let expected = true;
-    assert_eq!(actual, expected);
-
-    let actual = id_1 < id_0;
+    let actual: bool = id_0 < id_0;
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_0 < id_2;
+    let actual: bool = id_0 < id_1;
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_1 < id_0;
     let expected = false;
     assert_eq!(actual, expected);
 }
@@ -440,18 +446,17 @@ fn lt_test() {
 fn le_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
 
-    let actual = id_0 <= id_1;
+    let actual: bool = id_0 <= id_0;
     let expected = true;
     assert_eq!(actual, expected);
 
-    let actual = id_1 <= id_0;
+    let actual: bool = id_0 <= id_1;
+    let expected = true;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_1 <= id_0;
     let expected = false;
-    assert_eq!(actual, expected);
-
-    let actual = id_0 <= id_2;
-    let expected = true;
     assert_eq!(actual, expected);
 }
 
@@ -459,18 +464,17 @@ fn le_test() {
 fn gt_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
 
-    let actual = id_0 > id_1;
+    let actual: bool = id_0 > id_0;
     let expected = false;
     assert_eq!(actual, expected);
 
-    let actual = id_1 > id_0;
+    let actual: bool = id_0 > id_1;
+    let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_1 > id_0;
     let expected = true;
-    assert_eq!(actual, expected);
-
-    let actual = id_0 > id_2;
-    let expected = false;
     assert_eq!(actual, expected);
 }
 
@@ -478,17 +482,16 @@ fn gt_test() {
 fn ge_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 1);
 
-    let actual = id_0 >= id_1;
-    let expected = false;
-    assert_eq!(actual, expected);
-
-    let actual = id_1 >= id_0;
+    let actual: bool = id_0 >= id_0;
     let expected = true;
     assert_eq!(actual, expected);
 
-    let actual = id_0 >= id_2;
+    let actual: bool = id_0 >= id_1;
+    let expected = false;
+    assert_eq!(actual, expected);
+
+    let actual: bool = id_1 >= id_0;
     let expected = true;
     assert_eq!(actual, expected);
 }
@@ -497,35 +500,35 @@ fn ge_test() {
 fn upper_exp_fmt_test() {
     let id = id!(MTest; 2);
 
-    let actual = format!("{:E}", id);
+    let actual: String = format!("{:E}", id);
     let expected = "MTest(2E0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+E}", id);
+    let actual: String = format!("{:+E}", id);
     let expected = "MTest(+2E0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-E}", id);
+    let actual: String = format!("{:-E}", id);
     let expected = "MTest(2E0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#E}", id);
+    let actual: String = format!("{:#E}", id);
     let expected = "id_sys::tests::util::m_test::MTest(2E0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25E}", id);
+    let actual: String = format!("{:25E}", id);
     let expected = "MTest(                      2E0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25E}", id);
+    let actual: String = format!("{:<25E}", id);
     let expected = "MTest(2E0                      )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25E}", id);
+    let actual: String = format!("{:>25E}", id);
     let expected = "MTest(                      2E0)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25E}", id);
+    let actual: String = format!("{:^25E}", id);
     let expected = "MTest(           2E0           )";
     assert_eq!(actual, expected);
 }
@@ -534,35 +537,35 @@ fn upper_exp_fmt_test() {
 fn upper_hex_fmt_test() {
     let id = id!(MTest; 10);
 
-    let actual = format!("{:X}", id);
+    let actual: String = format!("{:X}", id);
     let expected = "MTest(A)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:+X}", id);
+    let actual: String = format!("{:+X}", id);
     let expected = "MTest(+A)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:-X}", id);
+    let actual: String = format!("{:-X}", id);
     let expected = "MTest(A)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:#X}", id);
+    let actual: String = format!("{:#X}", id);
     let expected = "id_sys::tests::util::m_test::MTest(0xA)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:25X}", id);
+    let actual: String = format!("{:25X}", id);
     let expected = "MTest(                        A)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:<25X}", id);
+    let actual: String = format!("{:<25X}", id);
     let expected = "MTest(A                        )";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:>25X}", id);
+    let actual: String = format!("{:>25X}", id);
     let expected = "MTest(                        A)";
     assert_eq!(actual, expected);
 
-    let actual = format!("{:^25X}", id);
+    let actual: String = format!("{:^25X}", id);
     let expected = "MTest(            A            )";
     assert_eq!(actual, expected);
 }

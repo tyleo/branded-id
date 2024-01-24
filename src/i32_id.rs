@@ -17,13 +17,6 @@ pub struct I32Id<TMarker: ?Sized> {
 }
 
 impl<TMarker> I32Id<TMarker> {
-    pub const fn from_i32(repr: i32) -> Self {
-        Self {
-            repr,
-            phantom: PhantomData,
-        }
-    }
-
     fn fmt_helper(
         self,
         fmt_repr: impl FnOnce(&i32, &mut Formatter) -> fmt::Result,
@@ -33,6 +26,13 @@ impl<TMarker> I32Id<TMarker> {
         f.write_char('(')?;
         fmt_repr(&self.to_i32(), f)?;
         f.write_char(')')
+    }
+
+    pub const fn from_i32(repr: i32) -> Self {
+        Self {
+            repr,
+            phantom: PhantomData,
+        }
     }
 
     pub const fn to_i32(self) -> i32 {
@@ -99,7 +99,7 @@ impl<TMarker> Hash for I32Id<TMarker> {
     where
         H: Hasher,
     {
-        self.repr.hash(state)
+        self.to_i32().hash(state)
     }
 
     fn hash_slice<H>(data: &[Self], state: &mut H)
@@ -131,21 +131,21 @@ impl<TMarker> Octal for I32Id<TMarker> {
 
 impl<TMarker> Ord for I32Id<TMarker> {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.repr.cmp(&other.repr)
+        self.to_i32().cmp(&other.to_i32())
     }
 
     fn max(self, other: Self) -> Self
     where
         Self: Sized,
     {
-        Self::from_i32(self.repr.max(other.repr))
+        Self::from_i32(self.to_i32().max(other.to_i32()))
     }
 
     fn min(self, other: Self) -> Self
     where
         Self: Sized,
     {
-        Self::from_i32(self.repr.min(other.repr))
+        Self::from_i32(self.to_i32().min(other.to_i32()))
     }
 
     fn clamp(self, min: Self, max: Self) -> Self
@@ -153,41 +153,41 @@ impl<TMarker> Ord for I32Id<TMarker> {
         Self: Sized,
         Self: PartialOrd,
     {
-        Self::from_i32(self.repr.clamp(min.repr, max.repr))
+        Self::from_i32(self.to_i32().clamp(min.to_i32(), max.to_i32()))
     }
 }
 
 impl<TMarker> PartialEq for I32Id<TMarker> {
     fn eq(&self, other: &Self) -> bool {
-        self.repr.eq(&other.repr)
+        self.to_i32().eq(&other.to_i32())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
     fn ne(&self, other: &Self) -> bool {
-        self.repr.ne(&other.repr)
+        self.to_i32().ne(&other.to_i32())
     }
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
 impl<TMarker> PartialOrd for I32Id<TMarker> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.repr.partial_cmp(&other.repr)
+        self.to_i32().partial_cmp(&other.to_i32())
     }
 
     fn lt(&self, other: &Self) -> bool {
-        self.repr.lt(&other.repr)
+        self.to_i32().lt(&other.to_i32())
     }
 
     fn le(&self, other: &Self) -> bool {
-        self.repr.le(&other.repr)
+        self.to_i32().le(&other.to_i32())
     }
 
     fn gt(&self, other: &Self) -> bool {
-        self.repr.gt(&other.repr)
+        self.to_i32().gt(&other.to_i32())
     }
 
     fn ge(&self, other: &Self) -> bool {
-        self.repr.ge(&other.repr)
+        self.to_i32().ge(&other.to_i32())
     }
 }
 

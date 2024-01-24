@@ -15,10 +15,6 @@ pub struct IdVec<TMarker: ?Sized, TValue> {
 }
 
 impl<TMarker, TValue> IdVec<TMarker, TValue> {
-    pub const fn new() -> Self {
-        Self::from_vec(Vec::new())
-    }
-
     pub fn as_mut_id_slice(&mut self) -> &mut IdSlice<TMarker, TValue> {
         IdSlice::from_mut_slice(&mut self.repr)
     }
@@ -64,6 +60,10 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
 
     pub fn len(&self) -> usize {
         self.repr.len()
+    }
+
+    pub const fn new() -> Self {
+        Self::from_vec(Vec::new())
     }
 
     pub fn push(&mut self, value: TValue) -> UsizeId<TMarker> {
