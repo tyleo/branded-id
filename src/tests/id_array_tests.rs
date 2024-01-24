@@ -88,15 +88,6 @@ fn into_array_test() {
 }
 
 #[test]
-fn as_ref_test() {
-    let id_array = id_array![1];
-
-    let actual: &IdSlice<MTest, i32> = id_array.as_ref();
-    let expected = id_slice![MTest; 1];
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn as_mut_test() {
     let mut id_array = id_array![1];
 
@@ -104,6 +95,15 @@ fn as_mut_test() {
     actual[id!(0)] = 2;
 
     let expected = id_slice![MTest; 2];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn as_ref_test() {
+    let id_array = id_array![1];
+
+    let actual: &IdSlice<MTest, i32> = id_array.as_ref();
+    let expected = id_slice![MTest; 1];
     assert_eq!(actual, expected);
 }
 

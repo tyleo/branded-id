@@ -1,10 +1,12 @@
-use crate::{IdSlice, IdSliceIndex, UsizeId};
+use crate::{IdArray, IdSlice, IdSliceIndex, UsizeId};
 use std::{
     borrow::{Borrow, BorrowMut},
+    cmp::Ordering,
     fmt::{self, Debug},
+    hash::{Hash, Hasher},
     marker::PhantomData,
     mem::transmute,
-    ops::{Index, IndexMut},
+    ops::{Deref, DerefMut, Index, IndexMut},
 };
 
 pub struct IdVec<TMarker: ?Sized, TValue> {
@@ -15,21 +17,6 @@ pub struct IdVec<TMarker: ?Sized, TValue> {
 impl<TMarker, TValue> IdVec<TMarker, TValue> {
     pub const fn new() -> Self {
         Self::from_vec(Vec::new())
-    }
-
-    pub const fn from_vec(vec: Vec<TValue>) -> Self {
-        Self {
-            repr: vec,
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn from_mut_vec(vec: &mut Vec<TValue>) -> &mut Self {
-        unsafe { transmute(vec) }
-    }
-
-    pub const fn from_vec_ref(vec: &Vec<TValue>) -> &Self {
-        unsafe { transmute(vec) }
     }
 
     pub fn as_mut_id_slice(&mut self) -> &mut IdSlice<TMarker, TValue> {
@@ -48,12 +35,31 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
         &self.repr
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.repr.is_empty()
-    }
-
     pub fn end(&self) -> UsizeId<TMarker> {
         self.as_id_slice().end()
+    }
+
+    pub fn from_mut_vec(vec: &mut Vec<TValue>) -> &mut Self {
+        unsafe { transmute(vec) }
+    }
+
+    pub const fn from_vec(vec: Vec<TValue>) -> Self {
+        Self {
+            repr: vec,
+            phantom: PhantomData,
+        }
+    }
+
+    pub const fn from_vec_ref(vec: &Vec<TValue>) -> &Self {
+        unsafe { transmute(vec) }
+    }
+
+    pub fn into_vec(self) -> Vec<TValue> {
+        self.repr
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.repr.is_empty()
     }
 
     pub fn len(&self) -> usize {
@@ -74,27 +80,45 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> AsRef<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
-    fn as_ref(&self) -> &IdSlice<TMarker, TValue> {
-        self.as_id_slice()
-    }
-}
-
 impl<TMarker, TValue> AsMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn as_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
         self.as_mut_id_slice()
     }
 }
 
+impl<TMarker, TValue> AsMut<IdVec<TMarker, TValue>> for IdVec<TMarker, TValue> {
+    fn as_mut(&mut self) -> &mut IdVec<TMarker, TValue> {
+        self
+    }
+}
+
+impl<TMarker, TValue> AsRef<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+    fn as_ref(&self) -> &IdSlice<TMarker, TValue> {
+        self.as_id_slice()
+    }
+}
+
+impl<TMarker, TValue> AsRef<IdVec<TMarker, TValue>> for IdVec<TMarker, TValue> {
+    fn as_ref(&self) -> &IdVec<TMarker, TValue> {
+        self
+    }
+}
+
 impl<TMarker, TValue> Borrow<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn borrow(&self) -> &IdSlice<TMarker, TValue> {
-        IdSlice::from_slice(self.repr.borrow())
+        IdSlice::from_slice(self.as_vec().borrow())
     }
 }
 
 impl<TMarker, TValue> BorrowMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn borrow_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
-        IdSlice::from_mut_slice(self.repr.borrow_mut())
+        IdSlice::from_mut_slice(self.as_mut_vec().borrow_mut())
+    }
+}
+
+impl<TMarker, TValue: Clone> Clone for IdVec<TMarker, TValue> {
+    fn clone(&self) -> Self {
+        Self::from_vec(self.as_vec().clone())
     }
 }
 
@@ -110,7 +134,65 @@ impl<TMarker, TValue> Default for IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> Eq for IdVec<TMarker, TValue> where Vec<TValue>: PartialEq {}
+impl<TMarker, TValue> Deref for IdVec<TMarker, TValue> {
+    type Target = IdSlice<TMarker, TValue>;
+
+    fn deref(&self) -> &Self::Target {
+        IdSlice::from_slice(self.as_vec().deref())
+    }
+}
+
+impl<TMarker, TValue> DerefMut for IdVec<TMarker, TValue> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        IdSlice::from_mut_slice(self.as_mut_vec().deref_mut())
+    }
+}
+
+impl<TMarker, TValue> Eq for IdVec<TMarker, TValue> where TValue: PartialEq {}
+
+impl<'a, TMarker, TValue> Extend<&'a TValue> for IdVec<TMarker, TValue>
+where
+    TValue: Copy + 'a,
+{
+    fn extend<T: IntoIterator<Item = &'a TValue>>(&mut self, iter: T) {
+        self.as_mut_vec().extend(iter)
+    }
+}
+
+impl<TMarker, TValue> Extend<TValue> for IdVec<TMarker, TValue> {
+    fn extend<T: IntoIterator<Item = TValue>>(&mut self, iter: T) {
+        self.as_mut_vec().extend(iter)
+    }
+}
+
+impl<TMarker, TValue> From<Vec<TValue>> for IdVec<TMarker, TValue> {
+    fn from(value: Vec<TValue>) -> Self {
+        Self::from_vec(value)
+    }
+}
+
+impl<TMarker, TValue> FromIterator<TValue> for IdVec<TMarker, TValue> {
+    fn from_iter<T: IntoIterator<Item = TValue>>(iter: T) -> Self {
+        Self::from_vec(Vec::from_iter(iter))
+    }
+}
+
+impl<TMarker, TValue> Hash for IdVec<TMarker, TValue>
+where
+    Vec<TValue>: Hash,
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.as_vec().hash(state)
+    }
+
+    fn hash_slice<H>(data: &[Self], state: &mut H)
+    where
+        H: Hasher,
+    {
+        let data = unsafe { transmute(data) };
+        <Vec<TValue>>::hash_slice(data, state)
+    }
+}
 
 impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     for IdVec<TMarker, TValue>
@@ -130,11 +212,169 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     }
 }
 
-impl<TMarker, TValue> PartialEq for IdVec<TMarker, TValue>
+impl<'a, TMarker, TValue> IntoIterator for &'a IdVec<TMarker, TValue> {
+    type Item = <&'a Vec<TValue> as IntoIterator>::Item;
+    type IntoIter = <&'a Vec<TValue> as IntoIterator>::IntoIter;
+
+    #[allow(clippy::into_iter_on_ref)]
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_vec().into_iter()
+    }
+}
+
+impl<'a, TMarker, TValue> IntoIterator for &'a mut IdVec<TMarker, TValue> {
+    type Item = <&'a mut Vec<TValue> as IntoIterator>::Item;
+    type IntoIter = <&'a mut Vec<TValue> as IntoIterator>::IntoIter;
+
+    #[allow(clippy::into_iter_on_ref)]
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_mut_vec().into_iter()
+    }
+}
+
+impl<TMarker, TValue> IntoIterator for IdVec<TMarker, TValue> {
+    type Item = <Vec<TValue> as IntoIterator>::Item;
+    type IntoIter = <Vec<TValue> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.into_vec().into_iter()
+    }
+}
+
+impl<TMarker, TValue: Ord> Ord for IdVec<TMarker, TValue> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.as_vec().cmp(other.as_vec())
+    }
+
+    fn max(self, other: Self) -> Self
+    where
+        Self: Sized,
+    {
+        Self::from_vec(self.into_vec().max(other.into_vec()))
+    }
+
+    fn min(self, other: Self) -> Self
+    where
+        Self: Sized,
+    {
+        Self::from_vec(self.into_vec().min(other.into_vec()))
+    }
+
+    fn clamp(self, min: Self, max: Self) -> Self
+    where
+        Self: Sized,
+        Self: PartialOrd,
+    {
+        Self::from_vec(self.into_vec().clamp(min.into_vec(), max.into_vec()))
+    }
+}
+
+impl<TMarker, TValueA, TValueB> PartialEq<&IdSlice<TMarker, TValueB>> for IdVec<TMarker, TValueA>
 where
-    Vec<TValue>: PartialEq,
+    TValueA: PartialEq<TValueB>,
 {
-    fn eq(&self, other: &Self) -> bool {
-        self.repr == other.repr
+    fn eq(&self, other: &&IdSlice<TMarker, TValueB>) -> bool {
+        self.as_id_slice().eq(*other)
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &&IdSlice<TMarker, TValueB>) -> bool {
+        self.as_id_slice().ne(*other)
+    }
+}
+
+impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<&IdArray<TMarker, TValueB, N>>
+    for IdVec<TMarker, TValueA>
+where
+    TValueA: PartialEq<TValueB>,
+{
+    fn eq(&self, other: &&IdArray<TMarker, TValueB, N>) -> bool {
+        self.as_id_slice().eq(other.as_id_slice())
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &&IdArray<TMarker, TValueB, N>) -> bool {
+        self.as_id_slice().ne(other.as_id_slice())
+    }
+}
+
+impl<TMarker, TValueA, TValueB> PartialEq<&mut IdSlice<TMarker, TValueB>>
+    for IdVec<TMarker, TValueA>
+where
+    TValueA: PartialEq<TValueB>,
+{
+    fn eq(&self, other: &&mut IdSlice<TMarker, TValueB>) -> bool {
+        self.as_id_slice().eq(*other)
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &&mut IdSlice<TMarker, TValueB>) -> bool {
+        self.as_id_slice().ne(*other)
+    }
+}
+
+impl<TMarker, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>> for IdVec<TMarker, TValueA>
+where
+    TValueA: PartialEq<TValueB>,
+{
+    fn eq(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
+        self.as_id_slice().eq(other)
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
+        self.as_id_slice().ne(other)
+    }
+}
+
+impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
+    for IdVec<TMarker, TValueA>
+where
+    TValueA: PartialEq<TValueB>,
+{
+    fn eq(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+        self.as_id_slice().eq(other.as_id_slice())
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+        self.as_id_slice().ne(other.as_id_slice())
+    }
+}
+
+impl<TMarker, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>> for IdVec<TMarker, TValueA>
+where
+    TValueA: PartialEq<TValueB>,
+{
+    fn eq(&self, other: &IdVec<TMarker, TValueB>) -> bool {
+        self.as_vec().eq(other.as_vec())
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &IdVec<TMarker, TValueB>) -> bool {
+        self.as_vec().ne(other.as_vec())
+    }
+}
+
+#[allow(clippy::non_canonical_partial_ord_impl)]
+impl<TMarker, TValue: PartialOrd> PartialOrd for IdVec<TMarker, TValue> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.as_vec().partial_cmp(other.as_vec())
+    }
+
+    fn lt(&self, other: &Self) -> bool {
+        self.as_vec().lt(other.as_vec())
+    }
+
+    fn le(&self, other: &Self) -> bool {
+        self.as_vec().le(other.as_vec())
+    }
+
+    fn gt(&self, other: &Self) -> bool {
+        self.as_vec().gt(other.as_vec())
+    }
+
+    fn ge(&self, other: &Self) -> bool {
+        self.as_vec().ge(other.as_vec())
     }
 }

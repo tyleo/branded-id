@@ -51,19 +51,19 @@ impl<TMarker, TValue, const N: usize> IdArray<TMarker, TValue, N> {
     }
 }
 
-impl<TMarker, TValue, const N: usize> AsRef<IdSlice<TMarker, TValue>>
-    for IdArray<TMarker, TValue, N>
-{
-    fn as_ref(&self) -> &IdSlice<TMarker, TValue> {
-        self.as_id_slice()
-    }
-}
-
 impl<TMarker, TValue, const N: usize> AsMut<IdSlice<TMarker, TValue>>
     for IdArray<TMarker, TValue, N>
 {
     fn as_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
         self.as_mut_id_slice()
+    }
+}
+
+impl<TMarker, TValue, const N: usize> AsRef<IdSlice<TMarker, TValue>>
+    for IdArray<TMarker, TValue, N>
+{
+    fn as_ref(&self) -> &IdSlice<TMarker, TValue> {
+        self.as_id_slice()
     }
 }
 
