@@ -47,6 +47,14 @@ impl<TMarker, TValue> IdSlice<TMarker, TValue> {
         unsafe { transmute(repr) }
     }
 
+    pub fn get<I: IdSliceIndex<Self>>(&self, index: I) -> Option<&I::Output> {
+        index.get(self)
+    }
+
+    pub fn get_mut<I: IdSliceIndex<Self>>(&mut self, index: I) -> Option<&mut I::Output> {
+        index.get_mut(self)
+    }
+
     pub const fn is_empty(&self) -> bool {
         self.as_slice().is_empty()
     }
