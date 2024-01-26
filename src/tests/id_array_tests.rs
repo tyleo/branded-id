@@ -31,7 +31,7 @@ fn as_mut_array_test() {
 
 #[test]
 fn as_mut_id_slice_test() {
-    let id_array = &mut id_array![1];
+    let mut id_array = id_array![1];
 
     let actual: &mut IdSlice<MTest, i32> = id_array.as_mut_id_slice();
     actual[id!(0)] = 2;
@@ -74,7 +74,7 @@ fn from_mut_array_test() {
     let actual: &mut IdArray<MTest, i32, 1> = IdArray::from_mut_array(array);
     actual[id!(0)] = 2;
 
-    let expected = &mut id_array![MTest; i32; 2];
+    let expected = &id_array![MTest; i32; 2];
     assert_eq!(actual, expected);
 }
 
