@@ -4,34 +4,6 @@ use crate::{
 };
 
 #[test]
-fn id32_0_test() {
-    let actual: Id32<MUnknown> = id32!(1);
-    let expected = Id32::from_u32(1);
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn id32_1_test() {
-    let actual = id32!(MUnknown; 1);
-    let expected = Id32::from_u32(1);
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn id32i_0_test() {
-    let actual: Id32I<MUnknown> = id32i!(1);
-    let expected = Id32I::from_i32(1);
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn id32i_1_test() {
-    let actual = id32i!(MUnknown; 1);
-    let expected = Id32I::from_i32(1);
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn id_array_0_test() {
     let actual = id_array![MUnknown; i32];
     let expected: IdArray<MUnknown, i32, 0> = IdArray::from_array([]);

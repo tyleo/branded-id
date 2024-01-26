@@ -152,7 +152,7 @@ impl<TMarker> Hash for UsizeId<TMarker> {
     }
 }
 
-unsafe impl<TValue, TMarker> IdSliceIndex<IdSlice<TMarker, TValue>> for UsizeId<TMarker> {
+impl<TValue, TMarker> IdSliceIndex<IdSlice<TMarker, TValue>> for UsizeId<TMarker> {
     type Output = TValue;
 
     fn get(self, slice: &IdSlice<TMarker, TValue>) -> Option<&Self::Output> {

@@ -1,6 +1,6 @@
 use crate::internal::Sealed;
 
-pub unsafe trait IdSliceIndex<T>: Sealed
+pub trait IdSliceIndex<T>: Sealed
 where
     T: ?Sized,
 {

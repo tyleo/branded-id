@@ -1,7 +1,7 @@
 use crate::{IdSlice, IdSliceIndex, UsizeId};
 use std::ops::RangeToInclusive;
 
-unsafe impl<TMarker, TValue> IdSliceIndex<IdSlice<TMarker, TValue>>
+impl<TMarker, TValue> IdSliceIndex<IdSlice<TMarker, TValue>>
     for RangeToInclusive<UsizeId<TMarker>>
 {
     type Output = IdSlice<TMarker, TValue>;

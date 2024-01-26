@@ -1,7 +1,7 @@
 use crate::{IdSlice, IdSliceIndex};
 use std::ops::RangeFull;
 
-unsafe impl<TMarker, TValue> IdSliceIndex<IdSlice<TMarker, TValue>> for RangeFull {
+impl<TMarker, TValue> IdSliceIndex<IdSlice<TMarker, TValue>> for RangeFull {
     type Output = IdSlice<TMarker, TValue>;
 
     fn get(self, slice: &IdSlice<TMarker, TValue>) -> Option<&Self::Output> {

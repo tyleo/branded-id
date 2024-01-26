@@ -35,16 +35,16 @@ impl<TMarker> U32Id<TMarker> {
         }
     }
 
-    pub const fn to_u32(self) -> u32 {
-        self.repr
-    }
-
     pub const fn to_i32_id(self) -> I32Id<TMarker> {
         I32Id::from_i32(self.to_u32() as i32)
     }
 
     pub const fn to_isize_id(self) -> IsizeId<TMarker> {
         IsizeId::from_isize(self.to_u32() as isize)
+    }
+
+    pub const fn to_u32(self) -> u32 {
+        self.repr
     }
 
     pub const fn to_usize_id(self) -> UsizeId<TMarker> {

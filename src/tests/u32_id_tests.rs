@@ -1,4 +1,6 @@
-use crate::{i32_id as id, isize_id, tests::util::MTest, u32_id, usize_id, I32Id, IsizeId, U32Id};
+use crate::{
+    i32_id, isize_id, tests::util::MTest, u32_id as id, usize_id, I32Id, IsizeId, U32Id, UsizeId,
+};
 use std::{
     cmp::Ordering,
     collections::hash_map::DefaultHasher,
@@ -7,18 +9,18 @@ use std::{
 };
 
 #[test]
-fn from_i32_test() {
-    let actual: I32Id<MTest> = I32Id::<MTest>::from_i32(1);
+fn from_u32_test() {
+    let actual: U32Id<MTest> = U32Id::<MTest>::from_u32(1);
     let expected = id!(MTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn to_i32_test() {
+fn to_i32_id_test() {
     let id = id!(MTest; 1);
 
-    let actual: i32 = id.to_i32();
-    let expected = 1;
+    let actual: I32Id<MTest> = id.to_i32_id();
+    let expected = i32_id!(MTest; 1);
     assert_eq!(actual, expected);
 }
 
@@ -32,11 +34,11 @@ fn to_isize_id_test() {
 }
 
 #[test]
-fn to_u32_id_test() {
+fn to_u32_test() {
     let id = id!(MTest; 1);
 
-    let actual: U32Id<MTest> = id.to_u32_id();
-    let expected = u32_id!(MTest; 1);
+    let actual: u32 = id.to_u32();
+    let expected = 1;
     assert_eq!(actual, expected);
 }
 
@@ -44,7 +46,7 @@ fn to_u32_id_test() {
 fn to_usize_id_test() {
     let id = id!(MTest; 1);
 
-    let actual: crate::UsizeId<MTest> = id.to_usize_id();
+    let actual: UsizeId<MTest> = id.to_usize_id();
     let expected = usize_id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -91,7 +93,7 @@ fn binary_fmt_test() {
 fn clone_test() {
     let id = id!(MTest; 1);
 
-    let actual: I32Id<MTest> = id.clone();
+    let actual: U32Id<MTest> = id.clone();
     let expected = id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -172,14 +174,14 @@ fn display_fmt_test() {
 
 #[test]
 fn from_test() {
-    let actual: I32Id<MTest> = From::from(1);
+    let actual: U32Id<MTest> = From::from(1);
     let expected = id!(MTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn from_str_test() {
-    let actual: I32Id<MTest> = <I32Id<MTest> as FromStr>::from_str("1").unwrap();
+    let actual: U32Id<MTest> = <U32Id<MTest> as FromStr>::from_str("1").unwrap();
     let expected = id!(MTest; 1);
     assert_eq!(actual, expected);
 }
@@ -190,7 +192,7 @@ fn hash_test() {
     let mut hasher_0 = DefaultHasher::new();
     id.hash(&mut hasher_0);
 
-    let int = 1;
+    let int = 1u32;
     let mut hasher_1 = DefaultHasher::new();
     int.hash(&mut hasher_1);
 
@@ -205,7 +207,7 @@ fn hash_slice_test() {
     let mut hasher_0 = DefaultHasher::new();
     ids.hash(&mut hasher_0);
 
-    let ints = [1, 2];
+    let ints = [1u32, 2u32];
     let mut hasher_1 = DefaultHasher::new();
     ints.hash(&mut hasher_1);
 
@@ -348,7 +350,7 @@ fn max_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
 
-    let actual: I32Id<MTest> = id_0.max(id_1);
+    let actual: U32Id<MTest> = id_0.max(id_1);
     let expected = id!(2);
     assert_eq!(actual, expected);
 }
@@ -358,7 +360,7 @@ fn min_test() {
     let id_0 = id!(MTest; 1);
     let id_1 = id!(MTest; 2);
 
-    let actual: I32Id<MTest> = id_0.min(id_1);
+    let actual: U32Id<MTest> = id_0.min(id_1);
     let expected = id!(1);
     assert_eq!(actual, expected);
 }
@@ -369,11 +371,11 @@ fn clamp_test() {
     let id_1 = id!(MTest; 2);
     let id_2 = id!(MTest; 3);
 
-    let actual: I32Id<MTest> = id_0.clamp(id_1, id_2);
+    let actual: U32Id<MTest> = id_0.clamp(id_1, id_2);
     let expected = id!(2);
     assert_eq!(actual, expected);
 
-    let actual: I32Id<MTest> = id_2.clamp(id_0, id_1);
+    let actual: U32Id<MTest> = id_2.clamp(id_0, id_1);
     let expected = id!(2);
     assert_eq!(actual, expected);
 }
