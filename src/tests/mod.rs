@@ -1,5 +1,6 @@
 pub mod util;
 
+mod ext;
 mod i32_id_tests;
 mod id_array_tests;
 mod id_ptr_tests;
