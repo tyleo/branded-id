@@ -1,23 +1,38 @@
-use crate::{IdSlice, IdSliceIndex};
+use crate::{internal::fmt_marker_name, I32Id, IdSlice, IdSliceIndex, IsizeId, U32Id};
 use std::{
     cmp::Ordering,
+    fmt::{
+        self, Binary, Debug, Display, Formatter, LowerExp, LowerHex, Octal, UpperExp, UpperHex,
+        Write,
+    },
     hash::{Hash, Hasher},
     marker::PhantomData,
     mem::transmute,
     ops::{Bound, Index, IndexMut, Range, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive},
+    str::FromStr,
 };
 
-#[derive(Debug)]
 pub struct UsizeId<TMarker: ?Sized> {
-    usize: usize,
     phantom: PhantomData<TMarker>,
+    repr: usize,
 }
 
 impl<TMarker> UsizeId<TMarker> {
+    fn fmt_helper(
+        self,
+        fmt_repr: impl FnOnce(&usize, &mut Formatter) -> fmt::Result,
+        f: &mut Formatter,
+    ) -> fmt::Result {
+        fmt_marker_name::<TMarker>(f)?;
+        f.write_char('(')?;
+        fmt_repr(&self.to_usize(), f)?;
+        f.write_char(')')
+    }
+
     pub const fn from_usize(usize: usize) -> UsizeId<TMarker> {
-        UsizeId {
-            usize,
+        Self {
             phantom: PhantomData,
+            repr: usize,
         }
     }
 
@@ -25,8 +40,20 @@ impl<TMarker> UsizeId<TMarker> {
         UsizeId::from_usize(self.to_usize() + value)
     }
 
+    pub const fn to_i32_id(self) -> I32Id<TMarker> {
+        I32Id::from_i32(self.to_usize() as i32)
+    }
+
+    pub const fn to_isize_id(self) -> IsizeId<TMarker> {
+        IsizeId::from_isize(self.to_usize() as isize)
+    }
+
+    pub const fn to_u32_id(self) -> U32Id<TMarker> {
+        U32Id::from_u32(self.to_usize() as u32)
+    }
+
     pub const fn to_usize(self) -> usize {
-        self.usize
+        self.repr
     }
 
     pub const fn usize_bound_pair_from_usize_id_bound_pair(
@@ -66,19 +93,45 @@ impl<TMarker> UsizeId<TMarker> {
     }
 }
 
+impl<TMarker> Binary for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(Binary::fmt, f)
+    }
+}
+
 impl<TMarker> Clone for UsizeId<TMarker> {
-    fn clone(&self) -> UsizeId<TMarker> {
+    fn clone(&self) -> Self {
         *self
     }
 }
 
 impl<TMarker> Copy for UsizeId<TMarker> {}
 
+impl<TMarker> Debug for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(Debug::fmt, f)
+    }
+}
+
+impl<TMarker> Display for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(Display::fmt, f)
+    }
+}
+
 impl<TMarker> Eq for UsizeId<TMarker> {}
 
 impl<TMarker> From<usize> for UsizeId<TMarker> {
     fn from(val: usize) -> Self {
-        UsizeId::from_usize(val)
+        Self::from_usize(val)
+    }
+}
+
+impl<TMarker> FromStr for UsizeId<TMarker> {
+    type Err = <usize as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(UsizeId::from_usize(usize::from_str(s)?))
     }
 }
 
@@ -87,7 +140,15 @@ impl<TMarker> Hash for UsizeId<TMarker> {
     where
         H: Hasher,
     {
-        self.usize.hash(state)
+        self.to_usize().hash(state)
+    }
+
+    fn hash_slice<H>(data: &[Self], state: &mut H)
+    where
+        H: Hasher,
+    {
+        let data = unsafe { transmute(data) };
+        usize::hash_slice(data, state)
     }
 }
 
@@ -111,23 +172,41 @@ unsafe impl<TValue, TMarker> IdSliceIndex<IdSlice<TMarker, TValue>> for UsizeId<
     }
 }
 
+impl<TMarker> LowerExp for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(LowerExp::fmt, f)
+    }
+}
+
+impl<TMarker> LowerHex for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(LowerHex::fmt, f)
+    }
+}
+
+impl<TMarker> Octal for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(Octal::fmt, f)
+    }
+}
+
 impl<TMarker> Ord for UsizeId<TMarker> {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.usize.cmp(&other.usize)
+        self.to_usize().cmp(&other.to_usize())
     }
 
     fn max(self, other: Self) -> Self
     where
         Self: Sized,
     {
-        self.usize.max(other.usize).into()
+        Self::from_usize(self.to_usize().max(other.to_usize()))
     }
 
     fn min(self, other: Self) -> Self
     where
         Self: Sized,
     {
-        self.usize.min(other.usize).into()
+        Self::from_usize(self.to_usize().min(other.to_usize()))
     }
 
     fn clamp(self, min: Self, max: Self) -> Self
@@ -135,34 +214,52 @@ impl<TMarker> Ord for UsizeId<TMarker> {
         Self: Sized,
         Self: PartialOrd,
     {
-        self.usize.clamp(min.usize, max.usize).into()
+        Self::from_usize(self.to_usize().clamp(min.to_usize(), max.to_usize()))
     }
 }
 
 impl<TMarker> PartialEq for UsizeId<TMarker> {
     fn eq(&self, other: &Self) -> bool {
-        self.usize == other.usize
+        self.to_usize().eq(&other.to_usize())
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &Self) -> bool {
+        self.to_usize().ne(&other.to_usize())
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl<TMarker> PartialOrd for UsizeId<TMarker> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+        self.to_usize().partial_cmp(&other.to_usize())
     }
 
     fn lt(&self, other: &Self) -> bool {
-        self.usize.lt(&other.usize)
+        self.to_usize().lt(&other.to_usize())
     }
 
     fn le(&self, other: &Self) -> bool {
-        self.usize.le(&other.usize)
+        self.to_usize().le(&other.to_usize())
     }
 
     fn gt(&self, other: &Self) -> bool {
-        self.usize.gt(&other.usize)
+        self.to_usize().gt(&other.to_usize())
     }
 
     fn ge(&self, other: &Self) -> bool {
-        self.usize.ge(&other.usize)
+        self.to_usize().ge(&other.to_usize())
+    }
+}
+
+impl<TMarker> UpperExp for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(UpperExp::fmt, f)
+    }
+}
+
+impl<TMarker> UpperHex for UsizeId<TMarker> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.fmt_helper(UpperHex::fmt, f)
     }
 }

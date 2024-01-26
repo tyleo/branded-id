@@ -12,8 +12,8 @@ use std::{
 };
 
 pub struct IsizeId<TMarker: ?Sized> {
-    repr: isize,
     phantom: PhantomData<TMarker>,
+    repr: isize,
 }
 
 impl<TMarker> IsizeId<TMarker> {
@@ -30,8 +30,8 @@ impl<TMarker> IsizeId<TMarker> {
 
     pub const fn from_isize(isize: isize) -> IsizeId<TMarker> {
         Self {
-            repr: isize,
             phantom: PhantomData,
+            repr: isize,
         }
     }
 

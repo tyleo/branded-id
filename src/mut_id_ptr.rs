@@ -1,7 +1,7 @@
-use crate::{internal::fmt_marker_name, IdPtr, IsizeId};
+use crate::{IdPtr, IsizeId};
 use std::{
     cmp::Ordering,
-    fmt::{self, Debug, Pointer, Write},
+    fmt::{self, Debug, Pointer},
     hash::{Hash, Hasher},
     marker::PhantomData,
     mem::transmute,
@@ -36,8 +36,7 @@ impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
     /// This function should ensure that the offset results in a slice which
     /// shares memory with the original slice.
     pub const unsafe fn offset(self, offset: IsizeId<TMarker>) -> Self {
-        let ptr = self.to_mut_ptr().offset(offset.to_isize());
-        Self::from_mut_ptr(ptr)
+        Self::from_mut_ptr(self.to_mut_ptr().offset(offset.to_isize()))
     }
 
     pub const fn to_id_ptr(self) -> IdPtr<TMarker, TValue> {
@@ -59,10 +58,7 @@ impl<TMarker, TValue> Copy for MutIdPtr<TMarker, TValue> {}
 
 impl<TMarker, TValue> Debug for MutIdPtr<TMarker, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt_marker_name::<TMarker>(f)?;
-        f.write_char('(')?;
-        Debug::fmt(&self.to_mut_ptr(), f)?;
-        f.write_char(')')
+        Debug::fmt(&self.to_id_ptr(), f)
     }
 }
 
@@ -84,7 +80,7 @@ impl<TMarker, TValue> Hash for MutIdPtr<TMarker, TValue> {
         H: Hasher,
     {
         let data = unsafe { transmute(data) };
-        <*const TValue>::hash_slice(data, state)
+        <*mut TValue>::hash_slice(data, state)
     }
 }
 
@@ -151,10 +147,7 @@ impl<TMarker, TValue> PartialOrd for MutIdPtr<TMarker, TValue> {
 }
 
 impl<TMarker, TValue> Pointer for MutIdPtr<TMarker, TValue> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt_marker_name::<TMarker>(f)?;
-        f.write_char('(')?;
-        Debug::fmt(&self.to_mut_ptr(), f)?;
-        f.write_char(')')
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        Pointer::fmt(&self.to_id_ptr(), f)
     }
 }

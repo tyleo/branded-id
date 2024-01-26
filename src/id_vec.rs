@@ -10,8 +10,8 @@ use std::{
 };
 
 pub struct IdVec<TMarker: ?Sized, TValue> {
-    repr: Vec<TValue>,
     phantom: PhantomData<TMarker>,
+    repr: Vec<TValue>,
 }
 
 impl<TMarker, TValue> IdVec<TMarker, TValue> {
@@ -41,8 +41,8 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
 
     pub const fn from_vec(vec: Vec<TValue>) -> Self {
         Self {
-            repr: vec,
             phantom: PhantomData,
+            repr: vec,
         }
     }
 
