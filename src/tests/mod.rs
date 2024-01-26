@@ -7,5 +7,6 @@ mod id_slice_tests;
 mod id_vec_tests;
 mod isize_id_tests;
 mod macros;
+mod mut_id_ptr_tests;
 mod u32_id_tests;
 mod usize_id_tests;
