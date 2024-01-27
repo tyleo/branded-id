@@ -1,6 +1,4 @@
-pub mod ext;
-pub mod internal;
-
+mod internal;
 mod macros;
 
 mod i32_id;
@@ -14,6 +12,8 @@ mod mut_id_ptr;
 mod u32_id;
 mod usize_id;
 
+pub mod ext;
+
 pub use i32_id::*;
 pub use id_array::*;
 pub use id_ptr::*;
@@ -26,4 +26,4 @@ pub use u32_id::*;
 pub use usize_id::*;
 
 #[cfg(test)]
-pub mod tests;
+mod tests;

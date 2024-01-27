@@ -5,7 +5,7 @@ pub trait VecExt<TValue>: Sealed {
 
     fn as_mut_id_vec<TMarker>(&mut self) -> &mut IdVec<TMarker, TValue>;
 
-    fn to_id_vec<TMarker>(self) -> IdVec<TMarker, TValue>;
+    fn into_id_vec<TMarker>(self) -> IdVec<TMarker, TValue>;
 }
 
 impl<TValue> VecExt<TValue> for Vec<TValue> {
@@ -17,7 +17,7 @@ impl<TValue> VecExt<TValue> for Vec<TValue> {
         IdVec::from_mut_vec(self)
     }
 
-    fn to_id_vec<TMarker>(self) -> IdVec<TMarker, TValue> {
+    fn into_id_vec<TMarker>(self) -> IdVec<TMarker, TValue> {
         IdVec::from_vec(self)
     }
 }
