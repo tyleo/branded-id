@@ -1,4 +1,4 @@
-// mod array_ext_tests;
+mod array_ext_tests;
 // mod bound_pair_ext_tests;
 // mod i32_ext_tests;
 // mod isize_ext_tests;
