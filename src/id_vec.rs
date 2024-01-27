@@ -27,7 +27,7 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
         IdSlice::from_slice(&self.repr)
     }
 
-    pub fn as_vec(&self) -> &Vec<TValue> {
+    pub const fn as_vec(&self) -> &Vec<TValue> {
         &self.repr
     }
 
