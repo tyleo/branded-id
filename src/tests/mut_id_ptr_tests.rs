@@ -8,6 +8,16 @@ use std::{
 };
 
 #[test]
+fn cast_to_test() {
+    let ptr: *mut _ = &mut 1;
+    let id_ptr = mut_id_ptr!(MTest; ptr);
+
+    let actual: MutIdPtr<MTest, u8> = id_ptr.cast_to::<u8>();
+    let expected = mut_id_ptr!(MTest; ptr as *mut u8);
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn deref_ptr_test() {
     unsafe {
         let ptr: *mut _ = &mut 1;

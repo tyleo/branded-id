@@ -1,6 +1,4 @@
-pub trait Extends<TMarker> {}
-
-impl<T> Extends<T> for T {}
+pub trait Extends<TMarker: ?Sized> {}
 
 mod i32_id;
 mod id_array;

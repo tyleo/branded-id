@@ -7,6 +7,16 @@ use std::{
 };
 
 #[test]
+fn cast_to_test() {
+    let ptr: *const _ = &1;
+    let id_ptr = id_ptr!(MTest; ptr);
+
+    let actual: IdPtr<MTest, u8> = id_ptr.cast_to::<u8>();
+    let expected = id_ptr!(MTest; ptr as *const u8);
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn deref_ptr_test() {
     unsafe {
         let ptr: *const _ = &1;

@@ -13,6 +13,10 @@ pub struct IdPtr<TMarker: ?Sized, TValue: ?Sized> {
 }
 
 impl<TMarker, TValue> IdPtr<TMarker, TValue> {
+    pub const fn cast_to<TValue2>(self) -> IdPtr<TMarker, TValue2> {
+        IdPtr::from_ptr(self.to_ptr() as *const TValue2)
+    }
+
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
     pub const unsafe fn deref_ptr<'a>(self) -> &'a TValue {

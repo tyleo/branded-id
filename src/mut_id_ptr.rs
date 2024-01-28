@@ -13,6 +13,10 @@ pub struct MutIdPtr<TMarker: ?Sized, TValue: ?Sized> {
 }
 
 impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
+    pub const fn cast_to<TValue2>(self) -> MutIdPtr<TMarker, TValue2> {
+        MutIdPtr::from_mut_ptr(self.to_mut_ptr() as *mut TValue2)
+    }
+
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
     pub unsafe fn deref_ptr<'a>(self) -> &'a mut TValue {
