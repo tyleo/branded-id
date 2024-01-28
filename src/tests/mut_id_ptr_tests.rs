@@ -69,6 +69,30 @@ fn offset_test() {
 }
 
 #[test]
+fn read_test() {
+    unsafe {
+        let ptr: *mut _ = &mut 1;
+        let id_ptr = mut_id_ptr!(MTest; ptr);
+
+        let actual: i32 = id_ptr.read();
+        let expected = 1;
+        assert_eq!(actual, expected);
+    }
+}
+
+#[test]
+fn read_unaligned_test() {
+    unsafe {
+        let ptr: *mut _ = &mut 1;
+        let id_ptr = mut_id_ptr!(MTest; ptr);
+
+        let actual: i32 = id_ptr.read_unaligned();
+        let expected = 1;
+        assert_eq!(actual, expected);
+    }
+}
+
+#[test]
 fn to_id_ptr_test() {
     let ptr: *mut _ = &mut 1;
     let id_ptr = mut_id_ptr!(MTest; ptr);
@@ -86,6 +110,32 @@ fn to_mut_ptr_test() {
     let actual: *mut i32 = id_ptr.to_mut_ptr();
     let expected = ptr;
     assert_eq!(actual, expected);
+}
+
+#[test]
+fn write_test() {
+    unsafe {
+        let ptr: *mut _ = &mut 1;
+        let id_ptr = mut_id_ptr!(MTest; ptr);
+        id_ptr.write(2);
+
+        let actual: i32 = id_ptr.read();
+        let expected = 2;
+        assert_eq!(actual, expected);
+    }
+}
+
+#[test]
+fn write_unaligned_test() {
+    unsafe {
+        let ptr: *mut _ = &mut 1;
+        let id_ptr = mut_id_ptr!(MTest; ptr);
+        id_ptr.write_unaligned(2);
+
+        let actual: i32 = id_ptr.read();
+        let expected = 2;
+        assert_eq!(actual, expected);
+    }
 }
 
 #[test]

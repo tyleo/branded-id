@@ -55,6 +55,30 @@ fn offset_test() {
 }
 
 #[test]
+fn read_test() {
+    unsafe {
+        let ptr: *const _ = &1;
+        let id_ptr = id_ptr!(MTest; ptr);
+
+        let actual: i32 = id_ptr.read();
+        let expected = 1;
+        assert_eq!(actual, expected);
+    }
+}
+
+#[test]
+fn read_unaligned_test() {
+    unsafe {
+        let ptr: *const _ = &1;
+        let id_ptr = id_ptr!(MTest; ptr);
+
+        let actual: i32 = id_ptr.read_unaligned();
+        let expected = 1;
+        assert_eq!(actual, expected);
+    }
+}
+
+#[test]
 fn to_ptr_test() {
     let ptr: *const _ = &1;
     let id_ptr = id_ptr!(MTest; ptr);

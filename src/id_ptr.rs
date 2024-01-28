@@ -36,6 +36,18 @@ impl<TMarker, TValue> IdPtr<TMarker, TValue> {
         Self::from_ptr(self.to_ptr().offset(offset.to_isize()))
     }
 
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read
+    pub const unsafe fn read(self) -> TValue {
+        self.to_ptr().read()
+    }
+
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned
+    pub const unsafe fn read_unaligned(self) -> TValue {
+        self.to_ptr().read_unaligned()
+    }
+
     pub const fn to_ptr(self) -> *const TValue {
         self.repr
     }

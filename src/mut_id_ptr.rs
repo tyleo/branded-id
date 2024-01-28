@@ -43,12 +43,36 @@ impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
         Self::from_mut_ptr(self.to_mut_ptr().offset(offset.to_isize()))
     }
 
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read-1
+    pub const unsafe fn read(self) -> TValue {
+        self.to_mut_ptr().read()
+    }
+
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1
+    pub const unsafe fn read_unaligned(self) -> TValue {
+        self.to_mut_ptr().read_unaligned()
+    }
+
     pub const fn to_id_ptr(self) -> IdPtr<TMarker, TValue> {
         IdPtr::from_ptr(self.to_mut_ptr())
     }
 
     pub const fn to_mut_ptr(self) -> *mut TValue {
         self.repr
+    }
+
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.write
+    pub unsafe fn write(self, val: TValue) {
+        self.to_mut_ptr().write(val)
+    }
+
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.write_unaligned
+    pub unsafe fn write_unaligned(self, val: TValue) {
+        self.to_mut_ptr().write_unaligned(val)
     }
 }
 
