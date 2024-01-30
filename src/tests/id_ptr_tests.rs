@@ -1,10 +1,27 @@
-use crate::{id_ptr, isize_id, mut_id_ptr, tests::util::MTest, IdPtr};
+use crate::{id_ptr, isize_id, mut_id_ptr, tests::util::MTest, usize_id, IdPtr};
 use std::{
     cmp::Ordering,
     collections::hash_map::DefaultHasher,
     hash::{Hash, Hasher},
     ptr::null,
 };
+
+#[test]
+fn as_test() {
+    unsafe {
+        let slice = [1, 2].as_slice();
+
+        let id_ptr = id_ptr!(MTest; slice.as_ptr());
+        let id_ptr = id_ptr.add(usize_id!(1));
+
+        let ptr = slice.as_ptr();
+        let ptr = ptr.add(1);
+
+        let actual: &i32 = id_ptr.deref_ptr();
+        let expected = &*ptr;
+        assert_eq!(actual, expected);
+    }
+}
 
 #[test]
 fn cast_to_test() {

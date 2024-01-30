@@ -1,4 +1,4 @@
-use crate::{IdPtr, IsizeId};
+use crate::{IdPtr, IsizeId, UsizeId};
 use std::{
     cmp::Ordering,
     fmt::{self, Debug, Pointer},
@@ -13,6 +13,12 @@ pub struct MutIdPtr<TMarker: ?Sized, TValue: ?Sized> {
 }
 
 impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
+    /// # Safety
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.add-1
+    pub const unsafe fn add(self, count: UsizeId<TMarker>) -> MutIdPtr<TMarker, TValue> {
+        MutIdPtr::from_mut_ptr(self.to_mut_ptr().add(count.to_usize()))
+    }
+
     pub const fn cast_to<TValue2>(self) -> MutIdPtr<TMarker, TValue2> {
         MutIdPtr::from_mut_ptr(self.to_mut_ptr() as *mut TValue2)
     }
@@ -37,8 +43,7 @@ impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
     }
 
     /// # Safety
-    /// This function should ensure that the offset results in a slice which
-    /// shares memory with the original slice.
+    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.offset-1
     pub const unsafe fn offset(self, offset: IsizeId<TMarker>) -> Self {
         Self::from_mut_ptr(self.to_mut_ptr().offset(offset.to_isize()))
     }
