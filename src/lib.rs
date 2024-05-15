@@ -26,10 +26,10 @@ pub use u32_id::*;
 pub use usize_id::*;
 
 #[cfg(feature = "extends")]
-mod extends;
+pub mod extends;
 
-#[cfg(feature = "extends")]
-pub use extends::*;
+#[cfg(feature = "soa")]
+pub mod soa;
 
 #[cfg(test)]
 mod tests;

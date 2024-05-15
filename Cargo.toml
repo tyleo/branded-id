@@ -8,5 +8,6 @@ edition = "2021"
 [dependencies]
 
 [features]
-default = ["extends"]
+default = ["extends", "soa"]
 extends = []
+soa = []
