@@ -1,7 +1,9 @@
 use crate::{ext::UsizeExt, UsizeId};
-use std::{default::Default, mem::size_of};
+use std::default::Default;
 
-pub struct UsizeIdStruct<TMarker> {
+use super::{BitAccessInfo, UsizeIdStructIter};
+
+pub struct UsizeIdStruct<TMarker: ?Sized> {
     used_ids: Vec<u64>,
     free_ids: Vec<UsizeId<TMarker>>,
     next_id: UsizeId<TMarker>,
@@ -43,32 +45,8 @@ impl<TMarker> UsizeIdStruct<TMarker> {
     }
 }
 
-struct BitAccessInfo {
-    slice_index: usize,
-    u64_pattern: u64,
-}
-
-fn get_bit_access_info(index: usize) -> BitAccessInfo {
-    // 00000001 <- 0
-    // 00000010 <- 1
-    // 00000100 <- 2
-    // 00001000 <- 3
-    // 00010000 <- 4
-    // 00100000 <- 5
-    // 01000000 <- 6
-    // 10000000 <- 7
-    let elem_size = size_of::<u64>();
-    let used_ids_list_index = index / elem_size;
-    let used_ids_bit_index = index % elem_size;
-    let bit_pattern = 1 << used_ids_bit_index;
-    BitAccessInfo {
-        slice_index: used_ids_list_index,
-        u64_pattern: bit_pattern,
-    }
-}
-
 fn clear_bit(used_ids: &mut [u64], index: usize) {
-    let bit_access_info = get_bit_access_info(index);
+    let bit_access_info = BitAccessInfo::from_index(index);
 
     // Clear the bit
     let old_pattern = used_ids[bit_access_info.slice_index];
@@ -77,7 +55,7 @@ fn clear_bit(used_ids: &mut [u64], index: usize) {
 }
 
 fn set_bit(used_ids: &mut Vec<u64>, index: usize) {
-    let bit_access_info = get_bit_access_info(index);
+    let bit_access_info = BitAccessInfo::from_index(index);
 
     // Ensure the bit we need to set actually exists
     ensure_size(used_ids, bit_access_info.slice_index + 1);
@@ -97,5 +75,14 @@ fn ensure_size(items: &mut Vec<u64>, desired_size: usize) {
 impl<TMarker> Default for UsizeIdStruct<TMarker> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<'a, TMarker> IntoIterator for &'a UsizeIdStruct<TMarker> {
+    type Item = UsizeId<TMarker>;
+    type IntoIter = UsizeIdStructIter<'a, TMarker>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        UsizeIdStructIter::from_used_ids(&self.used_ids)
     }
 }

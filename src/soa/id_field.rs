@@ -4,7 +4,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-pub struct IdField<TMarker, T> {
+pub struct IdField<TMarker: ?Sized, T> {
     items: IdVec<TMarker, MaybeUninit<T>>,
 }
 
@@ -15,7 +15,13 @@ impl<TMarker, T> IdField<TMarker, T> {
         }
     }
 
-    pub fn drop(self) {}
+    /// # Safety
+    /// A value must be `retain()`'d at the id for `release()`` to be safe to call.
+    pub unsafe fn release_all(mut self, iter: impl IntoIterator<Item = UsizeId<TMarker>>) {
+        for id in iter {
+            self.release(id)
+        }
+    }
 
     pub fn retain(&mut self, id: UsizeId<TMarker>, value: T) {
         ensure_size(&mut self.items, id.to_usize() + 1);

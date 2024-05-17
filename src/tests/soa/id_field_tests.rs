@@ -5,8 +5,7 @@ use crate::{
 
 #[test]
 fn new_test() {
-    let health = IdField::<MTest, u32>::new();
-    health.drop();
+    IdField::<MTest, u32>::new();
 }
 
 #[test]
@@ -21,8 +20,6 @@ fn retain_test() {
     let expected = 1;
 
     assert_eq!(actual, expected);
-
-    health.drop();
 }
 
 #[test]
@@ -45,6 +42,4 @@ fn release_test() {
     let expected = 1;
 
     assert_eq!(actual, expected);
-
-    health.drop();
 }

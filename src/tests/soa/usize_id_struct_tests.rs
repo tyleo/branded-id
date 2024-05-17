@@ -70,3 +70,72 @@ fn retain_release_test() {
     let expected = usize_id!(MTest; 0);
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn into_iter_test() {
+    let mut id_struct = UsizeIdStruct::<MTest>::new();
+
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![];
+    assert_eq!(actual, expected);
+
+    let id_0 = id_struct.retain();
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_0];
+    assert_eq!(actual, expected);
+
+    let id_1 = id_struct.retain();
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_0, id_1];
+    assert_eq!(actual, expected);
+
+    let id_2 = id_struct.retain();
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_0, id_1, id_2];
+    assert_eq!(actual, expected);
+
+    id_struct.release(id_0);
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_1, id_2];
+    assert_eq!(actual, expected);
+
+    id_struct.retain();
+    id_struct.release(id_1);
+
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_0, id_2];
+    assert_eq!(actual, expected);
+
+    id_struct.retain();
+    id_struct.release(id_2);
+
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_0, id_1];
+    assert_eq!(actual, expected);
+
+    id_struct.retain();
+    id_struct.release(id_0);
+    id_struct.release(id_1);
+
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_2];
+    assert_eq!(actual, expected);
+
+    id_struct.retain();
+    id_struct.retain();
+    id_struct.release(id_1);
+    id_struct.release(id_2);
+
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_0];
+    assert_eq!(actual, expected);
+
+    id_struct.retain();
+    id_struct.retain();
+    id_struct.release(id_0);
+    id_struct.release(id_2);
+
+    let actual: Vec<_> = id_struct.into_iter().collect();
+    let expected = vec![id_1];
+    assert_eq!(actual, expected);
+}
