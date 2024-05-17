@@ -14,7 +14,7 @@ pub struct IdVec<TMarker: ?Sized, TValue> {
     repr: Vec<TValue>,
 }
 
-impl<TMarker, TValue> IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> IdVec<TMarker, TValue> {
     pub fn as_mut_id_slice(&mut self) -> &mut IdSlice<TMarker, TValue> {
         IdSlice::from_mut_slice(&mut self.repr)
     }
@@ -80,61 +80,61 @@ impl<TMarker, TValue> IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> AsMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> AsMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn as_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
         self.as_mut_id_slice()
     }
 }
 
-impl<TMarker, TValue> AsMut<IdVec<TMarker, TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> AsMut<IdVec<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn as_mut(&mut self) -> &mut IdVec<TMarker, TValue> {
         self
     }
 }
 
-impl<TMarker, TValue> AsRef<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> AsRef<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn as_ref(&self) -> &IdSlice<TMarker, TValue> {
         self.as_id_slice()
     }
 }
 
-impl<TMarker, TValue> AsRef<IdVec<TMarker, TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> AsRef<IdVec<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn as_ref(&self) -> &IdVec<TMarker, TValue> {
         self
     }
 }
 
-impl<TMarker, TValue> Borrow<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Borrow<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn borrow(&self) -> &IdSlice<TMarker, TValue> {
         IdSlice::from_slice(self.as_vec().borrow())
     }
 }
 
-impl<TMarker, TValue> BorrowMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> BorrowMut<IdSlice<TMarker, TValue>> for IdVec<TMarker, TValue> {
     fn borrow_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
         IdSlice::from_mut_slice(self.as_mut_vec().borrow_mut())
     }
 }
 
-impl<TMarker, TValue: Clone> Clone for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue: Clone> Clone for IdVec<TMarker, TValue> {
     fn clone(&self) -> Self {
         Self::from_vec(self.as_vec().clone())
     }
 }
 
-impl<TMarker, TValue: Debug> Debug for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue: Debug> Debug for IdVec<TMarker, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.as_id_slice().fmt(f)
     }
 }
 
-impl<TMarker, TValue> Default for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Default for IdVec<TMarker, TValue> {
     fn default() -> Self {
         Self::from_vec(Default::default())
     }
 }
 
-impl<TMarker, TValue> Deref for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Deref for IdVec<TMarker, TValue> {
     type Target = IdSlice<TMarker, TValue>;
 
     fn deref(&self) -> &Self::Target {
@@ -142,15 +142,15 @@ impl<TMarker, TValue> Deref for IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> DerefMut for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> DerefMut for IdVec<TMarker, TValue> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         IdSlice::from_mut_slice(self.as_mut_vec().deref_mut())
     }
 }
 
-impl<TMarker, TValue> Eq for IdVec<TMarker, TValue> where TValue: PartialEq {}
+impl<TMarker: ?Sized, TValue> Eq for IdVec<TMarker, TValue> where TValue: PartialEq {}
 
-impl<'a, TMarker, TValue> Extend<&'a TValue> for IdVec<TMarker, TValue>
+impl<'a, TMarker: ?Sized, TValue> Extend<&'a TValue> for IdVec<TMarker, TValue>
 where
     TValue: Copy + 'a,
 {
@@ -159,25 +159,25 @@ where
     }
 }
 
-impl<TMarker, TValue> Extend<TValue> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Extend<TValue> for IdVec<TMarker, TValue> {
     fn extend<T: IntoIterator<Item = TValue>>(&mut self, iter: T) {
         self.as_mut_vec().extend(iter)
     }
 }
 
-impl<TMarker, TValue> From<Vec<TValue>> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> From<Vec<TValue>> for IdVec<TMarker, TValue> {
     fn from(value: Vec<TValue>) -> Self {
         Self::from_vec(value)
     }
 }
 
-impl<TMarker, TValue> FromIterator<TValue> for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> FromIterator<TValue> for IdVec<TMarker, TValue> {
     fn from_iter<T: IntoIterator<Item = TValue>>(iter: T) -> Self {
         Self::from_vec(Vec::from_iter(iter))
     }
 }
 
-impl<TMarker, TValue> Hash for IdVec<TMarker, TValue>
+impl<TMarker: ?Sized, TValue> Hash for IdVec<TMarker, TValue>
 where
     Vec<TValue>: Hash,
 {
@@ -194,7 +194,7 @@ where
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     for IdVec<TMarker, TValue>
 {
     type Output = I::Output;
@@ -204,7 +204,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     for IdVec<TMarker, TValue>
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
@@ -212,7 +212,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     }
 }
 
-impl<'a, TMarker, TValue> IntoIterator for &'a IdVec<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a IdVec<TMarker, TValue> {
     type Item = <&'a Vec<TValue> as IntoIterator>::Item;
     type IntoIter = <&'a Vec<TValue> as IntoIterator>::IntoIter;
 
@@ -222,7 +222,7 @@ impl<'a, TMarker, TValue> IntoIterator for &'a IdVec<TMarker, TValue> {
     }
 }
 
-impl<'a, TMarker, TValue> IntoIterator for &'a mut IdVec<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a mut IdVec<TMarker, TValue> {
     type Item = <&'a mut Vec<TValue> as IntoIterator>::Item;
     type IntoIter = <&'a mut Vec<TValue> as IntoIterator>::IntoIter;
 
@@ -232,7 +232,7 @@ impl<'a, TMarker, TValue> IntoIterator for &'a mut IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> IntoIterator for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> IntoIterator for IdVec<TMarker, TValue> {
     type Item = <Vec<TValue> as IntoIterator>::Item;
     type IntoIter = <Vec<TValue> as IntoIterator>::IntoIter;
 
@@ -241,7 +241,7 @@ impl<TMarker, TValue> IntoIterator for IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue: Ord> Ord for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue: Ord> Ord for IdVec<TMarker, TValue> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.as_vec().cmp(other.as_vec())
     }
@@ -269,7 +269,8 @@ impl<TMarker, TValue: Ord> Ord for IdVec<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValueA, TValueB> PartialEq<&IdSlice<TMarker, TValueB>> for IdVec<TMarker, TValueA>
+impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<&IdSlice<TMarker, TValueB>>
+    for IdVec<TMarker, TValueA>
 where
     TValueA: PartialEq<TValueB>,
 {
@@ -283,7 +284,7 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<&IdArray<TMarker, TValueB, N>>
+impl<TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<&IdArray<TMarker, TValueB, N>>
     for IdVec<TMarker, TValueA>
 where
     TValueA: PartialEq<TValueB>,
@@ -298,7 +299,7 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB> PartialEq<&mut IdSlice<TMarker, TValueB>>
+impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<&mut IdSlice<TMarker, TValueB>>
     for IdVec<TMarker, TValueA>
 where
     TValueA: PartialEq<TValueB>,
@@ -313,7 +314,8 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>> for IdVec<TMarker, TValueA>
+impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>>
+    for IdVec<TMarker, TValueA>
 where
     TValueA: PartialEq<TValueB>,
 {
@@ -327,7 +329,7 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
+impl<TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
     for IdVec<TMarker, TValueA>
 where
     TValueA: PartialEq<TValueB>,
@@ -342,7 +344,8 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>> for IdVec<TMarker, TValueA>
+impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>>
+    for IdVec<TMarker, TValueA>
 where
     TValueA: PartialEq<TValueB>,
 {
@@ -357,7 +360,7 @@ where
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
-impl<TMarker, TValue: PartialOrd> PartialOrd for IdVec<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue: PartialOrd> PartialOrd for IdVec<TMarker, TValue> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.as_vec().partial_cmp(other.as_vec())
     }

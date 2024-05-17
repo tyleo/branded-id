@@ -16,7 +16,7 @@ pub struct U32Id<TMarker: ?Sized> {
     repr: u32,
 }
 
-impl<TMarker> U32Id<TMarker> {
+impl<TMarker: ?Sized> U32Id<TMarker> {
     fn fmt_helper(
         self,
         fmt_repr: impl FnOnce(&u32, &mut Formatter) -> fmt::Result,
@@ -52,41 +52,41 @@ impl<TMarker> U32Id<TMarker> {
     }
 }
 
-impl<TMarker> Binary for U32Id<TMarker> {
+impl<TMarker: ?Sized> Binary for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Binary::fmt, f)
     }
 }
 
-impl<TMarker> Clone for U32Id<TMarker> {
+impl<TMarker: ?Sized> Clone for U32Id<TMarker> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<TMarker> Copy for U32Id<TMarker> {}
+impl<TMarker: ?Sized> Copy for U32Id<TMarker> {}
 
-impl<TMarker> Debug for U32Id<TMarker> {
+impl<TMarker: ?Sized> Debug for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Debug::fmt, f)
     }
 }
 
-impl<TMarker> Display for U32Id<TMarker> {
+impl<TMarker: ?Sized> Display for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Display::fmt, f)
     }
 }
 
-impl<TMarker> Eq for U32Id<TMarker> {}
+impl<TMarker: ?Sized> Eq for U32Id<TMarker> {}
 
-impl<TMarker> From<u32> for U32Id<TMarker> {
+impl<TMarker: ?Sized> From<u32> for U32Id<TMarker> {
     fn from(val: u32) -> Self {
         Self::from_u32(val)
     }
 }
 
-impl<TMarker> FromStr for U32Id<TMarker> {
+impl<TMarker: ?Sized> FromStr for U32Id<TMarker> {
     type Err = <u32 as FromStr>::Err;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -94,7 +94,7 @@ impl<TMarker> FromStr for U32Id<TMarker> {
     }
 }
 
-impl<TMarker> Hash for U32Id<TMarker> {
+impl<TMarker: ?Sized> Hash for U32Id<TMarker> {
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
@@ -111,25 +111,25 @@ impl<TMarker> Hash for U32Id<TMarker> {
     }
 }
 
-impl<TMarker> LowerExp for U32Id<TMarker> {
+impl<TMarker: ?Sized> LowerExp for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(LowerExp::fmt, f)
     }
 }
 
-impl<TMarker> LowerHex for U32Id<TMarker> {
+impl<TMarker: ?Sized> LowerHex for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(LowerHex::fmt, f)
     }
 }
 
-impl<TMarker> Octal for U32Id<TMarker> {
+impl<TMarker: ?Sized> Octal for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Octal::fmt, f)
     }
 }
 
-impl<TMarker> Ord for U32Id<TMarker> {
+impl<TMarker: ?Sized> Ord for U32Id<TMarker> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.to_u32().cmp(&other.to_u32())
     }
@@ -157,7 +157,7 @@ impl<TMarker> Ord for U32Id<TMarker> {
     }
 }
 
-impl<TMarker> PartialEq for U32Id<TMarker> {
+impl<TMarker: ?Sized> PartialEq for U32Id<TMarker> {
     fn eq(&self, other: &Self) -> bool {
         self.to_u32().eq(&other.to_u32())
     }
@@ -169,7 +169,7 @@ impl<TMarker> PartialEq for U32Id<TMarker> {
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
-impl<TMarker> PartialOrd for U32Id<TMarker> {
+impl<TMarker: ?Sized> PartialOrd for U32Id<TMarker> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.to_u32().partial_cmp(&other.to_u32())
     }
@@ -191,13 +191,13 @@ impl<TMarker> PartialOrd for U32Id<TMarker> {
     }
 }
 
-impl<TMarker> UpperExp for U32Id<TMarker> {
+impl<TMarker: ?Sized> UpperExp for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(UpperExp::fmt, f)
     }
 }
 
-impl<TMarker> UpperHex for U32Id<TMarker> {
+impl<TMarker: ?Sized> UpperHex for U32Id<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(UpperHex::fmt, f)
     }

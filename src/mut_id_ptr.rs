@@ -12,7 +12,7 @@ pub struct MutIdPtr<TMarker: ?Sized, TValue: ?Sized> {
     repr: *mut TValue,
 }
 
-impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> MutIdPtr<TMarker, TValue> {
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.add-1
     pub const unsafe fn add(self, count: UsizeId<TMarker>) -> MutIdPtr<TMarker, TValue> {
@@ -81,29 +81,29 @@ impl<TMarker, TValue> MutIdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> Clone for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Clone for MutIdPtr<TMarker, TValue> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<TMarker, TValue> Copy for MutIdPtr<TMarker, TValue> {}
+impl<TMarker: ?Sized, TValue> Copy for MutIdPtr<TMarker, TValue> {}
 
-impl<TMarker, TValue> Debug for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Debug for MutIdPtr<TMarker, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         Debug::fmt(&self.to_id_ptr(), f)
     }
 }
 
-impl<TMarker, TValue> Eq for MutIdPtr<TMarker, TValue> {}
+impl<TMarker: ?Sized, TValue> Eq for MutIdPtr<TMarker, TValue> {}
 
-impl<TMarker, TValue> From<*mut TValue> for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> From<*mut TValue> for MutIdPtr<TMarker, TValue> {
     fn from(value: *mut TValue) -> Self {
         Self::from_mut_ptr(value)
     }
 }
 
-impl<TMarker, TValue> Hash for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Hash for MutIdPtr<TMarker, TValue> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.to_mut_ptr().hash(state)
     }
@@ -117,7 +117,7 @@ impl<TMarker, TValue> Hash for MutIdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> Ord for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Ord for MutIdPtr<TMarker, TValue> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.to_mut_ptr().cmp(&other.to_mut_ptr())
     }
@@ -145,7 +145,7 @@ impl<TMarker, TValue> Ord for MutIdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> PartialEq<MutIdPtr<TMarker, TValue>> for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> PartialEq<MutIdPtr<TMarker, TValue>> for MutIdPtr<TMarker, TValue> {
     fn eq(&self, other: &MutIdPtr<TMarker, TValue>) -> bool {
         self.to_mut_ptr().eq(&other.to_mut_ptr())
     }
@@ -157,7 +157,7 @@ impl<TMarker, TValue> PartialEq<MutIdPtr<TMarker, TValue>> for MutIdPtr<TMarker,
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
-impl<TMarker, TValue> PartialOrd for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> PartialOrd for MutIdPtr<TMarker, TValue> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.to_mut_ptr().partial_cmp(&other.to_mut_ptr())
     }
@@ -179,7 +179,7 @@ impl<TMarker, TValue> PartialOrd for MutIdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> Pointer for MutIdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Pointer for MutIdPtr<TMarker, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         Pointer::fmt(&self.to_id_ptr(), f)
     }

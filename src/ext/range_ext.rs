@@ -1,7 +1,7 @@
 use crate::{IdSlice, IdSliceIndex, UsizeId};
 use std::ops::Range;
 
-impl<TMarker, TValue> IdSliceIndex<IdSlice<TMarker, TValue>> for Range<UsizeId<TMarker>> {
+impl<TMarker: ?Sized, TValue> IdSliceIndex<IdSlice<TMarker, TValue>> for Range<UsizeId<TMarker>> {
     type Output = IdSlice<TMarker, TValue>;
 
     fn get(self, slice: &IdSlice<TMarker, TValue>) -> Option<&Self::Output> {

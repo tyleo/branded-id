@@ -18,7 +18,7 @@ pub struct IdSlice<TMarker: ?Sized, TValue> {
     repr: [TValue],
 }
 
-impl<TMarker, TValue> IdSlice<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> IdSlice<TMarker, TValue> {
     pub fn as_mut_id_ptr(&mut self) -> MutIdPtr<TMarker, TValue> {
         MutIdPtr::from_mut_ptr(self.as_mut_slice().as_mut_ptr())
     }
@@ -72,19 +72,19 @@ impl<TMarker, TValue> IdSlice<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> AsMut<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> AsMut<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValue> {
     fn as_mut(&mut self) -> &mut Self {
         self
     }
 }
 
-impl<TMarker, TValue> AsRef<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> AsRef<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValue> {
     fn as_ref(&self) -> &Self {
         self
     }
 }
 
-impl<TMarker> BufRead for &IdSlice<TMarker, u8> {
+impl<TMarker: ?Sized> BufRead for &IdSlice<TMarker, u8> {
     fn fill_buf(&mut self) -> io::Result<&[u8]> {
         let repr: &mut &[u8] = unsafe { transmute(self) };
         repr.fill_buf()
@@ -106,46 +106,46 @@ impl<TMarker> BufRead for &IdSlice<TMarker, u8> {
     }
 }
 
-impl<TMarker, TValue: Debug> Debug for IdSlice<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue: Debug> Debug for IdSlice<TMarker, TValue> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         fmt_marker_name::<TMarker>(f)?;
         Debug::fmt(self.as_slice(), f)
     }
 }
 
-impl<TMarker, TValue> Default for &IdSlice<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Default for &IdSlice<TMarker, TValue> {
     fn default() -> Self {
         IdSlice::from_slice(&[])
     }
 }
 
-impl<TMarker, TValue> Default for &mut IdSlice<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue> Default for &mut IdSlice<TMarker, TValue> {
     fn default() -> Self {
         IdSlice::from_mut_slice(&mut [])
     }
 }
 
-impl<TMarker, TValue> Eq for IdSlice<TMarker, TValue> where [TValue]: PartialEq {}
+impl<TMarker: ?Sized, TValue> Eq for IdSlice<TMarker, TValue> where [TValue]: PartialEq {}
 
-impl<'a, TMarker, TValue> From<&'a [TValue]> for &'a IdSlice<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> From<&'a [TValue]> for &'a IdSlice<TMarker, TValue> {
     fn from(value: &'a [TValue]) -> Self {
         IdSlice::from_slice(value)
     }
 }
 
-impl<'a, TMarker, TValue> From<&'a mut [TValue]> for &'a IdSlice<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> From<&'a mut [TValue]> for &'a IdSlice<TMarker, TValue> {
     fn from(value: &'a mut [TValue]) -> Self {
         IdSlice::from_slice(value)
     }
 }
 
-impl<'a, TMarker, TValue> From<&'a mut [TValue]> for &'a mut IdSlice<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> From<&'a mut [TValue]> for &'a mut IdSlice<TMarker, TValue> {
     fn from(value: &'a mut [TValue]) -> Self {
         IdSlice::from_mut_slice(value)
     }
 }
 
-impl<TMarker, TValue> Hash for IdSlice<TMarker, TValue>
+impl<TMarker: ?Sized, TValue> Hash for IdSlice<TMarker, TValue>
 where
     [TValue]: Hash,
 {
@@ -154,7 +154,7 @@ where
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     for IdSlice<TMarker, TValue>
 {
     type Output = I::Output;
@@ -164,7 +164,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     for IdSlice<TMarker, TValue>
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
@@ -173,7 +173,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
 }
 
 #[allow(clippy::into_iter_on_ref)]
-impl<'a, TMarker, TValue> IntoIterator for &'a IdSlice<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a IdSlice<TMarker, TValue> {
     type Item = <&'a [TValue] as IntoIterator>::Item;
     type IntoIter = <&'a [TValue] as IntoIterator>::IntoIter;
 
@@ -183,7 +183,7 @@ impl<'a, TMarker, TValue> IntoIterator for &'a IdSlice<TMarker, TValue> {
 }
 
 #[allow(clippy::into_iter_on_ref)]
-impl<'a, TMarker, TValue> IntoIterator for &'a mut IdSlice<TMarker, TValue> {
+impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a mut IdSlice<TMarker, TValue> {
     type Item = <&'a mut [TValue] as IntoIterator>::Item;
     type IntoIter = <&'a mut [TValue] as IntoIterator>::IntoIter;
 
@@ -192,7 +192,7 @@ impl<'a, TMarker, TValue> IntoIterator for &'a mut IdSlice<TMarker, TValue> {
     }
 }
 
-impl<TMarker, TValue> Ord for IdSlice<TMarker, TValue>
+impl<TMarker: ?Sized, TValue> Ord for IdSlice<TMarker, TValue>
 where
     [TValue]: Ord,
 {
@@ -201,7 +201,8 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>> for IdSlice<TMarker, TValueA>
+impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>>
+    for IdSlice<TMarker, TValueA>
 where
     [TValueA]: PartialEq<[TValueB]>,
 {
@@ -215,7 +216,7 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
+impl<TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
     for IdSlice<TMarker, TValueA>
 where
     [TValueA]: PartialEq<[TValueB; N]>,
@@ -230,7 +231,8 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>> for IdSlice<TMarker, TValueA>
+impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>>
+    for IdSlice<TMarker, TValueA>
 where
     [TValueA]: PartialEq<Vec<TValueB>>,
 {
@@ -244,7 +246,7 @@ where
     }
 }
 
-impl<TMarker, TValue> PartialOrd for IdSlice<TMarker, TValue>
+impl<TMarker: ?Sized, TValue> PartialOrd for IdSlice<TMarker, TValue>
 where
     [TValue]: PartialOrd,
 {
@@ -269,7 +271,7 @@ where
     }
 }
 
-impl<TMarker> Read for &IdSlice<TMarker, u8> {
+impl<TMarker: ?Sized> Read for &IdSlice<TMarker, u8> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read(buf)
@@ -296,7 +298,7 @@ impl<TMarker> Read for &IdSlice<TMarker, u8> {
     }
 }
 
-impl<TMarker, TValue> ToOwned for IdSlice<TMarker, TValue>
+impl<TMarker: ?Sized, TValue> ToOwned for IdSlice<TMarker, TValue>
 where
     [TValue]: ToOwned<Owned = Vec<TValue>>,
 {
@@ -311,7 +313,7 @@ where
     }
 }
 
-impl<'a, TMarker> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
+impl<'a, TMarker: ?Sized> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
     type Iter = <&'a [SocketAddr] as ToSocketAddrs>::Iter;
 
     fn to_socket_addrs(&self) -> io::Result<Self::Iter> {
@@ -319,7 +321,7 @@ impl<'a, TMarker> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
     }
 }
 
-impl<'a, TMarker> io::Write for &'a mut IdSlice<TMarker, u8> {
+impl<'a, TMarker: ?Sized> io::Write for &'a mut IdSlice<TMarker, u8> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write(buf)

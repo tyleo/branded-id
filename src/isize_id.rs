@@ -16,7 +16,7 @@ pub struct IsizeId<TMarker: ?Sized> {
     repr: isize,
 }
 
-impl<TMarker> IsizeId<TMarker> {
+impl<TMarker: ?Sized> IsizeId<TMarker> {
     fn fmt_helper(
         self,
         fmt_repr: impl FnOnce(&isize, &mut Formatter) -> fmt::Result,
@@ -56,41 +56,41 @@ impl<TMarker> IsizeId<TMarker> {
     }
 }
 
-impl<TMarker> Binary for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Binary for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Binary::fmt, f)
     }
 }
 
-impl<TMarker> Clone for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Clone for IsizeId<TMarker> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<TMarker> Copy for IsizeId<TMarker> {}
+impl<TMarker: ?Sized> Copy for IsizeId<TMarker> {}
 
-impl<TMarker> Debug for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Debug for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Debug::fmt, f)
     }
 }
 
-impl<TMarker> Display for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Display for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Display::fmt, f)
     }
 }
 
-impl<TMarker> Eq for IsizeId<TMarker> {}
+impl<TMarker: ?Sized> Eq for IsizeId<TMarker> {}
 
-impl<TMarker> From<isize> for IsizeId<TMarker> {
+impl<TMarker: ?Sized> From<isize> for IsizeId<TMarker> {
     fn from(val: isize) -> Self {
         Self::from_isize(val)
     }
 }
 
-impl<TMarker> FromStr for IsizeId<TMarker> {
+impl<TMarker: ?Sized> FromStr for IsizeId<TMarker> {
     type Err = <isize as FromStr>::Err;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -98,7 +98,7 @@ impl<TMarker> FromStr for IsizeId<TMarker> {
     }
 }
 
-impl<TMarker> Hash for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Hash for IsizeId<TMarker> {
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
@@ -115,25 +115,25 @@ impl<TMarker> Hash for IsizeId<TMarker> {
     }
 }
 
-impl<TMarker> LowerExp for IsizeId<TMarker> {
+impl<TMarker: ?Sized> LowerExp for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(LowerExp::fmt, f)
     }
 }
 
-impl<TMarker> LowerHex for IsizeId<TMarker> {
+impl<TMarker: ?Sized> LowerHex for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(LowerHex::fmt, f)
     }
 }
 
-impl<TMarker> Octal for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Octal for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(Octal::fmt, f)
     }
 }
 
-impl<TMarker> Ord for IsizeId<TMarker> {
+impl<TMarker: ?Sized> Ord for IsizeId<TMarker> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.to_isize().cmp(&other.to_isize())
     }
@@ -161,7 +161,7 @@ impl<TMarker> Ord for IsizeId<TMarker> {
     }
 }
 
-impl<TMarker> PartialEq for IsizeId<TMarker> {
+impl<TMarker: ?Sized> PartialEq for IsizeId<TMarker> {
     fn eq(&self, other: &Self) -> bool {
         self.to_isize().eq(&other.to_isize())
     }
@@ -173,7 +173,7 @@ impl<TMarker> PartialEq for IsizeId<TMarker> {
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
-impl<TMarker> PartialOrd for IsizeId<TMarker> {
+impl<TMarker: ?Sized> PartialOrd for IsizeId<TMarker> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.to_isize().partial_cmp(&other.to_isize())
     }
@@ -195,13 +195,13 @@ impl<TMarker> PartialOrd for IsizeId<TMarker> {
     }
 }
 
-impl<TMarker> UpperExp for IsizeId<TMarker> {
+impl<TMarker: ?Sized> UpperExp for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(UpperExp::fmt, f)
     }
 }
 
-impl<TMarker> UpperHex for IsizeId<TMarker> {
+impl<TMarker: ?Sized> UpperHex for IsizeId<TMarker> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         self.fmt_helper(UpperHex::fmt, f)
     }

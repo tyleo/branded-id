@@ -17,7 +17,7 @@ impl<'a, TMarker: ?Sized> UsizeIdStructIter<'a, TMarker> {
     }
 }
 
-impl<'a, TMarker> Iterator for UsizeIdStructIter<'a, TMarker> {
+impl<'a, TMarker: ?Sized> Iterator for UsizeIdStructIter<'a, TMarker> {
     type Item = UsizeId<TMarker>;
 
     fn next(&mut self) -> Option<Self::Item> {

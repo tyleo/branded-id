@@ -14,7 +14,7 @@ pub struct IdArray<TMarker: ?Sized, TValue, const N: usize> {
     repr: [TValue; N],
 }
 
-impl<TMarker, TValue, const N: usize> IdArray<TMarker, TValue, N> {
+impl<TMarker: ?Sized, TValue, const N: usize> IdArray<TMarker, TValue, N> {
     pub const fn as_array(&self) -> &[TValue; N] {
         &self.repr
     }
@@ -51,7 +51,7 @@ impl<TMarker, TValue, const N: usize> IdArray<TMarker, TValue, N> {
     }
 }
 
-impl<TMarker, TValue, const N: usize> AsMut<IdSlice<TMarker, TValue>>
+impl<TMarker: ?Sized, TValue, const N: usize> AsMut<IdSlice<TMarker, TValue>>
     for IdArray<TMarker, TValue, N>
 {
     fn as_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
@@ -59,7 +59,7 @@ impl<TMarker, TValue, const N: usize> AsMut<IdSlice<TMarker, TValue>>
     }
 }
 
-impl<TMarker, TValue, const N: usize> AsRef<IdSlice<TMarker, TValue>>
+impl<TMarker: ?Sized, TValue, const N: usize> AsRef<IdSlice<TMarker, TValue>>
     for IdArray<TMarker, TValue, N>
 {
     fn as_ref(&self) -> &IdSlice<TMarker, TValue> {
@@ -67,7 +67,7 @@ impl<TMarker, TValue, const N: usize> AsRef<IdSlice<TMarker, TValue>>
     }
 }
 
-impl<TMarker, TValue, const N: usize> Borrow<IdSlice<TMarker, TValue>>
+impl<TMarker: ?Sized, TValue, const N: usize> Borrow<IdSlice<TMarker, TValue>>
     for IdArray<TMarker, TValue, N>
 {
     fn borrow(&self) -> &IdSlice<TMarker, TValue> {
@@ -75,7 +75,7 @@ impl<TMarker, TValue, const N: usize> Borrow<IdSlice<TMarker, TValue>>
     }
 }
 
-impl<TMarker, TValue, const N: usize> BorrowMut<IdSlice<TMarker, TValue>>
+impl<TMarker: ?Sized, TValue, const N: usize> BorrowMut<IdSlice<TMarker, TValue>>
     for IdArray<TMarker, TValue, N>
 {
     fn borrow_mut(&mut self) -> &mut IdSlice<TMarker, TValue> {
@@ -83,7 +83,7 @@ impl<TMarker, TValue, const N: usize> BorrowMut<IdSlice<TMarker, TValue>>
     }
 }
 
-impl<TMarker, TValue, const N: usize> Clone for IdArray<TMarker, TValue, N>
+impl<TMarker: ?Sized, TValue, const N: usize> Clone for IdArray<TMarker, TValue, N>
 where
     [TValue; N]: Clone,
 {
@@ -92,15 +92,18 @@ where
     }
 }
 
-impl<TMarker, TValue, const N: usize> Copy for IdArray<TMarker, TValue, N> where [TValue; N]: Copy {}
+impl<TMarker: ?Sized, TValue, const N: usize> Copy for IdArray<TMarker, TValue, N> where
+    [TValue; N]: Copy
+{
+}
 
-impl<TMarker, TValue: Debug, const N: usize> Debug for IdArray<TMarker, TValue, N> {
+impl<TMarker: ?Sized, TValue: Debug, const N: usize> Debug for IdArray<TMarker, TValue, N> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.as_id_slice(), f)
     }
 }
 
-impl<TMarker, TValue, const N: usize> Default for IdArray<TMarker, TValue, N>
+impl<TMarker: ?Sized, TValue, const N: usize> Default for IdArray<TMarker, TValue, N>
 where
     [TValue; N]: Default,
 {
@@ -109,16 +112,18 @@ where
     }
 }
 
-impl<TMarker, TValue, const N: usize> Eq for IdArray<TMarker, TValue, N> where [TValue; N]: PartialEq
-{}
+impl<TMarker: ?Sized, TValue, const N: usize> Eq for IdArray<TMarker, TValue, N> where
+    [TValue; N]: PartialEq
+{
+}
 
-impl<TMarker, TValue, const N: usize> From<[TValue; N]> for IdArray<TMarker, TValue, N> {
+impl<TMarker: ?Sized, TValue, const N: usize> From<[TValue; N]> for IdArray<TMarker, TValue, N> {
     fn from(value: [TValue; N]) -> Self {
         Self::from_array(value)
     }
 }
 
-impl<TMarker, TValue, const N: usize> Hash for IdArray<TMarker, TValue, N>
+impl<TMarker: ?Sized, TValue, const N: usize> Hash for IdArray<TMarker, TValue, N>
 where
     [TValue; N]: Hash,
 {
@@ -135,7 +140,7 @@ where
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize> Index<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize> Index<I>
     for IdArray<TMarker, TValue, N>
 {
     type Output = I::Output;
@@ -145,7 +150,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize>
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize> IndexMut<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize> IndexMut<I>
     for IdArray<TMarker, TValue, N>
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
@@ -154,7 +159,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>, const N: usize>
 }
 
 #[allow(clippy::into_iter_on_ref)]
-impl<'a, TMarker, TValue, const N: usize> IntoIterator for &'a IdArray<TMarker, TValue, N> {
+impl<'a, TMarker: ?Sized, TValue, const N: usize> IntoIterator for &'a IdArray<TMarker, TValue, N> {
     type Item = <&'a [TValue; N] as IntoIterator>::Item;
     type IntoIter = <&'a [TValue; N] as IntoIterator>::IntoIter;
 
@@ -164,7 +169,9 @@ impl<'a, TMarker, TValue, const N: usize> IntoIterator for &'a IdArray<TMarker, 
 }
 
 #[allow(clippy::into_iter_on_ref)]
-impl<'a, TMarker, TValue, const N: usize> IntoIterator for &'a mut IdArray<TMarker, TValue, N> {
+impl<'a, TMarker: ?Sized, TValue, const N: usize> IntoIterator
+    for &'a mut IdArray<TMarker, TValue, N>
+{
     type Item = <&'a mut [TValue; N] as IntoIterator>::Item;
     type IntoIter = <&'a mut [TValue; N] as IntoIterator>::IntoIter;
 
@@ -173,7 +180,7 @@ impl<'a, TMarker, TValue, const N: usize> IntoIterator for &'a mut IdArray<TMark
     }
 }
 
-impl<TMarker, TValue, const N: usize> IntoIterator for IdArray<TMarker, TValue, N> {
+impl<TMarker: ?Sized, TValue, const N: usize> IntoIterator for IdArray<TMarker, TValue, N> {
     type Item = <[TValue; N] as IntoIterator>::Item;
     type IntoIter = <[TValue; N] as IntoIterator>::IntoIter;
 
@@ -182,7 +189,7 @@ impl<TMarker, TValue, const N: usize> IntoIterator for IdArray<TMarker, TValue, 
     }
 }
 
-impl<TMarker, TValue: Ord, const N: usize> Ord for IdArray<TMarker, TValue, N> {
+impl<TMarker: ?Sized, TValue: Ord, const N: usize> Ord for IdArray<TMarker, TValue, N> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.as_array().cmp(other.as_array())
     }
@@ -210,7 +217,7 @@ impl<TMarker, TValue: Ord, const N: usize> Ord for IdArray<TMarker, TValue, N> {
     }
 }
 
-impl<'a, TMarker, TValueA, TValueB, const N: usize> PartialEq<&'a IdSlice<TMarker, TValueB>>
+impl<'a, TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<&'a IdSlice<TMarker, TValueB>>
     for IdArray<TMarker, TValueA, N>
 where
     [TValueA; N]: PartialEq<&'a [TValueB]>,
@@ -225,8 +232,8 @@ where
     }
 }
 
-impl<'a, TMarker, TValueA, TValueB, const N: usize> PartialEq<&'a mut IdSlice<TMarker, TValueB>>
-    for IdArray<TMarker, TValueA, N>
+impl<'a, TMarker: ?Sized, TValueA, TValueB, const N: usize>
+    PartialEq<&'a mut IdSlice<TMarker, TValueB>> for IdArray<TMarker, TValueA, N>
 where
     [TValueA; N]: PartialEq<&'a mut [TValueB]>,
 {
@@ -242,7 +249,7 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdSlice<TMarker, TValueB>>
+impl<TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<IdSlice<TMarker, TValueB>>
     for IdArray<TMarker, TValueA, N>
 where
     [TValueA; N]: PartialEq<[TValueB]>,
@@ -257,7 +264,7 @@ where
     }
 }
 
-impl<TMarker, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
+impl<TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
     for IdArray<TMarker, TValueA, N>
 where
     [TValueA; N]: PartialEq<[TValueB; N]>,
@@ -273,7 +280,9 @@ where
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
-impl<TMarker, TValue: PartialOrd, const N: usize> PartialOrd for IdArray<TMarker, TValue, N> {
+impl<TMarker: ?Sized, TValue: PartialOrd, const N: usize> PartialOrd
+    for IdArray<TMarker, TValue, N>
+{
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.as_array().partial_cmp(other.as_array())
     }

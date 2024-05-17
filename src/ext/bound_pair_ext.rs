@@ -1,7 +1,7 @@
 use crate::{IdSlice, IdSliceIndex, UsizeId};
 use std::ops::Bound;
 
-impl<TMarker, TValue> IdSliceIndex<IdSlice<TMarker, TValue>>
+impl<TMarker: ?Sized, TValue> IdSliceIndex<IdSlice<TMarker, TValue>>
     for (Bound<UsizeId<TMarker>>, Bound<UsizeId<TMarker>>)
 {
     type Output = IdSlice<TMarker, TValue>;

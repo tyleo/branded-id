@@ -9,7 +9,7 @@ pub struct UsizeIdStruct<TMarker: ?Sized> {
     next_id: UsizeId<TMarker>,
 }
 
-impl<TMarker> UsizeIdStruct<TMarker> {
+impl<TMarker: ?Sized> UsizeIdStruct<TMarker> {
     pub fn new() -> Self {
         Self {
             used_ids: Vec::new(),
@@ -72,13 +72,13 @@ fn ensure_size(items: &mut Vec<u64>, desired_size: usize) {
     }
 }
 
-impl<TMarker> Default for UsizeIdStruct<TMarker> {
+impl<TMarker: ?Sized> Default for UsizeIdStruct<TMarker> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'a, TMarker> IntoIterator for &'a UsizeIdStruct<TMarker> {
+impl<'a, TMarker: ?Sized> IntoIterator for &'a UsizeIdStruct<TMarker> {
     type Item = UsizeId<TMarker>;
     type IntoIter = UsizeIdStructIter<'a, TMarker>;
 

@@ -8,7 +8,7 @@ pub struct IdField<TMarker: ?Sized, T> {
     items: IdVec<TMarker, MaybeUninit<T>>,
 }
 
-impl<TMarker, T> IdField<TMarker, T> {
+impl<TMarker: ?Sized, T> IdField<TMarker, T> {
     pub fn new() -> Self {
         Self {
             items: IdVec::new(),
@@ -36,19 +36,22 @@ impl<TMarker, T> IdField<TMarker, T> {
     }
 }
 
-fn ensure_size<TMarker, T>(items: &mut IdVec<TMarker, MaybeUninit<T>>, desired_size: usize) {
+fn ensure_size<TMarker: ?Sized, T>(
+    items: &mut IdVec<TMarker, MaybeUninit<T>>,
+    desired_size: usize,
+) {
     while items.len() < desired_size {
         items.push(MaybeUninit::uninit());
     }
 }
 
-impl<TMarker, T> Default for IdField<TMarker, T> {
+impl<TMarker: ?Sized, T> Default for IdField<TMarker, T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     for IdField<TMarker, TValue>
 {
     type Output = I::Output;
@@ -61,7 +64,7 @@ impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     }
 }
 
-impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
+impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     for IdField<TMarker, TValue>
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
