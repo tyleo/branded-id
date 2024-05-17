@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "id_sys"
+name = "id-sys"
 version = "0.1.0"
