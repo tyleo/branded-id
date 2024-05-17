@@ -1,51 +1,67 @@
-use crate::{soa::MakeDefault, U32Id};
-use std::marker::PhantomData;
+use crate::{IdSlice, IdSliceIndex, IdVec, UsizeId};
+use std::{
+    mem::{transmute, MaybeUninit},
+    ops::{Index, IndexMut},
+};
 
-pub struct IdStruct<T, TMarker> {
-    phantom: PhantomData<TMarker>,
-    items: Vec<T>,
+pub struct IdField<TMarker, T> {
+    items: IdVec<TMarker, MaybeUninit<T>>,
 }
 
-impl<T, TMarker> IdStruct<T, TMarker> {
+impl<TMarker, T> IdField<TMarker, T> {
     pub fn new() -> Self {
         Self {
-            phantom: PhantomData,
-            items: Vec::new(),
+            items: IdVec::new(),
         }
     }
 
-    pub fn retain(&mut self, id: U32Id<TMarker>, value: T)
-    where
-        T: MakeDefault<T>,
-    {
-        self.retain_mk::<T>(id, value)
+    pub fn drop(self) {}
+
+    pub fn retain(&mut self, id: UsizeId<TMarker>, value: T) {
+        ensure_size(&mut self.items, id.to_usize() + 1);
+        self.items[id].write(value);
     }
 
-    pub fn retain_mk<TMakeDefault: MakeDefault<T>>(&mut self, id: U32Id<TMarker>, value: T) {
-        ensure_size::<_, TMakeDefault>(&mut self.items, (id.to_u32() + 1) as usize);
-        self.items[id.to_u32() as usize] = value;
-    }
-
-    pub fn release(&mut self, id: U32Id<TMarker>)
-    where
-        T: MakeDefault<T>,
-    {
-        self.release_mk::<T>(id)
-    }
-
-    pub fn release_mk<TMakeDefault: MakeDefault<T>>(&mut self, id: U32Id<TMarker>) {
-        self.items[id.to_u32() as usize] = TMakeDefault::make_default()
+    /// # Safety
+    /// A value must be `retain()`'d at the id for `release()`` to be safe to call.
+    pub unsafe fn release(&mut self, id: UsizeId<TMarker>) {
+        let item = &mut self.items[id];
+        MaybeUninit::assume_init_drop(item)
     }
 }
 
-fn ensure_size<T, TMakeDefault: MakeDefault<T>>(items: &mut Vec<T>, desired_size: usize) {
+fn ensure_size<TMarker, T>(items: &mut IdVec<TMarker, MaybeUninit<T>>, desired_size: usize) {
     while items.len() < desired_size {
-        items.push(TMakeDefault::make_default())
+        items.push(MaybeUninit::uninit());
     }
 }
 
-impl<T, TMarker> Default for IdStruct<T, TMarker> {
+impl<TMarker, T> Default for IdField<TMarker, T> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
+    for IdField<TMarker, TValue>
+{
+    type Output = I::Output;
+
+    fn index(&self, index: I) -> &Self::Output {
+        unsafe {
+            let items_actual = transmute::<_, &IdVec<TMarker, TValue>>(&self.items);
+            items_actual.index(index)
+        }
+    }
+}
+
+impl<TMarker, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
+    for IdField<TMarker, TValue>
+{
+    fn index_mut(&mut self, index: I) -> &mut Self::Output {
+        unsafe {
+            let items_actual = transmute::<_, &mut IdVec<TMarker, TValue>>(&mut self.items);
+            items_actual.index_mut(index)
+        }
     }
 }

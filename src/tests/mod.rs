@@ -14,3 +14,6 @@ mod usize_id_tests;
 
 #[cfg(feature = "extends")]
 pub mod extends;
+
+#[cfg(feature = "soa")]
+pub mod soa;

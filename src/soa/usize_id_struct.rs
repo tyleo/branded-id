@@ -1,40 +1,44 @@
-use crate::{ext::U32Ext, U32Id};
+use crate::{ext::UsizeExt, UsizeId};
 use std::{default::Default, mem::size_of};
 
-pub struct U32IdStruct<TMarker> {
+pub struct UsizeIdStruct<TMarker> {
     used_ids: Vec<u64>,
-    free_ids: Vec<U32Id<TMarker>>,
-    next_id: U32Id<TMarker>,
+    free_ids: Vec<UsizeId<TMarker>>,
+    next_id: UsizeId<TMarker>,
 }
 
-impl<TMarker> U32IdStruct<TMarker> {
+impl<TMarker> UsizeIdStruct<TMarker> {
     pub fn new() -> Self {
         Self {
             used_ids: Vec::new(),
             free_ids: Vec::new(),
-            next_id: 0u32.to_u32_id(),
+            next_id: 0usize.to_usize_id(),
         }
     }
 
-    pub fn retain(&mut self) -> U32Id<TMarker> {
+    pub fn count(&self) -> usize {
+        self.next_id.to_usize() - self.free_ids.len()
+    }
+
+    pub fn retain(&mut self) -> UsizeId<TMarker> {
         let result = if let Some(free_id) = self.free_ids.pop() {
             // If we have a free id, use it
             free_id
         } else {
             // Otherwise, get the next id
             let result = self.next_id;
-            self.next_id = (self.next_id.to_u32() + 1).to_u32_id();
+            self.next_id = (self.next_id.to_usize() + 1).to_usize_id();
             result
         };
 
         // Set the bit associated with the id
-        set_bit(&mut self.used_ids, result.to_u32() as usize);
+        set_bit(&mut self.used_ids, result.to_usize());
 
         result
     }
 
-    pub fn release(&mut self, id: U32Id<TMarker>) {
-        clear_bit(&mut self.used_ids, id.to_u32() as usize);
+    pub fn release(&mut self, id: UsizeId<TMarker>) {
+        clear_bit(&mut self.used_ids, id.to_usize());
         self.free_ids.push(id);
     }
 }
@@ -45,6 +49,14 @@ struct BitAccessInfo {
 }
 
 fn get_bit_access_info(index: usize) -> BitAccessInfo {
+    // 00000001 <- 0
+    // 00000010 <- 1
+    // 00000100 <- 2
+    // 00001000 <- 3
+    // 00010000 <- 4
+    // 00100000 <- 5
+    // 01000000 <- 6
+    // 10000000 <- 7
     let elem_size = size_of::<u64>();
     let used_ids_list_index = index / elem_size;
     let used_ids_bit_index = index % elem_size;
@@ -56,30 +68,33 @@ fn get_bit_access_info(index: usize) -> BitAccessInfo {
 }
 
 fn clear_bit(used_ids: &mut [u64], index: usize) {
-    // 00000001 <- 0
-    // 00000010 <- 1
-    // 00000100 <- 2
-    // 00001000 <- 3
-    // 00010000 <- 4
-    // 00100000 <- 5
-    // 01000000 <- 6
-    // 10000000 <- 7
     let bit_access_info = get_bit_access_info(index);
 
+    // Clear the bit
     let old_pattern = used_ids[bit_access_info.slice_index];
     let new_pattern = old_pattern & (!bit_access_info.u64_pattern);
     used_ids[bit_access_info.slice_index] = new_pattern;
 }
 
-fn set_bit(used_ids: &mut [u64], index: usize) {
+fn set_bit(used_ids: &mut Vec<u64>, index: usize) {
     let bit_access_info = get_bit_access_info(index);
 
+    // Ensure the bit we need to set actually exists
+    ensure_size(used_ids, bit_access_info.slice_index + 1);
+
+    // Set the bit
     let old_pattern = used_ids[bit_access_info.slice_index];
     let new_pattern = old_pattern | bit_access_info.u64_pattern;
     used_ids[bit_access_info.slice_index] = new_pattern;
 }
 
-impl<TMarker> Default for U32IdStruct<TMarker> {
+fn ensure_size(items: &mut Vec<u64>, desired_size: usize) {
+    while items.len() < desired_size {
+        items.push(0);
+    }
+}
+
+impl<TMarker> Default for UsizeIdStruct<TMarker> {
     fn default() -> Self {
         Self::new()
     }
