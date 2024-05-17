@@ -4,11 +4,11 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-pub struct IdField<TMarker: ?Sized, T> {
-    items: IdVec<TMarker, MaybeUninit<T>>,
+pub struct IdField<TMarker: ?Sized, TValue> {
+    items: IdVec<TMarker, MaybeUninit<TValue>>,
 }
 
-impl<TMarker: ?Sized, T> IdField<TMarker, T> {
+impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     pub fn new() -> Self {
         Self {
             items: IdVec::new(),
@@ -23,7 +23,7 @@ impl<TMarker: ?Sized, T> IdField<TMarker, T> {
         }
     }
 
-    pub fn retain(&mut self, id: UsizeId<TMarker>, value: T) {
+    pub fn retain(&mut self, id: UsizeId<TMarker>, value: TValue) {
         ensure_size(&mut self.items, id.to_usize() + 1);
         self.items[id].write(value);
     }
@@ -36,8 +36,8 @@ impl<TMarker: ?Sized, T> IdField<TMarker, T> {
     }
 }
 
-fn ensure_size<TMarker: ?Sized, T>(
-    items: &mut IdVec<TMarker, MaybeUninit<T>>,
+fn ensure_size<TMarker: ?Sized, TValue>(
+    items: &mut IdVec<TMarker, MaybeUninit<TValue>>,
     desired_size: usize,
 ) {
     while items.len() < desired_size {
@@ -45,7 +45,7 @@ fn ensure_size<TMarker: ?Sized, T>(
     }
 }
 
-impl<TMarker: ?Sized, T> Default for IdField<TMarker, T> {
+impl<TMarker: ?Sized, TValue> Default for IdField<TMarker, TValue> {
     fn default() -> Self {
         Self::new()
     }
