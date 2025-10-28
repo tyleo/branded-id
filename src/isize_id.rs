@@ -110,7 +110,7 @@ impl<TMarker: ?Sized> Hash for IsizeId<TMarker> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[IsizeId<TMarker>], &[isize]>(data) };
         isize::hash_slice(data, state)
     }
 }

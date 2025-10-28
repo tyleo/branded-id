@@ -106,7 +106,7 @@ impl<TMarker: ?Sized> Hash for I32Id<TMarker> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[I32Id<TMarker>], &[i32]>(data) };
         i32::hash_slice(data, state)
     }
 }

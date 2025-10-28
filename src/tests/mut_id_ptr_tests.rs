@@ -250,206 +250,218 @@ fn hash_slice_test() {
 
 #[test]
 fn cmp_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: Ordering = id_ptr_0.cmp(&id_ptr_0);
-    let expected = Ordering::Equal;
+    let expected = ptr_0.cmp(&ptr_0);
     assert_eq!(actual, expected);
 
     let actual: Ordering = id_ptr_0.cmp(&id_ptr_1);
-    let expected = Ordering::Less;
+    let expected = ptr_0.cmp(&ptr_1);
     assert_eq!(actual, expected);
 
     let actual: Ordering = id_ptr_1.cmp(&id_ptr_0);
-    let expected = Ordering::Greater;
+    let expected = ptr_1.cmp(&ptr_0);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn max_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: MutIdPtr<MTest, i32> = id_ptr_0.max(id_ptr_1);
-    let expected = id_ptr_1;
-    assert_eq!(actual, expected);
+    let expected = ptr_0.max(ptr_1);
+    assert_eq!(actual.to_mut_ptr(), expected);
 }
 
 #[test]
 fn min_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: MutIdPtr<MTest, i32> = id_ptr_0.min(id_ptr_1);
-    let expected = id_ptr_0;
-    assert_eq!(actual, expected);
+    let expected = ptr_0.min(ptr_1);
+    assert_eq!(actual.to_mut_ptr(), expected);
 }
 
 #[test]
 fn clamp_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
-    let ptr_2 = 3 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
+    let ptr_2: *mut _ = &mut 2;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
     let id_ptr_2 = mut_id_ptr!(MTest; ptr_2);
 
-    let actual: MutIdPtr<MTest, i32> = id_ptr_0.clamp(id_ptr_1, id_ptr_2);
-    let expected = id_ptr_1;
-    assert_eq!(actual, expected);
+    let id_min = id_ptr_1.min(id_ptr_2);
+    let id_max = id_ptr_1.max(id_ptr_2);
 
-    let actual: MutIdPtr<MTest, i32> = id_ptr_2.clamp(id_ptr_0, id_ptr_1);
-    let expected = id_ptr_1;
-    assert_eq!(actual, expected);
+    let min = ptr_1.min(ptr_2);
+    let max = ptr_1.max(ptr_2);
+
+    let actual: MutIdPtr<MTest, i32> = id_ptr_0.clamp(id_min, id_max);
+    let expected = ptr_0.clamp(min, max);
+    assert_eq!(actual.to_mut_ptr(), expected);
+
+    let id_min = id_ptr_0.min(id_ptr_1);
+    let id_max = id_ptr_0.max(id_ptr_1);
+
+    let min = ptr_0.min(ptr_1);
+    let max = ptr_0.max(ptr_1);
+
+    let actual: MutIdPtr<MTest, i32> = id_ptr_2.clamp(id_min, id_max);
+    let expected = ptr_2.clamp(min, max);
+    assert_eq!(actual.to_mut_ptr(), expected);
 }
 
 #[test]
 fn eq_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: bool = id_ptr_0.eq(&id_ptr_0);
-    let expected = true;
+    let expected = ptr_0.eq(&ptr_0);
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_0.eq(&id_ptr_1);
-    let expected = false;
+    let expected = ptr_0.eq(&ptr_1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn ne_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: bool = id_ptr_0.ne(&id_ptr_0);
-    let expected = false;
+    let expected = ptr_0.ne(&ptr_0);
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_0.ne(&id_ptr_1);
-    let expected = true;
+    let expected = ptr_0.ne(&ptr_1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn partial_cmp_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: Option<Ordering> = id_ptr_0.partial_cmp(&id_ptr_0);
-    let expected = Some(Ordering::Equal);
+    let expected = ptr_0.partial_cmp(&ptr_0);
     assert_eq!(actual, expected);
 
     let actual: Option<Ordering> = id_ptr_0.partial_cmp(&id_ptr_1);
-    let expected = Some(Ordering::Less);
+    let expected = ptr_0.partial_cmp(&ptr_1);
     assert_eq!(actual, expected);
 
     let actual: Option<Ordering> = id_ptr_1.partial_cmp(&id_ptr_0);
-    let expected = Some(Ordering::Greater);
+    let expected = ptr_1.partial_cmp(&ptr_0);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn lt_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: bool = id_ptr_0 < id_ptr_0;
-    let expected = false;
+    let expected = ptr_0 < ptr_0;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_0 < id_ptr_1;
-    let expected = true;
+    let expected = ptr_0 < ptr_1;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_1 < id_ptr_0;
-    let expected = false;
+    let expected = ptr_1 < ptr_0;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn le_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: bool = id_ptr_0 <= id_ptr_0;
-    let expected = true;
+    let expected = ptr_0 <= ptr_0;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_0 <= id_ptr_1;
-    let expected = true;
+    let expected = ptr_0 <= ptr_1;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_1 <= id_ptr_0;
-    let expected = false;
+    let expected = ptr_1 <= ptr_0;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn gt_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: bool = id_ptr_0 > id_ptr_0;
-    let expected = false;
+    let expected = ptr_0 > ptr_0;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_0 > id_ptr_1;
-    let expected = false;
+    let expected = ptr_0 > ptr_1;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_1 > id_ptr_0;
-    let expected = true;
+    let expected = ptr_1 > ptr_0;
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn ge_test() {
-    let ptr_0 = 1 as *mut i32;
-    let ptr_1 = 2 as *mut i32;
+    let ptr_0: *mut _ = &mut 0;
+    let ptr_1: *mut _ = &mut 1;
 
     let id_ptr_0 = mut_id_ptr!(MTest; ptr_0);
     let id_ptr_1 = mut_id_ptr!(MTest; ptr_1);
 
     let actual: bool = id_ptr_0 >= id_ptr_0;
-    let expected = true;
+    let expected = ptr_0 >= ptr_0;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_0 >= id_ptr_1;
-    let expected = false;
+    let expected = ptr_0 >= ptr_1;
     assert_eq!(actual, expected);
 
     let actual: bool = id_ptr_1 >= id_ptr_0;
-    let expected = true;
+    let expected = ptr_1 >= ptr_0;
     assert_eq!(actual, expected);
 }
 

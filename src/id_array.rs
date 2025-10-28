@@ -135,7 +135,7 @@ where
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[IdArray<TMarker, TValue, N>], &[[TValue; N]]>(data) };
         <[TValue; N]>::hash_slice(data, state)
     }
 }

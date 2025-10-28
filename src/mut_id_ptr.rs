@@ -112,7 +112,7 @@ impl<TMarker: ?Sized, TValue> Hash for MutIdPtr<TMarker, TValue> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[MutIdPtr<TMarker, TValue>], &[*mut TValue]>(data) };
         <*mut TValue>::hash_slice(data, state)
     }
 }

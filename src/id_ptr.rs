@@ -105,7 +105,7 @@ impl<TMarker: ?Sized, TValue> Hash for IdPtr<TMarker, TValue> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[IdPtr<TMarker, TValue>], &[*const TValue]>(data) };
         <*const TValue>::hash_slice(data, state)
     }
 }

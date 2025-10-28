@@ -106,7 +106,7 @@ impl<TMarker: ?Sized> Hash for U32Id<TMarker> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[U32Id<TMarker>], &[u32]>(data) };
         u32::hash_slice(data, state)
     }
 }

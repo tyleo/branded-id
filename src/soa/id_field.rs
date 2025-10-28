@@ -58,7 +58,10 @@ impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I
 
     fn index(&self, index: I) -> &Self::Output {
         unsafe {
-            let items_actual = transmute::<_, &IdVec<TMarker, TValue>>(&self.items);
+            let items_actual = transmute::<
+                &IdVec<TMarker, std::mem::MaybeUninit<TValue>>,
+                &IdVec<TMarker, TValue>,
+            >(&self.items);
             items_actual.index(index)
         }
     }
@@ -69,7 +72,10 @@ impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMu
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
         unsafe {
-            let items_actual = transmute::<_, &mut IdVec<TMarker, TValue>>(&mut self.items);
+            let items_actual = transmute::<
+                &mut IdVec<TMarker, std::mem::MaybeUninit<TValue>>,
+                &mut IdVec<TMarker, TValue>,
+            >(&mut self.items);
             items_actual.index_mut(index)
         }
     }

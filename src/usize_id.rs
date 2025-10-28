@@ -147,7 +147,7 @@ impl<TMarker: ?Sized> Hash for UsizeId<TMarker> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[UsizeId<TMarker>], &[usize]>(data) };
         usize::hash_slice(data, state)
     }
 }

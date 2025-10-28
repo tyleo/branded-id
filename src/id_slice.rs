@@ -321,7 +321,7 @@ impl<'a, TMarker: ?Sized> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
     }
 }
 
-impl<'a, TMarker: ?Sized> io::Write for &'a mut IdSlice<TMarker, u8> {
+impl<TMarker: ?Sized> io::Write for &mut IdSlice<TMarker, u8> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write(buf)

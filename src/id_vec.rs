@@ -189,7 +189,7 @@ where
     where
         H: Hasher,
     {
-        let data = unsafe { transmute(data) };
+        let data = unsafe { transmute::<&[IdVec<TMarker, TValue>], &[Vec<TValue>]>(data) };
         <Vec<TValue>>::hash_slice(data, state)
     }
 }
