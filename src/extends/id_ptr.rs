@@ -1,6 +1,6 @@
 use crate::{extends::Extends, IdPtr};
 
-impl<TMarker: ?Sized, TValue> IdPtr<TMarker, TValue> {
+impl<TMarker: ?Sized, TValue: ?Sized> IdPtr<TMarker, TValue> {
     pub const fn downcast_to<TExtendedMarker>(self) -> IdPtr<TExtendedMarker, TValue>
     where
         TExtendedMarker: Extends<TMarker> + ?Sized,
