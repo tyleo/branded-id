@@ -1,4 +1,4 @@
-use crate::{internal::fmt_marker_name, IsizeId, MutIdPtr, UsizeId};
+use crate::{IsizeId, MutIdPtr, UsizeId, internal::fmt_marker_name};
 use std::{
     cmp::Ordering,
     fmt::{self, Debug, Pointer, Write},
