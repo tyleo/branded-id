@@ -1,6 +1,6 @@
 [workspace]
-members = ["projects/id-sys", "projects/no-engine"]
+members = ["projects/id_sys", "projects/no_engine"]
 resolver = "2"
 
 [patch.crates-io]
-id-sys = { path = "projects/id-sys" }
+id_sys = { path = "projects/id_sys" }
