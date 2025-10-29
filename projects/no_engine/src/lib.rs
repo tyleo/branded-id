@@ -13,11 +13,11 @@ mod tests {
     }
 }
 
-struct MWindow;
+// struct MWindow;
 
-trait WindowSys {
-    fn create() -> MWindow;
-}
+// trait WindowSys {
+//     fn create() -> MWindow;
+// }
 
 // # Capabilities required for 1-D games:
 // 1. Ability to create a 1xX window
