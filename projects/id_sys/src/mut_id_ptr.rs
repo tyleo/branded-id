@@ -20,13 +20,13 @@ impl<TMarker: ?Sized, TValue: ?Sized> MutIdPtr<TMarker, TValue> {
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
     pub unsafe fn deref_ptr<'a>(self) -> &'a mut TValue {
-        &mut *self.repr
+        unsafe { &mut *self.repr }
     }
 
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
     pub unsafe fn deref_ptr_mut<'a>(self) -> &'a mut TValue {
-        &mut *self.repr
+        unsafe { &mut *self.repr }
     }
 
     pub const fn from_mut_ptr(repr: *mut TValue) -> Self {
@@ -49,37 +49,37 @@ impl<TMarker: ?Sized, TValue> MutIdPtr<TMarker, TValue> {
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.add-1
     pub const unsafe fn add(self, count: UsizeId<TMarker>) -> MutIdPtr<TMarker, TValue> {
-        MutIdPtr::from_mut_ptr(self.to_mut_ptr().add(count.to_usize()))
+        MutIdPtr::from_mut_ptr(unsafe { self.to_mut_ptr().add(count.to_usize()) })
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.offset-1
     pub const unsafe fn offset(self, offset: IsizeId<TMarker>) -> Self {
-        Self::from_mut_ptr(self.to_mut_ptr().offset(offset.to_isize()))
+        Self::from_mut_ptr(unsafe { self.to_mut_ptr().offset(offset.to_isize()) })
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read-1
     pub const unsafe fn read(self) -> TValue {
-        self.to_mut_ptr().read()
+        unsafe { self.to_mut_ptr().read() }
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1
     pub const unsafe fn read_unaligned(self) -> TValue {
-        self.to_mut_ptr().read_unaligned()
+        unsafe { self.to_mut_ptr().read_unaligned() }
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.write
     pub unsafe fn write(self, val: TValue) {
-        self.to_mut_ptr().write(val)
+        unsafe { self.to_mut_ptr().write(val) }
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.write_unaligned
     pub unsafe fn write_unaligned(self, val: TValue) {
-        self.to_mut_ptr().write_unaligned(val)
+        unsafe { self.to_mut_ptr().write_unaligned(val) }
     }
 }
 

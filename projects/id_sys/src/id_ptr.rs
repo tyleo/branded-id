@@ -20,7 +20,7 @@ impl<TMarker: ?Sized, TValue: ?Sized> IdPtr<TMarker, TValue> {
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
     pub const unsafe fn deref_ptr<'a>(self) -> &'a TValue {
-        &*self.repr
+        unsafe { &*self.repr }
     }
 
     pub const fn from_ptr(repr: *const TValue) -> Self {
@@ -39,25 +39,25 @@ impl<TMarker: ?Sized, TValue> IdPtr<TMarker, TValue> {
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.add
     pub const unsafe fn add(self, count: UsizeId<TMarker>) -> IdPtr<TMarker, TValue> {
-        IdPtr::from_ptr(self.to_ptr().add(count.to_usize()))
+        IdPtr::from_ptr(unsafe { self.to_ptr().add(count.to_usize()) })
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.offset
     pub const unsafe fn offset(self, offset: IsizeId<TMarker>) -> Self {
-        Self::from_ptr(self.to_ptr().offset(offset.to_isize()))
+        Self::from_ptr(unsafe { self.to_ptr().offset(offset.to_isize()) })
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read
     pub const unsafe fn read(self) -> TValue {
-        self.to_ptr().read()
+        unsafe { self.to_ptr().read() }
     }
 
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned
     pub const unsafe fn read_unaligned(self) -> TValue {
-        self.to_ptr().read_unaligned()
+        unsafe { self.to_ptr().read_unaligned() }
     }
 }
 

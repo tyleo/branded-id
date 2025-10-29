@@ -1,6 +1,6 @@
 use crate::{IdSlice, IdSliceIndex, IdVec, UsizeId};
 use std::{
-    mem::{transmute, MaybeUninit},
+    mem::{MaybeUninit, transmute},
     ops::{Index, IndexMut},
 };
 
@@ -19,7 +19,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// A value must be `retain()`'d at the id for `release()`` to be safe to call.
     pub unsafe fn release_all(mut self, iter: impl IntoIterator<Item = UsizeId<TMarker>>) {
         for id in iter {
-            self.release(id)
+            unsafe { self.release(id) }
         }
     }
 
@@ -32,7 +32,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// A value must be `retain()`'d at the id for `release()`` to be safe to call.
     pub unsafe fn release(&mut self, id: UsizeId<TMarker>) {
         let item = &mut self.items[id];
-        MaybeUninit::assume_init_drop(item)
+        unsafe { MaybeUninit::assume_init_drop(item) }
     }
 }
 
@@ -51,6 +51,7 @@ impl<TMarker: ?Sized, TValue> Default for IdField<TMarker, TValue> {
     }
 }
 
+// TODO: This seems unsound. We probably need `get()` and `set()` methods instead.
 impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
     for IdField<TMarker, TValue>
 {
@@ -67,6 +68,7 @@ impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I
     }
 }
 
+// TODO: This seems unsound. We probably need `get()` and `set()` methods instead.
 impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
     for IdField<TMarker, TValue>
 {
