@@ -16,7 +16,7 @@ fn retain_test() {
     let id_0 = obj.retain();
     health.retain(id_0, 1);
 
-    let actual = health[id_0];
+    let actual = *unsafe { health.get(id_0) };
     let expected = 1;
 
     assert_eq!(actual, expected);
@@ -38,7 +38,7 @@ fn release_test() {
     let id_0 = obj.retain();
     health.retain(id_0, 1);
 
-    let actual = health[id_0];
+    let actual = *unsafe { health.get(id_0) };
     let expected = 1;
 
     assert_eq!(actual, expected);
