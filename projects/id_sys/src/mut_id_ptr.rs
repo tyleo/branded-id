@@ -1,4 +1,4 @@
-use crate::{IdPtr, IsizeId, UsizeId};
+use crate::IdPtr;
 use std::{
     cmp::Ordering,
     fmt::{self, Debug, Pointer},
@@ -46,18 +46,6 @@ impl<TMarker: ?Sized, TValue: ?Sized> MutIdPtr<TMarker, TValue> {
 }
 
 impl<TMarker: ?Sized, TValue> MutIdPtr<TMarker, TValue> {
-    /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.add-1
-    pub const unsafe fn add(self, count: UsizeId<TMarker>) -> MutIdPtr<TMarker, TValue> {
-        MutIdPtr::from_mut_ptr(unsafe { self.to_mut_ptr().add(count.to_usize()) })
-    }
-
-    /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.offset-1
-    pub const unsafe fn offset(self, offset: IsizeId<TMarker>) -> Self {
-        Self::from_mut_ptr(unsafe { self.to_mut_ptr().offset(offset.to_isize()) })
-    }
-
     /// # Safety
     /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read-1
     pub const unsafe fn read(self) -> TValue {

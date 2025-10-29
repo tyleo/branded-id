@@ -1,4 +1,4 @@
-use crate::{id_ptr, isize_id, mut_id_ptr, tests::util::MTest, usize_id, IdPtr, MutIdPtr};
+use crate::{IdPtr, MutIdPtr, id_ptr, mut_id_ptr, tests::util::MTest};
 use std::{
     cmp::Ordering,
     collections::hash_map::DefaultHasher,
@@ -6,23 +6,6 @@ use std::{
     mem::transmute,
     ptr::null,
 };
-
-#[test]
-fn add_test() {
-    unsafe {
-        let mut slice = [1, 2];
-
-        let id_ptr = mut_id_ptr!(MTest; slice.as_mut_ptr());
-        let id_ptr = id_ptr.add(usize_id!(1));
-
-        let ptr = slice.as_ptr();
-        let ptr = ptr.add(1);
-
-        let actual: &i32 = id_ptr.deref_ptr();
-        let expected = &*ptr;
-        assert_eq!(actual, expected);
-    }
-}
 
 #[test]
 fn cast_to_test() {
@@ -66,23 +49,6 @@ fn from_mut_ptr_test() {
     let actual: MutIdPtr<MTest, i32> = MutIdPtr::from_mut_ptr(ptr);
     let expected = mut_id_ptr!(MTest; ptr);
     assert_eq!(actual, expected);
-}
-
-#[test]
-fn offset_test() {
-    unsafe {
-        let mut slice = [1, 2];
-
-        let id_ptr = mut_id_ptr!(MTest; slice.as_mut_ptr());
-        let id_ptr = id_ptr.offset(isize_id!(1));
-
-        let ptr = slice.as_ptr();
-        let ptr = ptr.offset(1);
-
-        let actual: &i32 = id_ptr.deref_ptr();
-        let expected = &*ptr;
-        assert_eq!(actual, expected);
-    }
 }
 
 #[test]
