@@ -13,7 +13,6 @@ use std::{
     slice::{Iter, IterMut},
 };
 
-#[repr(transparent)]
 pub struct IdSlice<TMarker: ?Sized, TValue> {
     phantom: PhantomData<TMarker>,
     repr: [TValue],

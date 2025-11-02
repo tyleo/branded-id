@@ -9,7 +9,6 @@ use std::{
     ops::{Deref, DerefMut, Index, IndexMut},
 };
 
-#[repr(transparent)]
 pub struct IdVec<TMarker: ?Sized, TValue> {
     phantom: PhantomData<TMarker>,
     repr: Vec<TValue>,
