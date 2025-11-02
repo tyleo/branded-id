@@ -1,4 +1,4 @@
-use crate::{internal::fmt_marker_name, I32Id, U32Id, UsizeId};
+use crate::{I32Id, U32Id, UsizeId, internal::fmt_marker_name};
 use std::{
     cmp::Ordering,
     fmt::{
@@ -11,6 +11,7 @@ use std::{
     str::FromStr,
 };
 
+#[repr(transparent)]
 pub struct IsizeId<TMarker: ?Sized> {
     phantom: PhantomData<TMarker>,
     repr: isize,

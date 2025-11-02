@@ -6,7 +6,7 @@ pub struct IdField<TMarker: ?Sized, TValue> {
 }
 
 impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             items: IdVec::new(),
         }

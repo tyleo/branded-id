@@ -7,6 +7,7 @@ use std::{
     mem::transmute,
 };
 
+#[repr(transparent)]
 pub struct IdPtr<TMarker: ?Sized, TValue: ?Sized> {
     phantom: PhantomData<TMarker>,
     repr: *const TValue,

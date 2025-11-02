@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, UsizeId};
+use crate::{UsizeId, internal::Sealed};
 
 pub trait UsizeExt: Sealed {
     fn to_usize_id<TMarker: ?Sized>(self) -> UsizeId<TMarker>;

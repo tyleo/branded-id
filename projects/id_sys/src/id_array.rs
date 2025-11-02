@@ -9,6 +9,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
+#[repr(transparent)]
 pub struct IdArray<TMarker: ?Sized, TValue, const N: usize> {
     phantom: PhantomData<TMarker>,
     repr: [TValue; N],

@@ -1,4 +1,4 @@
-use crate::{ext::UsizeExt, UsizeId};
+use crate::{UsizeId, ext::UsizeExt};
 use std::default::Default;
 
 use super::{BitAccessInfo, UsizeIdStructIter};
@@ -10,11 +10,11 @@ pub struct UsizeIdStruct<TMarker: ?Sized> {
 }
 
 impl<TMarker: ?Sized> UsizeIdStruct<TMarker> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             used_ids: Vec::new(),
             free_ids: Vec::new(),
-            next_id: 0usize.to_usize_id(),
+            next_id: UsizeId::from_usize(0usize),
         }
     }
 
@@ -43,6 +43,10 @@ impl<TMarker: ?Sized> UsizeIdStruct<TMarker> {
         clear_bit(&mut self.used_ids, id.to_usize());
         self.free_ids.push(id);
     }
+
+    pub fn is_retained(&self, id: UsizeId<TMarker>) -> bool {
+        is_bit_set(&self.used_ids, id.to_usize())
+    }
 }
 
 fn clear_bit(used_ids: &mut [u64], index: usize) {
@@ -64,6 +68,17 @@ fn set_bit(used_ids: &mut Vec<u64>, index: usize) {
     let old_pattern = used_ids[bit_access_info.slice_index];
     let new_pattern = old_pattern | bit_access_info.u64_pattern;
     used_ids[bit_access_info.slice_index] = new_pattern;
+}
+
+fn is_bit_set(used_ids: &[u64], index: usize) -> bool {
+    let bit_access_info = BitAccessInfo::from_index(index);
+
+    if bit_access_info.slice_index >= used_ids.len() {
+        return false;
+    }
+
+    let pattern = used_ids[bit_access_info.slice_index];
+    (pattern & bit_access_info.u64_pattern) != 0
 }
 
 fn ensure_size(items: &mut Vec<u64>, desired_size: usize) {

@@ -1,4 +1,4 @@
-use crate::{internal::fmt_marker_name, IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId};
+use crate::{IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId, internal::fmt_marker_name};
 use std::{
     cmp::Ordering,
     fmt,
@@ -13,6 +13,7 @@ use std::{
     slice::{Iter, IterMut},
 };
 
+#[repr(transparent)]
 pub struct IdSlice<TMarker: ?Sized, TValue> {
     phantom: PhantomData<TMarker>,
     repr: [TValue],
