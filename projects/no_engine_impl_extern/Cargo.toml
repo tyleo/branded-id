@@ -1,8 +1,8 @@
 [package]
-name = "no_engine"
+name = "no_engine_impl_extern"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-id_sys = "0.1.0"
+id_sys = { version = "0.1.0", features = [] }
 no_engine_abstractions = "0.1.0"

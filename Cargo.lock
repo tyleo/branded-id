@@ -11,4 +11,38 @@ name = "no_engine"
 version = "0.1.0"
 dependencies = [
  "id_sys",
+ "no_engine_abstractions",
+]
+
+[[package]]
+name = "no_engine_abstractions"
+version = "0.1.0"
+dependencies = [
+ "id_sys",
+]
+
+[[package]]
+name = "no_engine_impl_bevy"
+version = "0.1.0"
+dependencies = [
+ "id_sys",
+ "no_engine_abstractions",
+ "no_engine_impl_extern",
+]
+
+[[package]]
+name = "no_engine_impl_extern"
+version = "0.1.0"
+dependencies = [
+ "id_sys",
+ "no_engine_abstractions",
+]
+
+[[package]]
+name = "no_engine_test_game"
+version = "0.1.0"
+dependencies = [
+ "id_sys",
+ "no_engine",
+ "no_engine_impl_extern",
 ]
