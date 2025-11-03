@@ -8,8 +8,8 @@ use {
 #[derive(Clone, Copy)]
 pub struct MutWindowCtxPtr(pub *mut c_void);
 
-#[cfg_attr(target_arch = "wasm32", link(wasm_import_module = "no_engine_ffi"))]
-#[cfg_attr(not(target_arch = "wasm32"), link(name = "no_engine_ffi"))]
+#[cfg_attr(target_arch = "wasm32", link(wasm_import_module = "no_engine_extern"))]
+#[cfg_attr(not(target_arch = "wasm32"), link(name = "no_engine_extern"))]
 unsafe extern "C" {
     fn window_sys_ctx_retain_window(
         ctx_ptr: MutWindowCtxPtr,
