@@ -1,0 +1,13 @@
+{
+    "name": "tyleo-rs",
+    "version": "0.1.0",
+    "author": "tyleo",
+    "license": "MIT",
+    "type": "module",
+    "sideEffects": false,
+    "scripts": {
+        "build:release-wasm": "npm run build:no_engine_impl_bevy:release-wasm && npm run build:no_engine_test_game:release-wasm",
+        "build:no_engine_impl_bevy:release-wasm": "cargo build --package no_engine_impl_bevy --profile=release-wasm --target wasm32-unknown-unknown",
+        "build:no_engine_test_game:release-wasm": "cargo build --package no_engine_test_game --profile=release-wasm --target wasm32-unknown-unknown"
+    }
+}
