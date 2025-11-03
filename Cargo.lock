@@ -27,7 +27,6 @@ version = "0.1.0"
 dependencies = [
  "id_sys",
  "no_engine_abstractions",
- "no_engine_impl_extern",
 ]
 
 [[package]]

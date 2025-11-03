@@ -6,9 +6,7 @@ use {
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct MutWindowCtxPtr {
-    pub ptr: *mut c_void,
-}
+pub struct MutWindowCtxPtr(pub *mut c_void);
 
 #[cfg_attr(target_arch = "wasm32", link(wasm_import_module = "no_engine_ffi"))]
 #[cfg_attr(not(target_arch = "wasm32"), link(name = "no_engine_ffi"))]
