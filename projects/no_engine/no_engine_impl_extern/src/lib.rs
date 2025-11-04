@@ -4,12 +4,16 @@ use {
     std::ffi::c_void,
 };
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 #[repr(transparent)]
 #[derive(Clone, Copy)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct MutWindowCtxPtr(pub *mut c_void);
 
-#[cfg_attr(target_arch = "wasm32", link(wasm_import_module = "no_engine_extern"))]
-#[cfg_attr(not(target_arch = "wasm32"), link(name = "no_engine_extern"))]
+#[cfg_attr(feature = "wasm", link(wasm_import_module = "no_engine_extern"))]
+#[cfg_attr(not(feature = "wasm"), link(name = "no_engine_extern"))]
 unsafe extern "C" {
     fn window_sys_ctx_retain_window(
         ctx_ptr: MutWindowCtxPtr,

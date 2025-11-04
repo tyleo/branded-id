@@ -7,6 +7,14 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+bevy = { version = "0.17.2", default-features = false, features = [
+    # "bevy_asset",
+    "bevy_render",
+    "bevy_state",
+    # "bevy_text",
+    "bevy_winit",
+    # "png",
+] }
 id_sys = { version = "0.1.0", features = ["soa"] }
 no_engine_abstractions = "0.1.0"
 

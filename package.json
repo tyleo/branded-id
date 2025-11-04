@@ -7,7 +7,10 @@
     "sideEffects": false,
     "scripts": {
         "build:release-wasm": "npm run build:no_engine_impl_bevy:release-wasm && npm run build:no_engine_test_game:release-wasm",
-        "build:no_engine_impl_bevy:release-wasm": "cargo build --package no_engine_impl_bevy --profile=release-wasm --target wasm32-unknown-unknown",
-        "build:no_engine_test_game:release-wasm": "cargo build --package no_engine_test_game --profile=release-wasm --target wasm32-unknown-unknown"
+        "build:no_engine_impl_bevy:release-wasm": "npm run build:no_engine_impl_bevy:cargo:release-wasm",
+        "build:no_engine_impl_bevy:cargo:release-wasm": "cargo build --package no_engine_impl_bevy --profile=release-wasm --target wasm32-unknown-unknown",
+        "build:no_engine_test_game:release-wasm": "npm run build:no_engine_test_game:cargo:release-wasm && npm run build:no_engine_test_game:wasm-bindgen:release-wasm",
+        "build:no_engine_test_game:cargo:release-wasm": "cargo build --package no_engine_test_game --profile=release-wasm --target wasm32-unknown-unknown",
+        "build:no_engine_test_game:wasm-bindgen:release-wasm": "wasm-bindgen target/wasm32-unknown-unknown/release-wasm/no_engine_test_game.wasm --out-dir target/wasm-bindgen/no_engine_test_game --out-name no_engine_test_game --target web --omit-default-module-path"
     }
 }
