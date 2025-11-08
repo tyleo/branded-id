@@ -6,8 +6,7 @@ edition = "2024"
 [dependencies]
 id_sys = { version = "0.1.0", features = [] }
 no_engine_abstractions = "0.1.0"
-wasm-bindgen = { version = "0.2.105", optional = true }
 
 [features]
 default = ["wasm"]
-wasm = ["dep:wasm-bindgen"]
+wasm = []

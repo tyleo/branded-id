@@ -4,28 +4,26 @@ use {
     std::ffi::c_void,
 };
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct MutWindowCtxPtr(pub *mut c_void);
 
 #[cfg_attr(feature = "wasm", link(wasm_import_module = "no_engine_extern"))]
 #[cfg_attr(not(feature = "wasm"), link(name = "no_engine_extern"))]
 unsafe extern "C" {
+    fn window_sys_ctx_new() -> *mut c_void;
+
     fn window_sys_ctx_retain_window(
-        ctx_ptr: MutWindowCtxPtr,
+        ctx_ptr: *mut c_void,
         id: UsizeId<MWindow>,
         width: u32,
         height: u32,
     );
 
-    fn window_sys_ctx_release_window(ctx_ptr: MutWindowCtxPtr, id: UsizeId<MWindow>);
+    fn window_sys_ctx_release_window(ctx_ptr: *mut c_void, id: UsizeId<MWindow>);
 
     fn window_sys_ctx_set_pixel_color(
-        ctx_ptr: MutWindowCtxPtr,
+        ctx_ptr: *mut c_void,
         id: UsizeId<MWindow>,
         x: u32,
         y: u32,
@@ -34,15 +32,20 @@ unsafe extern "C" {
 }
 
 impl WindowSysCtx for MutWindowCtxPtr {
+    fn new() -> Self {
+        let ctx_ptr = unsafe { window_sys_ctx_new() };
+        MutWindowCtxPtr(ctx_ptr)
+    }
+
     fn retain_window(&mut self, id: UsizeId<MWindow>, width: u32, height: u32) {
-        unsafe { window_sys_ctx_retain_window(*self, id, width, height) }
+        unsafe { window_sys_ctx_retain_window(self.0, id, width, height) }
     }
 
     unsafe fn release_window(&mut self, id: UsizeId<MWindow>) {
-        unsafe { window_sys_ctx_release_window(*self, id) }
+        unsafe { window_sys_ctx_release_window(self.0, id) }
     }
 
     unsafe fn set_pixel_color(&mut self, id: UsizeId<MWindow>, x: u32, y: u32, color: ColorU8) {
-        unsafe { window_sys_ctx_set_pixel_color(*self, id, x, y, color) }
+        unsafe { window_sys_ctx_set_pixel_color(self.0, id, x, y, color) }
     }
 }

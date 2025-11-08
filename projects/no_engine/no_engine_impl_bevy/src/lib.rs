@@ -25,6 +25,10 @@ impl Default for BevyWindowCtx {
 }
 
 impl WindowSysCtx for BevyWindowCtx {
+    fn new() -> Self {
+        Self::default()
+    }
+
     fn retain_window(&mut self, id: UsizeId<MWindow>, _width: u32, _height: u32) {
         self.windows.retain(id, ());
     }

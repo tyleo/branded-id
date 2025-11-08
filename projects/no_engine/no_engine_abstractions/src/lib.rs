@@ -11,6 +11,8 @@ pub struct ColorU8 {
 pub struct MWindow;
 
 pub trait WindowSysCtx {
+    fn new() -> Self;
+
     fn retain_window(&mut self, id: UsizeId<MWindow>, width: u32, height: u32);
 
     /// # Safety

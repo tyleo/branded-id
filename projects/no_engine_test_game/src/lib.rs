@@ -3,7 +3,9 @@ use no_engine::*;
 #[cfg(feature = "extern")]
 pub mod extern_impl;
 
-fn run<Ctx: WindowSysCtx>(mut ctx: Ctx) {
+fn run<Ctx: WindowSysCtx>() {
+    let mut ctx = Ctx::new();
+
     let mut window_sys = WindowSys::new();
 
     let window_id = window_sys.retain(&mut ctx, 10, 1);
