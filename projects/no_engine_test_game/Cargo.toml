@@ -10,9 +10,7 @@ crate-type = ["cdylib", "rlib"]
 id_sys = "0.1.0"
 no_engine = "0.1.0"
 no_engine_impl_extern = { version = "0.1.0", optional = true }
-wasm-bindgen = { version = "0.2.105", optional = true }
 
 [features]
-default = ["wasm"]
+default = ["extern"]
 extern = ["dep:no_engine_impl_extern"]
-wasm = ["extern", "dep:wasm-bindgen"]

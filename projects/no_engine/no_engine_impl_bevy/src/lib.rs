@@ -1,6 +1,6 @@
 use {
     id_sys::{UsizeId, soa::IdField},
-    no_engine_abstractions::{ColorU8, MWindow, WindowSysCtx},
+    no_engine_abstractions::{ColorU8, MWindow, Vector2U32, WindowSysCtx},
 };
 
 #[cfg(feature = "extern")]
@@ -37,7 +37,12 @@ impl WindowSysCtx for BevyWindowCtx {
         unsafe { self.windows.release(id) }
     }
 
-    unsafe fn set_pixel_color(&mut self, _id: UsizeId<MWindow>, _x: u32, _y: u32, _color: ColorU8) {
+    unsafe fn set_pixel_color(
+        &mut self,
+        _id: UsizeId<MWindow>,
+        _position: Vector2U32,
+        _color: ColorU8,
+    ) {
         // Implementation to set pixel color in Bevy window
     }
 }

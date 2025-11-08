@@ -16,6 +16,7 @@ fn run<Ctx: WindowSysCtx>() {
 
     println!("`run`: coloring window");
     for x in 1..10 {
+        let position = Vector2U32 { x, y: 0 };
         let color = if (x % 2) == 0 {
             ColorU8 {
                 r: 0,
@@ -31,7 +32,7 @@ fn run<Ctx: WindowSysCtx>() {
                 a: 255,
             }
         };
-        unsafe { window_sys.set_pixel_color(&mut ctx, window_id, x, 0, color) }
+        unsafe { window_sys.set_pixel_color(&mut ctx, window_id, position, color) }
     }
 
     println!("`run`: releasing window");

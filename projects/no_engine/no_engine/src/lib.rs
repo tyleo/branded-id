@@ -37,12 +37,11 @@ impl WindowSys {
         &mut self,
         ctx: &mut Ctx,
         id: UsizeId<MWindow>,
-        x: u32,
-        y: u32,
+        position: Vector2U32,
         color: ColorU8,
     ) {
         unsafe {
-            ctx.set_pixel_color(id, x, y, color);
+            ctx.set_pixel_color(id, position, color);
         }
     }
 }

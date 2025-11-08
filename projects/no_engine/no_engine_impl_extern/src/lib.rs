@@ -1,6 +1,6 @@
 use {
     id_sys::UsizeId,
-    no_engine_abstractions::{ColorU8, MWindow, WindowSysCtx},
+    no_engine_abstractions::{ColorU8, MWindow, Vector2U32, WindowSysCtx},
     std::ffi::c_void,
 };
 
@@ -8,7 +8,7 @@ use {
 #[derive(Clone, Copy)]
 pub struct MutWindowCtxPtr(pub *mut c_void);
 
-#[cfg_attr(feature = "wasm", link(wasm_import_module = "no_engine_extern"))]
+#[cfg_attr(feature = "wasm", link(wasm_import_module = "no_engine_extern",))]
 #[cfg_attr(not(feature = "wasm"), link(name = "no_engine_extern"))]
 unsafe extern "C" {
     fn window_sys_ctx_new() -> *mut c_void;
@@ -27,7 +27,10 @@ unsafe extern "C" {
         id: UsizeId<MWindow>,
         x: u32,
         y: u32,
-        color: ColorU8,
+        r: u8,
+        g: u8,
+        b: u8,
+        a: u8,
     );
 }
 
@@ -45,7 +48,16 @@ impl WindowSysCtx for MutWindowCtxPtr {
         unsafe { window_sys_ctx_release_window(self.0, id) }
     }
 
-    unsafe fn set_pixel_color(&mut self, id: UsizeId<MWindow>, x: u32, y: u32, color: ColorU8) {
-        unsafe { window_sys_ctx_set_pixel_color(self.0, id, x, y, color) }
+    unsafe fn set_pixel_color(
+        &mut self,
+        id: UsizeId<MWindow>,
+        position: Vector2U32,
+        color: ColorU8,
+    ) {
+        unsafe {
+            window_sys_ctx_set_pixel_color(
+                self.0, id, position.x, position.y, color.r, color.g, color.b, color.a,
+            )
+        }
     }
 }
