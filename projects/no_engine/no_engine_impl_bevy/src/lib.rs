@@ -1,48 +1,10 @@
-use {
-    id_sys::{UsizeId, soa::IdField},
-    no_engine_abstractions::{ColorU8, MWindow, Vector2U32, WindowSysCtx},
-};
+mod bevy_log_sys_ctx;
+mod bevy_no_engine_sys_ctx;
+mod bevy_window_sys_ctx;
 
 #[cfg(feature = "extern")]
 pub mod extern_impl;
 
-pub struct BevyWindowCtx {
-    windows: IdField<MWindow, ()>,
-}
-
-impl BevyWindowCtx {
-    pub fn new() -> Self {
-        Self {
-            windows: IdField::new(),
-        }
-    }
-}
-
-impl Default for BevyWindowCtx {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl WindowSysCtx for BevyWindowCtx {
-    fn new() -> Self {
-        Self::default()
-    }
-
-    fn retain_window(&mut self, id: UsizeId<MWindow>, _width: u32, _height: u32) {
-        self.windows.retain(id, ());
-    }
-
-    unsafe fn release_window(&mut self, id: UsizeId<MWindow>) {
-        unsafe { self.windows.release(id) }
-    }
-
-    unsafe fn set_pixel_color(
-        &mut self,
-        _id: UsizeId<MWindow>,
-        _position: Vector2U32,
-        _color: ColorU8,
-    ) {
-        // Implementation to set pixel color in Bevy window
-    }
-}
+pub use bevy_log_sys_ctx::*;
+pub use bevy_no_engine_sys_ctx::*;
+pub use bevy_window_sys_ctx::*;

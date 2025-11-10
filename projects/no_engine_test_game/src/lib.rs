@@ -3,18 +3,16 @@ use no_engine::*;
 #[cfg(feature = "extern")]
 pub mod extern_impl;
 
-fn run<Ctx: WindowSysCtx>() {
-    println!("`run`: called");
-    println!("`run`: creating ctx");
-    let mut ctx = Ctx::new();
+fn run<Ctx: NoEngineSysCtx>(no_engine_sys: NoEngineSys<Ctx>) {
+    let log_sys = no_engine_sys.log_sys;
+    let mut window_sys = no_engine_sys.window_sys;
 
-    println!("`run`: creating window_sys");
-    let mut window_sys = WindowSys::new();
+    log_sys.log("`run`: called");
 
-    println!("`run`: retaining window");
-    let window_id = window_sys.retain(&mut ctx, 10, 1);
+    log_sys.log("`run`: retaining window");
+    let window_id = window_sys.retain(10, 1);
 
-    println!("`run`: coloring window");
+    log_sys.log("`run`: coloring window");
     for x in 1..10 {
         let position = Vector2U32 { x, y: 0 };
         let color = if (x % 2) == 0 {
@@ -32,12 +30,12 @@ fn run<Ctx: WindowSysCtx>() {
                 a: 255,
             }
         };
-        unsafe { window_sys.set_pixel_color(&mut ctx, window_id, position, color) }
+        unsafe { window_sys.set_pixel_color(window_id, position, color) }
     }
 
-    println!("`run`: releasing window");
+    log_sys.log("`run`: releasing window");
     unsafe {
-        window_sys.release(&mut ctx, window_id);
+        window_sys.release(window_id);
     }
-    println!("`run`: completed");
+    log_sys.log("`run`: completed");
 }

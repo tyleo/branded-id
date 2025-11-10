@@ -623,6 +623,7 @@ dependencies = [
  "bevy_gizmos",
  "bevy_image",
  "bevy_input",
+ "bevy_log",
  "bevy_math",
  "bevy_mesh",
  "bevy_platform",
@@ -2147,6 +2148,7 @@ dependencies = [
  "bevy",
  "id_sys",
  "no_engine_abstractions",
+ "wasm-bindgen",
 ]
 
 [[package]]
