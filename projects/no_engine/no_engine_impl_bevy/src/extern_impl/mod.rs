@@ -1,4 +1,3 @@
-pub mod mem;
 pub mod ptr_to_ctx;
 pub mod ptr_to_ctx_mut;
 

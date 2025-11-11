@@ -8,5 +8,6 @@ pub unsafe extern "C" fn run_with_extern() {
     let ctx = unsafe { ExternNoEngineSysCtx::new() };
     let no_engine_sys =
         NoEngineSys::<ExternNoEngineSysCtx>::new(ctx.log_sys_ctx, ctx.window_sys_ctx);
+
     run(no_engine_sys);
 }

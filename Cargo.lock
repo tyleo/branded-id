@@ -2149,6 +2149,7 @@ dependencies = [
  "id_sys",
  "no_engine_abstractions",
  "wasm-bindgen",
+ "wasm_extern_mem",
 ]
 
 [[package]]
@@ -3293,6 +3294,10 @@ checksum = "76f218a38c84bcb33c25ec7059b07847d465ce0e0a76b995e134a45adcb6af76"
 dependencies = [
  "unicode-ident",
 ]
+
+[[package]]
+name = "wasm_extern_mem"
+version = "0.1.0"
 
 [[package]]
 name = "web-sys"

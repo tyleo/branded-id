@@ -1,8 +1,8 @@
-use {crate::extern_impl::mem::get_extern_slice, std::str::from_utf8_unchecked};
+use {crate::get_extern_slice, std::str::from_utf8_unchecked};
 
 /// # Safety
 /// The `ptr` must point to a valid `str` with the specified length.
-pub(crate) unsafe fn get_extern_str<'a>(str_ptr: *const u8, str_len: usize) -> &'a str {
+pub unsafe fn get_extern_str<'a>(str_ptr: *const u8, str_len: usize) -> &'a str {
     // Early return for empty strings to avoid unsafe calls.
     if str_len == 0 {
         return "";

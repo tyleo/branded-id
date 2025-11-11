@@ -18,9 +18,10 @@ bevy = { version = "0.17.2", default-features = false, features = [
 ] }
 id_sys = { version = "0.1.0", features = ["soa"] }
 no_engine_abstractions = "0.1.0"
-wasm-bindgen = "0.2.105"
+wasm-bindgen = { version = "0.2.105", optional = true }
+wasm_extern_mem = { version = "0.1.0", optional = true }
 
 [features]
-default = ["extern", "wasm"]
+default = ["wasm"]
 extern = []
-wasm = []
+wasm = ["extern", "dep:wasm-bindgen", "dep:wasm_extern_mem"]
