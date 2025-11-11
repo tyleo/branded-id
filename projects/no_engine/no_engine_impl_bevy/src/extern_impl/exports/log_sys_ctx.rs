@@ -1,8 +1,8 @@
 use {
     crate::{BevyLogSysCtx, extern_impl::ptr_to_ctx},
+    extern_mem,
     no_engine_abstractions::LogSysCtx,
     std::ffi::c_void,
-    wasm_extern_mem,
 };
 
 /// # Safety
@@ -31,6 +31,6 @@ pub unsafe extern "C" fn log_sys_ctx_drop(ctx_ptr: *mut c_void) {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn log_sys_ctx_log(ctx_ptr: *mut c_void, str_ptr: *const u8, str_len: usize) {
     let ctx = unsafe { get_bevy_log_sys_ctx_from_ptr(ctx_ptr) };
-    let message = unsafe { wasm_extern_mem::get_extern_str(str_ptr, str_len) };
+    let message = unsafe { extern_mem::get_extern_str(str_ptr, str_len) };
     ctx.log(message);
 }

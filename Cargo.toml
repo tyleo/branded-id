@@ -1,23 +1,23 @@
 [workspace]
 members = [
+    "projects/extern_mem",
     "projects/id_sys",
     "projects/no_engine/no_engine",
     "projects/no_engine/no_engine_abstractions",
     "projects/no_engine/no_engine_impl_bevy",
     "projects/no_engine/no_engine_impl_extern",
     "projects/no_engine_test_game",
-    "projects/wasm_extern_mem",
 ]
 resolver = "2"
 
 [patch.crates-io]
+extern_mem = { path = "projects/extern_mem" }
 id_sys = { path = "projects/id_sys" }
 no_engine = { path = "projects/no_engine/no_engine" }
 no_engine_abstractions = { path = "projects/no_engine/no_engine_abstractions" }
 no_engine_impl_bevy = { path = "projects/no_engine/no_engine_impl_bevy" }
 no_engine_impl_extern = { path = "projects/no_engine/no_engine_impl_extern" }
 no_engine_test_game = { path = "projects/no_engine_test_game" }
-wasm_extern_mem = { path = "projects/wasm_extern_mem" }
 
 # Enable more optimization in the release profile at the cost of compile time.
 [profile.release]

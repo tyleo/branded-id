@@ -1582,6 +1582,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "extern_mem"
+version = "0.1.0"
+
+[[package]]
 name = "fastrand"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2146,10 +2150,10 @@ name = "no_engine_impl_bevy"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "extern_mem",
  "id_sys",
  "no_engine_abstractions",
  "wasm-bindgen",
- "wasm_extern_mem",
 ]
 
 [[package]]
@@ -2164,6 +2168,7 @@ dependencies = [
 name = "no_engine_test_game"
 version = "0.1.0"
 dependencies = [
+ "extern_mem",
  "id_sys",
  "no_engine",
  "no_engine_impl_extern",
@@ -3294,10 +3299,6 @@ checksum = "76f218a38c84bcb33c25ec7059b07847d465ce0e0a76b995e134a45adcb6af76"
 dependencies = [
  "unicode-ident",
 ]
-
-[[package]]
-name = "wasm_extern_mem"
-version = "0.1.0"
 
 [[package]]
 name = "web-sys"

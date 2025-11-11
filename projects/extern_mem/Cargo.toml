@@ -1,4 +1,4 @@
 [package]
-name = "wasm_extern_mem"
+name = "extern_mem"
 version = "0.1.0"
 edition = "2024"

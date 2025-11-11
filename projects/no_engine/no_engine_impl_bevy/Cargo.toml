@@ -16,12 +16,12 @@ bevy = { version = "0.17.2", default-features = false, features = [
     "bevy_winit",
     # "png",
 ] }
+extern_mem = { version = "0.1.0", optional = true }
 id_sys = { version = "0.1.0", features = ["soa"] }
 no_engine_abstractions = "0.1.0"
 wasm-bindgen = { version = "0.2.105", optional = true }
-wasm_extern_mem = { version = "0.1.0", optional = true }
 
 [features]
 default = ["wasm"]
-extern = []
-wasm = ["extern", "dep:wasm-bindgen", "dep:wasm_extern_mem"]
+extern = ["dep:extern_mem"]
+wasm = ["extern", "dep:wasm-bindgen"]
