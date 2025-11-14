@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "projects/cross_mem",
     "projects/extern_mem",
     "projects/id_sys",
     "projects/no_engine/no_engine",
@@ -11,6 +12,7 @@ members = [
 resolver = "2"
 
 [patch.crates-io]
+cross_mem = { path = "projects/cross_mem" }
 extern_mem = { path = "projects/extern_mem" }
 id_sys = { path = "projects/id_sys" }
 no_engine = { path = "projects/no_engine/no_engine" }
