@@ -1,5 +1,7 @@
 use {
-    crate::{CrossMemResult, CrossPtr, CrossRef, CrossRefMut, CrossSafe, NonEmptyBytes},
+    crate::{
+        CrossMemError, CrossMemResult, CrossPtr, CrossRef, CrossRefMut, CrossSafe, NonEmptyBytes,
+    },
     safe_alloc::{LayoutExt, PowerOfTwoUsize},
     std::{alloc::Layout, num::NonZeroUsize},
 };
@@ -35,7 +37,8 @@ impl CrossBoxDyn {
             None => CrossPtr::dangling(alignment),
         };
 
-        let layout = Layout::from_size_align_safe(bytes, alignment);
+        let layout =
+            Layout::from_size_pow_2_align(bytes, alignment).ok_or(CrossMemError::SizeOverflow)?;
 
         Ok(CrossBoxDyn { ptr, layout })
     }
@@ -46,7 +49,8 @@ impl CrossBoxDyn {
         alignment: PowerOfTwoUsize,
     ) -> CrossMemResult<Self> {
         let ptr = CrossPtr::from_non_empty_bytes(bytes, alignment)?;
-        let layout = Layout::from_size_align_safe(bytes.len().get(), alignment);
+        let layout = Layout::from_size_pow_2_align(bytes.len().get(), alignment)
+            .ok_or(CrossMemError::SizeOverflow)?;
 
         Ok(CrossBoxDyn { ptr, layout })
     }

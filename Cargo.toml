@@ -4,6 +4,7 @@ members = [
     "projects/mem/cross_mem",
     "projects/mem/export_alloc",
     "projects/mem/extern_mem",
+    "projects/mem/import_alloc",
     "projects/mem/safe_alloc",
     "projects/no_engine/no_engine",
     "projects/no_engine/no_engine_abstractions",
@@ -17,6 +18,7 @@ resolver = "2"
 cross_mem = { path = "projects/mem/cross_mem" }
 export_alloc = { path = "projects/mem/export_alloc" }
 extern_mem = { path = "projects/mem/extern_mem" }
+import_alloc = { path = "projects/mem/import_alloc" }
 safe_alloc = { path = "projects/mem/safe_alloc" }
 id_sys = { path = "projects/id_sys" }
 no_engine = { path = "projects/no_engine/no_engine" }

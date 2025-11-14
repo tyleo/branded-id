@@ -1,5 +1,5 @@
 use {
-    crate::PowerOfTwoUsize,
+    crate::{LayoutExt, PowerOfTwoUsize},
     std::{alloc::Layout, num::NonZeroUsize},
 };
 
@@ -12,13 +12,17 @@ pub struct AllocSafeLayout {
 
 impl AllocSafeLayout {
     /// Creates a new [`AllocSafeLayout`] from size and alignment.
-    pub const fn from_size_align(size: NonZeroUsize, align: PowerOfTwoUsize) -> Self {
+    pub fn from_size_align(size: NonZeroUsize, align: PowerOfTwoUsize) -> Option<Self> {
+        if Layout::does_size_rounded_to_multiple_of_align_overflow_isize(size.get(), align) {
+            return None;
+        }
+
         let size = size.get();
-        let align = align.get_usize();
+        let align = align.as_usize();
 
         let layout = unsafe { Layout::from_size_align_unchecked(size, align) };
 
-        AllocSafeLayout { layout }
+        Some(AllocSafeLayout { layout })
     }
 
     /// Returns the underlying [`Layout`].

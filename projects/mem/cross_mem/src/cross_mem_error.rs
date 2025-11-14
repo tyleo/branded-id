@@ -4,6 +4,6 @@ pub enum CrossMemError {
     /// Memory allocation failed in the separate module.
     AllocFailure,
 
-    /// The provided bytes slice is empty.
-    EmptySlice,
+    /// The requested size overflowed the maximum allowed size.
+    SizeOverflow,
 }

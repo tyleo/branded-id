@@ -5,10 +5,6 @@ edition = "2024"
 license-file = "LICENSE"
 description = "Provides data structures which can be marked such that they only work with similarly marked integer data types."
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-
 [features]
 default = ["extends", "soa"]
 extends = []

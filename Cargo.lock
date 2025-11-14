@@ -1868,6 +1868,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "import_alloc"
+version = "0.1.0"
+dependencies = [
+ "safe_alloc",
+]
+
+[[package]]
 name = "indexmap"
 version = "2.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

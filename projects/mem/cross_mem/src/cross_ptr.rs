@@ -29,7 +29,7 @@ impl CrossPtr {
     /// This is mainly used for working with zero-sized types (ZSTs).
     pub fn dangling(alignment: PowerOfTwoUsize) -> Self {
         CrossPtr {
-            ptr: alignment.get_non_zero_usize(),
+            ptr: alignment.as_non_zero_usize(),
         }
     }
 
