@@ -1,8 +1,10 @@
 [workspace]
 members = [
-    "projects/cross_mem",
-    "projects/extern_mem",
     "projects/id_sys",
+    "projects/mem/cross_mem",
+    "projects/mem/export_alloc",
+    "projects/mem/extern_mem",
+    "projects/mem/safe_alloc",
     "projects/no_engine/no_engine",
     "projects/no_engine/no_engine_abstractions",
     "projects/no_engine/no_engine_impl_bevy",
@@ -12,8 +14,10 @@ members = [
 resolver = "2"
 
 [patch.crates-io]
-cross_mem = { path = "projects/cross_mem" }
-extern_mem = { path = "projects/extern_mem" }
+cross_mem = { path = "projects/mem/cross_mem" }
+export_alloc = { path = "projects/mem/export_alloc" }
+extern_mem = { path = "projects/mem/extern_mem" }
+safe_alloc = { path = "projects/mem/safe_alloc" }
 id_sys = { path = "projects/id_sys" }
 no_engine = { path = "projects/no_engine/no_engine" }
 no_engine_abstractions = { path = "projects/no_engine/no_engine_abstractions" }

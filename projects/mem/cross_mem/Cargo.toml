@@ -3,6 +3,9 @@ name = "cross_mem"
 version = "0.1.0"
 edition = "2024"
 
+[dependencies]
+safe_alloc = "0.1.0"
+
 [features]
 default = ["wasm"]
 wasm = []

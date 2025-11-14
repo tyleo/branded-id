@@ -1,8 +1,6 @@
 use {
-    crate::{
-        CrossMemResult, CrossPtr, CrossRef, CrossRefMut, CrossSafe, LayoutExt, NonEmptyBytes,
-        PowerOfTwoUsize,
-    },
+    crate::{CrossMemResult, CrossPtr, CrossRef, CrossRefMut, CrossSafe, NonEmptyBytes},
+    safe_alloc::{LayoutExt, PowerOfTwoUsize},
     std::{alloc::Layout, num::NonZeroUsize},
 };
 

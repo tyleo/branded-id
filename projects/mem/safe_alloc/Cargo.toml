@@ -1,0 +1,5 @@
+[package]
+name = "safe_alloc"
+description = "Types for making `std::mem::alloc` and `std::mem::dealloc` safer to use."
+version = "0.1.0"
+edition = "2024"

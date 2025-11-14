@@ -4,15 +4,15 @@ use {
 };
 
 pub trait LayoutExt: Sealed {
-    /// Creates a new `Self` from a size and alignment.
-    fn from_size_align_safe(size: usize, alignment: PowerOfTwoUsize) -> Self;
+    /// Creates a new [`Layout`] from a size and alignment.
+    fn from_size_align_safe(size: usize, alignment: PowerOfTwoUsize) -> Layout;
 
-    /// Creates a new `Self` from the type `T`.
+    /// Creates a new [`Layout`] from the type `T`.
     fn from_type<T>() -> Self
     where
         T: Sized;
 
-    /// Converts the layout into a size and alignment.
+    /// Converts the [`Layout`] into a size and alignment.
     fn into_size_align(self) -> (usize, PowerOfTwoUsize);
 }
 

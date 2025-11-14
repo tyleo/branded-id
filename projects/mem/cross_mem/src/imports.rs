@@ -1,7 +1,4 @@
-use {
-    crate::{CrossPtr, PowerOfTwoUsize},
-    std::num::NonZeroUsize,
-};
+use {crate::CrossPtr, safe_alloc::PowerOfTwoUsize, std::num::NonZeroUsize};
 
 #[cfg_attr(feature = "wasm", link(wasm_import_module = "cross_mem_wasm"))]
 #[cfg_attr(not(feature = "wasm"), link(name = "cross_mem"))]

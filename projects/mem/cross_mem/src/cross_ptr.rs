@@ -1,8 +1,9 @@
 use {
     crate::{
         CrossMemError, CrossMemResult, CrossRef, CrossRefMut, CrossSafe, NonEmptyBytes,
-        PowerOfTwoUsize, cross_alloc, cross_free, cross_memcpy,
+        cross_alloc, cross_free, cross_memcpy,
     },
+    safe_alloc::PowerOfTwoUsize,
     std::num::NonZeroUsize,
 };
 
