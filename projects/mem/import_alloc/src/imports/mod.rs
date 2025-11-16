@@ -1,3 +1,9 @@
-mod import_alloc;
+mod alloc;
+mod alloc_zeroed;
+mod dealloc;
+mod realloc;
 
-pub use import_alloc::*;
+pub use alloc::*;
+pub use alloc_zeroed::*;
+pub use dealloc::*;
+pub use realloc::*;
