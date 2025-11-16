@@ -6,7 +6,8 @@ unsafe extern "C" {
     /// Deallocates memory with the global allocator.
     /// # Safety
     /// The caller must ensure:
-    /// 1. `ptr` is a block of memory currently allocated via this allocator and,
+    /// 1. `ptr` is a block of memory currently allocated via this allocator
+    ///    and,
     /// 2. the layout is the same layout that was used to allocate that block of
     ///    memory.
     ///

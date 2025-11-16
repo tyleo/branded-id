@@ -11,9 +11,9 @@ unsafe extern "C" {
     /// 2. the layout is the same layout that was used to allocate that block of
     ///    memory,
     /// 3. `new_size` is greater than zero.
-    /// 4. `new_size`, when rounded up to the nearest multiple of `layout.align()`,
-    ///    does not overflow [`isize`] (i.e., the rounded value must be less than or
-    ///    equal to [`isize::MAX`]).
+    /// 4. `new_size`, when rounded up to the nearest multiple of
+    ///    `layout.align()`, does not overflow [`isize`] (i.e., the rounded
+    ///    value must be less than or equal to [`isize::MAX`]).
     ///
     /// If these are not followed, undefined behavior can result.
     pub unsafe fn realloc(
