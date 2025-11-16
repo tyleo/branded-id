@@ -22,6 +22,7 @@ impl PowerOfTwoUsize {
     /// of two.
     /// # Safety
     /// The caller must ensure that `value` is a power of two.
+    #[inline]
     pub const unsafe fn from_usize_unchecked(value: usize) -> Self {
         unsafe {
             PowerOfTwoUsize::from_non_zero_usize_unchecked(NonZeroUsize::new_unchecked(value))
@@ -37,6 +38,7 @@ impl PowerOfTwoUsize {
     /// of two.
     /// # Safety
     /// The caller must ensure that `value` is a power of two.
+    #[inline]
     pub const unsafe fn from_non_zero_usize_unchecked(value: NonZeroUsize) -> Self {
         PowerOfTwoUsize(value)
     }
@@ -48,11 +50,13 @@ impl PowerOfTwoUsize {
     }
 
     /// Returns the underlying [`NonZeroUsize`] value.
+    #[inline]
     pub const fn as_non_zero_usize(&self) -> NonZeroUsize {
         self.0
     }
 
     /// Returns the underlying `usize` value.
+    #[inline]
     pub const fn as_usize(&self) -> usize {
         self.as_non_zero_usize().get()
     }

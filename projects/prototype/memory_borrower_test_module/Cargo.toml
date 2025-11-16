@@ -1,0 +1,10 @@
+[package]
+name = "memory_borrower_test_module"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+import_alloc = "0.1.0"

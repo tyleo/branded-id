@@ -11,6 +11,13 @@
         "build:no_engine_impl_bevy:cargo:release-wasm": "cargo build --package no_engine_impl_bevy --profile=release-wasm --target wasm32-unknown-unknown",
         "build:no_engine_impl_bevy:wasm-bindgen:release-wasm": "wasm-bindgen target/wasm32-unknown-unknown/release-wasm/no_engine_impl_bevy.wasm --out-dir target/wasm-bindgen/no_engine_impl_bevy --out-name no_engine_impl_bevy --target web --omit-default-module-path",
         "build:no_engine_test_game:release-wasm": "npm run build:no_engine_test_game:cargo:release-wasm",
-        "build:no_engine_test_game:cargo:release-wasm": "cargo build --package no_engine_test_game --profile=release-wasm --target wasm32-unknown-unknown"
-    }
+        "build:no_engine_test_game:cargo:release-wasm": "cargo build --package no_engine_test_game --profile=release-wasm --target wasm32-unknown-unknown",
+        "build:prototype": "npm run build:prototype:memory_owner_test_module && npm run build:prototype:memory_borrower_test_module",
+        "build:prototype:memory_owner_test_module": "npm run build:prototype:memory_owner_test_module:cargo:release-wasm",
+        "build:prototype:memory_owner_test_module:cargo:release-wasm": "cargo build --package memory_owner_test_module --profile=release-wasm --target wasm32-unknown-unknown",
+        "build:prototype:memory_borrower_test_module": "npm run --workspace memory_borrower_test_module build:release-wasm"
+    },
+    "workspaces": [
+        "projects/prototype/memory_borrower_test_module"
+    ]
 }

@@ -3,6 +3,9 @@ name = "no_engine_impl_bevy"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 bevy = { version = "0.17.2", default-features = false, features = [
     # "bevy_asset",
