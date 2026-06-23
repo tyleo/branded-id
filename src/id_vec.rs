@@ -17,34 +17,42 @@ pub struct IdVec<TBrand: ?Sized, TValue> {
 }
 
 impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
+    /// Borrows the contents as a mutable [`IdSlice`].
     pub fn as_mut_id_slice(&mut self) -> &mut IdSlice<TBrand, TValue> {
         IdSlice::from_mut_slice(&mut self.repr)
     }
 
+    /// Borrows the underlying `Vec` mutably.
     pub fn as_mut_vec(&mut self) -> &mut Vec<TValue> {
         &mut self.repr
     }
 
+    /// Borrows the contents as an [`IdSlice`].
     pub fn as_id_slice(&self) -> &IdSlice<TBrand, TValue> {
         IdSlice::from_slice(&self.repr)
     }
 
+    /// Borrows the underlying `Vec`.
     pub const fn as_vec(&self) -> &Vec<TValue> {
         &self.repr
     }
 
+    /// Returns the number of elements the vec can hold without reallocating.
     pub fn capacity(&self) -> usize {
         self.repr.capacity()
     }
 
+    /// Removes all elements, keeping the allocated capacity.
     pub fn clear(&mut self) {
         self.repr.clear()
     }
 
+    /// Returns the [`UsizeId`] one past the last element, equal to the length.
     pub fn end(&self) -> UsizeId<TBrand> {
         self.as_id_slice().end()
     }
 
+    /// Appends a clone of each element of `other`.
     pub fn extend_from_slice(&mut self, other: &[TValue])
     where
         TValue: Clone,
@@ -52,12 +60,14 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         self.repr.extend_from_slice(other)
     }
 
+    /// Reinterprets a mutable `Vec` reference as a mutable [`IdVec`].
     pub fn from_mut_vec(vec: &mut Vec<TValue>) -> &mut Self {
         // SAFETY: IdVec is #[repr(transparent)] over Vec<TValue>, so &mut Vec
         // and &mut IdVec share a layout.
         unsafe { transmute(vec) }
     }
 
+    /// Wraps an owned `Vec`.
     pub const fn from_vec(vec: Vec<TValue>) -> Self {
         Self {
             phantom: PhantomData,
@@ -65,55 +75,73 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         }
     }
 
+    /// Reinterprets a `Vec` reference as an [`IdVec`].
     pub const fn from_vec_ref(vec: &Vec<TValue>) -> &Self {
         // SAFETY: IdVec is #[repr(transparent)] over Vec<TValue>, so &Vec and
         // &IdVec share a layout.
         unsafe { transmute(vec) }
     }
 
+    /// Inserts `value` at `index`, shifting the later elements up.
+    ///
+    /// # Panics
+    /// Panics if `index` is greater than the length.
     pub fn insert(&mut self, index: UsizeId<TBrand>, value: TValue) {
         self.repr.insert(index.to_usize(), value)
     }
 
+    /// Unwraps into the owned `Vec`.
     #[must_use]
     pub fn into_vec(self) -> Vec<TValue> {
         self.repr
     }
 
+    /// Returns whether there are no elements.
     pub fn is_empty(&self) -> bool {
         self.repr.is_empty()
     }
 
+    /// Returns the number of elements.
     pub fn len(&self) -> usize {
         self.repr.len()
     }
 
+    /// Creates an empty vec that reserves no storage up front.
     pub const fn new() -> Self {
         Self::from_vec(Vec::new())
     }
 
+    /// Removes and returns the last element, or `None` if empty.
     pub fn pop(&mut self) -> Option<TValue> {
         self.repr.pop()
     }
 
+    /// Appends `value` and returns the [`UsizeId`] of the newly appended element.
     pub fn push(&mut self, value: TValue) -> UsizeId<TBrand> {
         let res = self.end();
         self.repr.push(value);
         res
     }
 
+    /// Removes and returns the element at `index`, shifting the later elements down.
+    ///
+    /// # Panics
+    /// Panics if `index` is out of bounds.
     pub fn remove(&mut self, index: UsizeId<TBrand>) -> TValue {
         self.repr.remove(index.to_usize())
     }
 
+    /// Reserves capacity for at least `additional` more elements.
     pub fn reserve(&mut self, additional: usize) {
         self.repr.reserve(additional)
     }
 
+    /// Reserves capacity for exactly `additional` more elements.
     pub fn reserve_exact(&mut self, additional: usize) {
         self.repr.reserve_exact(additional)
     }
 
+    /// Resizes to `new_len`, cloning `value` to fill any new slots.
     pub fn resize(&mut self, new_len: usize, value: TValue)
     where
         TValue: Clone,
@@ -121,18 +149,25 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         self.repr.resize(new_len, value)
     }
 
+    /// Drops excess capacity down to the length.
     pub fn shrink_to_fit(&mut self) {
         self.repr.shrink_to_fit()
     }
 
+    /// Removes and returns the element at `index`, moving the last element into its place.
+    ///
+    /// # Panics
+    /// Panics if `index` is out of bounds.
     pub fn swap_remove(&mut self, index: UsizeId<TBrand>) -> TValue {
         self.repr.swap_remove(index.to_usize())
     }
 
+    /// Shortens to `len`, dropping the rest. Keeps the contents if already shorter.
     pub fn truncate(&mut self, len: usize) {
         self.repr.truncate(len)
     }
 
+    /// Creates an empty vec with room for `capacity` elements reserved up front.
     pub fn with_capacity(capacity: usize) -> Self {
         Self::from_vec(Vec::with_capacity(capacity))
     }

@@ -18,22 +18,27 @@ pub struct IdArray<TBrand: ?Sized, TValue, const N: usize> {
 }
 
 impl<TBrand: ?Sized, TValue, const N: usize> IdArray<TBrand, TValue, N> {
+    /// Borrows the underlying `[TValue; N]`.
     pub const fn as_array(&self) -> &[TValue; N] {
         &self.repr
     }
 
+    /// Borrows the underlying `[TValue; N]` mutably.
     pub fn as_mut_array(&mut self) -> &mut [TValue; N] {
         &mut self.repr
     }
 
+    /// Borrows the elements as a mutable [`IdSlice`].
     pub fn as_mut_id_slice(&mut self) -> &mut IdSlice<TBrand, TValue> {
         IdSlice::from_mut_slice(self.as_mut_array())
     }
 
+    /// Borrows the elements as an [`IdSlice`].
     pub const fn as_id_slice(&self) -> &IdSlice<TBrand, TValue> {
         IdSlice::from_slice(self.as_array())
     }
 
+    /// Wraps an owned `[TValue; N]` as an [`IdArray`].
     pub const fn from_array(repr: [TValue; N]) -> Self {
         Self {
             phantom: PhantomData,
@@ -41,27 +46,32 @@ impl<TBrand: ?Sized, TValue, const N: usize> IdArray<TBrand, TValue, N> {
         }
     }
 
+    /// Reinterprets a `[TValue; N]` as an [`IdArray`].
     pub const fn from_array_ref(repr: &[TValue; N]) -> &Self {
         // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &[TValue; N]
         // and &IdArray share a layout.
         unsafe { transmute(repr) }
     }
 
+    /// Reinterprets a mutable `[TValue; N]` as a mutable [`IdArray`].
     pub fn from_mut_array(repr: &mut [TValue; N]) -> &mut Self {
         // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &mut [TValue; N]
         // and &mut IdArray share a layout.
         unsafe { transmute(repr) }
     }
 
+    /// Unwraps into the owned `[TValue; N]`.
     #[must_use]
     pub fn into_array(self) -> [TValue; N] {
         self.repr
     }
 
+    /// Returns an iterator over shared references to the elements.
     pub fn iter(&self) -> Iter<'_, TValue> {
         self.as_array().iter()
     }
 
+    /// Returns an iterator over mutable references to the elements.
     pub fn iter_mut(&mut self) -> IterMut<'_, TValue> {
         self.as_mut_array().iter_mut()
     }

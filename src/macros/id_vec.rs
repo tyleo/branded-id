@@ -1,6 +1,14 @@
 /// Builds an [`IdVec`](crate::IdVec), mirroring the `vec!` macro. Takes an optional
 /// `Brand` and element type, then either `elem; count` or a comma-separated
 /// list of elements.
+///
+/// # Examples
+/// ```rust
+/// use branded_id::{id_vec, IdVec};
+/// struct Row;
+/// let v: IdVec<Row, i32> = id_vec![Row; 1, 2, 3];
+/// assert_eq!(v.len(), 3);
+/// ```
 #[macro_export]
 macro_rules! id_vec {
     ($brand:ty; $value:ty) => (

@@ -1,5 +1,13 @@
 /// Builds a [`UsizeId`](crate::UsizeId). Forms: `usize_id!(value)` (brand inferred) and
 /// `usize_id!(Brand; value)`.
+///
+/// # Examples
+/// ```rust
+/// use branded_id::{usize_id, UsizeId};
+/// struct Row;
+/// let id: UsizeId<Row> = usize_id!(Row; 3);
+/// assert_eq!(id.to_usize(), 3);
+/// ```
 #[macro_export]
 macro_rules! usize_id {
     ($id:expr) => {

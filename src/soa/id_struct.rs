@@ -100,6 +100,10 @@ impl<TId: Id> IdStruct<TId> {
 
     /// Releases `id`, recycling it for a future [`retain`](Self::retain) and
     /// swap-removing it from the packed retained region of `dense`.
+    ///
+    /// # Panics
+    /// Panics if `id` is not currently retained, including when the pool is
+    /// empty.
     pub fn release(&mut self, id: TId) {
         let usize_id = id.to_usize_id();
         let index_backing = self.sparse[usize_id];

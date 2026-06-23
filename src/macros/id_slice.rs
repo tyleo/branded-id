@@ -1,6 +1,14 @@
 /// Builds an [`IdSlice`](crate::IdSlice) borrowing a temporary array. Takes an optional
 /// `Brand` and element type, then either `elem; count` or a comma-separated
 /// list of elements.
+///
+/// # Examples
+/// ```rust
+/// use branded_id::{id_slice, IdSlice};
+/// struct Row;
+/// let s: &IdSlice<Row, i32> = id_slice![Row; 1, 2, 3];
+/// assert_eq!(s.len(), 3);
+/// ```
 #[macro_export]
 macro_rules! id_slice {
     ($brand:ty; $value:ty) => (

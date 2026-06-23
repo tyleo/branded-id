@@ -1,5 +1,14 @@
 /// Builds a [`MutIdPtr`](crate::MutIdPtr) from a raw pointer. Forms: `mut_id_ptr!(ptr)`,
 /// `mut_id_ptr!(Brand; ptr)`, and `mut_id_ptr!(Brand; Value; ptr)`.
+///
+/// # Examples
+/// ```rust
+/// use branded_id::{mut_id_ptr, MutIdPtr};
+/// struct Row;
+/// let mut x = 5i32;
+/// let p: MutIdPtr<Row, i32> = mut_id_ptr!(Row; &mut x as *mut i32);
+/// assert_eq!(unsafe { *p.to_mut_ptr() }, 5);
+/// ```
 #[macro_export]
 macro_rules! mut_id_ptr {
     ($ptr:expr) => {

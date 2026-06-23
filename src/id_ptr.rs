@@ -15,6 +15,7 @@ pub struct IdPtr<TBrand: ?Sized, TValue: ?Sized> {
 }
 
 impl<TBrand: ?Sized, TValue: ?Sized> IdPtr<TBrand, TValue> {
+    /// Reinterprets the pointee as `TValue2`, keeping the brand.
     pub const fn cast_to<TValue2>(self) -> IdPtr<TBrand, TValue2> {
         IdPtr::from_ptr(self.to_ptr() as *const TValue2)
     }
@@ -25,6 +26,7 @@ impl<TBrand: ?Sized, TValue: ?Sized> IdPtr<TBrand, TValue> {
         unsafe { &*self.repr }
     }
 
+    /// Wraps a raw `*const TValue` with the brand.
     pub const fn from_ptr(repr: *const TValue) -> Self {
         Self {
             phantom: PhantomData,
@@ -32,6 +34,7 @@ impl<TBrand: ?Sized, TValue: ?Sized> IdPtr<TBrand, TValue> {
         }
     }
 
+    /// Returns the underlying raw `*const TValue`, dropping the brand.
     pub const fn to_ptr(self) -> *const TValue {
         self.repr
     }

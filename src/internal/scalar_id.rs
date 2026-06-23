@@ -37,6 +37,7 @@ macro_rules! scalar_id {
                 f.write_char(')')
             }
 
+            /// Wraps a raw integer as a branded id.
             pub const fn $from(repr: $prim) -> Self {
                 Self {
                     phantom: ::std::marker::PhantomData,
@@ -44,6 +45,7 @@ macro_rules! scalar_id {
                 }
             }
 
+            /// Returns the underlying integer.
             pub const fn $to(self) -> $prim {
                 self.repr
             }

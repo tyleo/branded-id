@@ -1,6 +1,7 @@
 use crate::{UsizeId, extends::Extends};
 
 impl<TBrand: ?Sized> UsizeId<TBrand> {
+    /// Returns the same index rebranded toward the extending brand.
     pub const fn downcast_to<TExtendedBrand>(self) -> UsizeId<TExtendedBrand>
     where
         TExtendedBrand: Extends<TBrand> + ?Sized,
@@ -8,6 +9,7 @@ impl<TBrand: ?Sized> UsizeId<TBrand> {
         UsizeId::from_usize(self.to_usize())
     }
 
+    /// Returns the same index rebranded toward the base brand.
     pub const fn upcast_to<TExtendedBrand>(self) -> UsizeId<TExtendedBrand>
     where
         TExtendedBrand: ?Sized,

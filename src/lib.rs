@@ -27,6 +27,8 @@
 //! modules. The `*_id!`, [`id_array!`], [`id_vec!`], and [`id_slice!`] macros
 //! build them concisely.
 
+#![warn(missing_docs)]
+
 mod internal;
 mod macros;
 

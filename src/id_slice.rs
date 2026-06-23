@@ -22,58 +22,73 @@ pub struct IdSlice<TBrand: ?Sized, TValue> {
 }
 
 impl<TBrand: ?Sized, TValue> IdSlice<TBrand, TValue> {
+    /// Returns a brand-typed mutable pointer to the first element.
     pub fn as_mut_id_ptr(&mut self) -> MutIdPtr<TBrand, TValue> {
         MutIdPtr::from_mut_ptr(self.as_mut_slice().as_mut_ptr())
     }
 
+    /// Borrows the underlying `[TValue]` mutably.
     pub fn as_mut_slice(&mut self) -> &mut [TValue] {
         &mut self.repr
     }
 
+    /// Returns a brand-typed pointer to the first element.
     pub const fn as_id_ptr(&self) -> IdPtr<TBrand, TValue> {
         IdPtr::from_ptr(self.as_slice().as_ptr())
     }
 
+    /// Borrows the underlying `[TValue]`.
     pub const fn as_slice(&self) -> &[TValue] {
         &self.repr
     }
 
+    /// Returns the [`UsizeId`] one past the last element.
     pub const fn end(&self) -> UsizeId<TBrand> {
         UsizeId::from_usize(self.len())
     }
 
+    /// Reinterprets a mutable `[TValue]` as a mutable [`IdSlice`].
     pub fn from_mut_slice(repr: &mut [TValue]) -> &mut Self {
         // SAFETY: IdSlice is #[repr(transparent)] over [TValue], so &mut [TValue]
         // and &mut IdSlice share a layout.
         unsafe { transmute(repr) }
     }
 
+    /// Reinterprets a `[TValue]` as an [`IdSlice`].
     pub const fn from_slice(repr: &[TValue]) -> &Self {
         // SAFETY: IdSlice is #[repr(transparent)] over [TValue], so &[TValue]
         // and &IdSlice share a layout.
         unsafe { transmute(repr) }
     }
 
+    /// Returns a reference to the element or subslice at `index`, or [`None`]
+    /// if out of bounds.
     pub fn get<I: IdSliceIndex<Self>>(&self, index: I) -> Option<&I::Output> {
         index.get(self)
     }
 
+    /// Returns a mutable reference to the element or subslice at `index`, or
+    /// [`None`] if out of bounds.
     pub fn get_mut<I: IdSliceIndex<Self>>(&mut self, index: I) -> Option<&mut I::Output> {
         index.get_mut(self)
     }
 
+    /// Returns `true` if there are no elements.
     pub const fn is_empty(&self) -> bool {
         self.as_slice().is_empty()
     }
 
+    /// Returns an iterator over shared references to the elements.
     pub fn iter(&self) -> Iter<'_, TValue> {
         self.as_slice().iter()
     }
 
+    /// Returns an iterator over mutable references to the elements.
     pub fn iter_mut(&mut self) -> IterMut<'_, TValue> {
         self.as_mut_slice().iter_mut()
     }
 
+    /// Returns the number of elements.
     pub const fn len(&self) -> usize {
         self.as_slice().len()
     }

@@ -15,6 +15,7 @@ pub struct MutIdPtr<TBrand: ?Sized, TValue: ?Sized> {
 }
 
 impl<TBrand: ?Sized, TValue: ?Sized> MutIdPtr<TBrand, TValue> {
+    /// Reinterprets the pointee as `TValue2`, keeping the brand.
     pub const fn cast_to<TValue2>(self) -> MutIdPtr<TBrand, TValue2> {
         MutIdPtr::from_mut_ptr(self.to_mut_ptr() as *mut TValue2)
     }
@@ -31,6 +32,7 @@ impl<TBrand: ?Sized, TValue: ?Sized> MutIdPtr<TBrand, TValue> {
         unsafe { &mut *self.repr }
     }
 
+    /// Wraps a raw `*mut TValue` with the brand.
     pub const fn from_mut_ptr(repr: *mut TValue) -> Self {
         Self {
             phantom: PhantomData,
@@ -38,10 +40,12 @@ impl<TBrand: ?Sized, TValue: ?Sized> MutIdPtr<TBrand, TValue> {
         }
     }
 
+    /// Converts to a shared [`IdPtr`], keeping the brand.
     pub const fn to_id_ptr(self) -> IdPtr<TBrand, TValue> {
         IdPtr::from_ptr(self.to_mut_ptr())
     }
 
+    /// Returns the underlying raw `*mut TValue`, dropping the brand.
     pub const fn to_mut_ptr(self) -> *mut TValue {
         self.repr
     }

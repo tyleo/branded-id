@@ -1,6 +1,15 @@
 /// Builds an [`IdArray`](crate::IdArray), mirroring array literals. Takes an optional
 /// `Brand` and element type, then either `elem; count` or a comma-separated
 /// list of elements; the length `N` is inferred.
+///
+/// # Examples
+/// ```rust
+/// use branded_id::{id_array, usize_id, IdArray, UsizeId};
+/// struct Row;
+/// let a: IdArray<Row, i32, 3> = id_array![Row; 1, 2, 3];
+/// let id: UsizeId<Row> = usize_id!(Row; 2);
+/// assert_eq!(a[id], 3);
+/// ```
 #[macro_export]
 macro_rules! id_array {
     ($brand:ty; $value:ty) => (
