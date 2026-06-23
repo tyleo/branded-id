@@ -9,7 +9,7 @@ use crate::{
 /// Ids are allocated with [`retain`](Self::retain) and recycled with
 /// [`release`](Self::release). Retained ids are kept in a packed `live`
 /// list; releasing swap-removes from that list so iteration only ever
-/// visits retained ids (in swap-remove order, not sorted).
+/// visits retained ids.
 pub struct UsizeIdStruct<TMarker: ?Sized> {
     /// The ids currently retained, packed.
     live: Vec<UsizeId<TMarker>>,
@@ -68,21 +68,6 @@ impl<TMarker: ?Sized> UsizeIdStruct<TMarker> {
         self.live_index_plus_one.len().to_usize_id()
     }
 
-    pub fn retain(&mut self) -> UsizeId<TMarker> {
-        // Recycle a freed id if one is available; otherwise allocate a
-        // brand-new one (which also grows the reverse-index list).
-        let id = match self.free.pop() {
-            Some(free_id) => free_id,
-            None => self.live_index_plus_one.push(0),
-        };
-
-        self.live.push(id);
-        // Store index + 1 so that 0 can mean "not retained".
-        self.live_index_plus_one[id] = self.live.len();
-
-        id
-    }
-
     pub fn release(&mut self, id: UsizeId<TMarker>) {
         let live_index_plus_one = self.live_index_plus_one[id];
 
@@ -100,6 +85,21 @@ impl<TMarker: ?Sized> UsizeIdStruct<TMarker> {
 
         self.live_index_plus_one[last_id] = live_index_plus_one;
         self.live[live_index_plus_one - 1] = last_id;
+    }
+
+    pub fn retain(&mut self) -> UsizeId<TMarker> {
+        // Recycle a freed id if one is available; otherwise allocate a
+        // brand-new one (which also grows the reverse-index list).
+        let id = match self.free.pop() {
+            Some(free_id) => free_id,
+            None => self.live_index_plus_one.push(0),
+        };
+
+        self.live.push(id);
+        // Store index + 1 so that 0 can mean "not retained".
+        self.live_index_plus_one[id] = self.live.len();
+
+        id
     }
 }
 
