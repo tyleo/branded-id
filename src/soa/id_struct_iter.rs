@@ -8,7 +8,7 @@ pub struct IdStructIter<'a, TId> {
 }
 
 impl<'a, TId> IdStructIter<'a, TId> {
-    pub fn from_live(live: &'a [TId]) -> Self {
+    pub(super) fn from_live(live: &'a [TId]) -> Self {
         Self { live: live.iter() }
     }
 }

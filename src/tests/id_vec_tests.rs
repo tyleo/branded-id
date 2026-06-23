@@ -53,11 +53,39 @@ fn as_vec_test() {
 }
 
 #[test]
+fn capacity_test() {
+    let id_vec: IdVec<MTest, i32> = IdVec::with_capacity(4);
+
+    let actual: usize = id_vec.capacity();
+    assert!(actual >= 4);
+}
+
+#[test]
+fn clear_test() {
+    let mut id_vec = id_vec![MTest; 1, 2, 3];
+    id_vec.clear();
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![];
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn end_test() {
     let vec = id_vec![MTest; 1];
 
     let actual: UsizeId<MTest> = vec.end();
     let expected = id!(1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn extend_from_slice_test() {
+    let mut id_vec = id_vec![MTest; 1];
+    id_vec.extend_from_slice(&[2, 3]);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 }
 
@@ -87,6 +115,16 @@ fn from_vec_ref_test() {
 
     let actual: &IdVec<MTest, i32> = IdVec::from_vec_ref(&vec);
     let expected = id_slice![1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn insert_test() {
+    let mut id_vec = id_vec![MTest; 1, 3];
+    id_vec.insert(id!(1), 2);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 }
 
@@ -137,6 +175,19 @@ fn new_test() {
 }
 
 #[test]
+fn pop_test() {
+    let mut id_vec = id_vec![MTest; 1, 2];
+
+    let actual: Option<i32> = id_vec.pop();
+    let expected = Some(2);
+    assert_eq!(actual, expected);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn push_test() {
     let mut id_vec = id_vec![MTest];
 
@@ -150,12 +201,88 @@ fn push_test() {
 }
 
 #[test]
+fn remove_test() {
+    let mut id_vec = id_vec![MTest; 1, 2, 3];
+
+    let actual: i32 = id_vec.remove(id!(1));
+    let expected = 2;
+    assert_eq!(actual, expected);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![1, 3];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn reserve_test() {
+    let mut id_vec = id_vec![MTest; 1];
+    id_vec.reserve(8);
+
+    let actual: usize = id_vec.capacity();
+    assert!(actual >= 9);
+}
+
+#[test]
+fn reserve_exact_test() {
+    let mut id_vec = id_vec![MTest; 1];
+    id_vec.reserve_exact(8);
+
+    let actual: usize = id_vec.capacity();
+    assert!(actual >= 9);
+}
+
+#[test]
 fn resize_test() {
     let mut id_vec = id_vec![MTest];
     id_vec.resize(5, 1);
 
     let actual: IdVec<MTest, i32> = id_vec;
     let expected = id_slice![1, 1, 1, 1, 1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn shrink_to_fit_test() {
+    let mut id_vec: IdVec<MTest, i32> = IdVec::with_capacity(16);
+    id_vec.push(1);
+    id_vec.shrink_to_fit();
+
+    let actual: usize = id_vec.capacity();
+    assert!(actual >= 1);
+}
+
+#[test]
+fn swap_remove_test() {
+    let mut id_vec = id_vec![MTest; 1, 2, 3];
+
+    let actual: i32 = id_vec.swap_remove(id!(0));
+    let expected = 1;
+    assert_eq!(actual, expected);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![3, 2];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn truncate_test() {
+    let mut id_vec = id_vec![MTest; 1, 2, 3];
+    id_vec.truncate(1);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn with_capacity_test() {
+    let id_vec: IdVec<MTest, i32> = IdVec::with_capacity(8);
+
+    let actual: usize = id_vec.capacity();
+    assert!(actual >= 8);
+
+    let actual: IdVec<MTest, i32> = id_vec;
+    let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 

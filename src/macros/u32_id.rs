@@ -1,3 +1,5 @@
+/// Builds a [`U32Id`](crate::U32Id). Forms: `u32_id!(value)` (marker inferred) and
+/// `u32_id!(Marker; value)`.
 #[macro_export]
 macro_rules! u32_id {
     ($id: expr) => {

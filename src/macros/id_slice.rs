@@ -1,3 +1,6 @@
+/// Builds an [`IdSlice`](crate::IdSlice) borrowing a temporary array. Takes an optional
+/// `Marker` and element type, then either `elem; count` or a comma-separated
+/// list of elements.
 #[macro_export]
 macro_rules! id_slice {
     ($marker: ty; $value: ty) => (

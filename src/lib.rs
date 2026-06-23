@@ -1,3 +1,32 @@
+//! Data structures that are *marked* so they only interoperate with similarly
+//! marked integer types.
+//!
+//! Every id and container in this crate carries a `TMarker` type parameter.
+//! Two ids built for different markers are distinct types, so the compiler
+//! rejects using one domain's id to index another domain's storage, even
+//! though both are just integers at runtime.
+//!
+//! # Example
+//! ```
+//! use id_sys::{UsizeId, usize_id};
+//!
+//! struct Apples;
+//! struct Oranges;
+//!
+//! let apple: UsizeId<Apples> = usize_id!(Apples; 2);
+//! let orange: UsizeId<Oranges> = usize_id!(Oranges; 2);
+//!
+//! // Same underlying integer, but the marker keeps the domains apart.
+//! assert_eq!(apple.to_usize(), orange.to_usize());
+//! ```
+//!
+//! The crate provides marker-typed integer ids ([`UsizeId`], [`I32Id`],
+//! [`U32Id`], [`IsizeId`]), the containers they index ([`IdSlice`],
+//! [`IdArray`], [`IdVec`]) and pointers ([`IdPtr`], [`MutIdPtr`]), plus the
+//! optional `extends` (marker conversions) and `soa` (columnar id pools)
+//! modules. The `*_id!`, [`id_array!`], [`id_vec!`], and [`id_slice!`] macros
+//! build them concisely.
+
 mod internal;
 mod macros;
 

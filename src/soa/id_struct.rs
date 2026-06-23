@@ -23,6 +23,7 @@ pub struct IdStruct<TId: Id> {
 }
 
 impl<TId: Id> IdStruct<TId> {
+    /// Creates an empty id pool.
     pub const fn new() -> Self {
         Self {
             live: Vec::new(),
@@ -52,9 +53,22 @@ impl<TId: Id> IdStruct<TId> {
         self.live.len()
     }
 
+    /// Whether the pool currently has no retained ids.
+    pub fn is_empty(&self) -> bool {
+        self.live.is_empty()
+    }
+
+    /// Whether `id` is currently retained. Safe and `false` for ids that were
+    /// never handed out or have already been released.
     pub fn is_retained(&self, id: TId) -> bool {
         let id = id.to_usize_id();
         id.to_usize() < self.live_index_plus_one.len() && self.live_index_plus_one[id] != 0
+    }
+
+    /// Iterates the retained ids in their packed `live` order, the same as
+    /// `(&self).into_iter()`.
+    pub fn iter(&self) -> IdStructIter<'_, TId> {
+        self.into_iter()
     }
 
     /// Peeks at the next id [`retain`](Self::retain) would return, without
@@ -72,6 +86,8 @@ impl<TId: Id> IdStruct<TId> {
         TId::from_usize_id(self.live_index_plus_one.end())
     }
 
+    /// Releases `id`, recycling it for a future [`retain`](Self::retain) and
+    /// swap-removing it from the packed `live` list.
     pub fn release(&mut self, id: TId) {
         let live_index_plus_one = self.live_index_plus_one[id.to_usize_id()];
 
@@ -91,6 +107,8 @@ impl<TId: Id> IdStruct<TId> {
         self.live[live_index_plus_one - 1] = last_id;
     }
 
+    /// Retains and returns an id, reusing a previously released id when one
+    /// is available and otherwise allocating a fresh one.
     pub fn retain(&mut self) -> TId {
         // Recycle a freed id if one is available; otherwise allocate a
         // brand-new one (which also grows the reverse-index list).

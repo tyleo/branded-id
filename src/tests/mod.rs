@@ -6,6 +6,7 @@ mod id_array_tests;
 mod id_ptr_tests;
 mod id_slice_tests;
 mod id_vec_tests;
+mod internal;
 mod isize_id_tests;
 mod macros;
 mod mut_id_ptr_tests;

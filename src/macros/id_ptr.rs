@@ -1,3 +1,5 @@
+/// Builds an [`IdPtr`](crate::IdPtr) from a raw pointer. Forms: `id_ptr!(ptr)`,
+/// `id_ptr!(Marker; ptr)`, and `id_ptr!(Marker; Value; ptr)`.
 #[macro_export]
 macro_rules! id_ptr {
     ($ptr: expr) => {

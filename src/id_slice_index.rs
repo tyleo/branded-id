@@ -1,5 +1,8 @@
 use crate::internal::Sealed;
 
+/// A value that can index an [`IdSlice`](crate::IdSlice): a
+/// [`UsizeId`](crate::UsizeId) selects one element, an id range selects a
+/// sub-slice.
 pub trait IdSliceIndex<T>: Sealed
 where
     T: ?Sized,

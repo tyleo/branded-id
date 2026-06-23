@@ -41,11 +41,29 @@ fn to_u32_id_test() {
 }
 
 #[test]
+fn to_u32_id_truncates_negative_test() {
+    let id = id!(MTest; -1);
+
+    let actual: U32Id<MTest> = id.to_u32_id();
+    let expected = u32_id!(MTest; u32::MAX);
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn to_usize_id_test() {
     let id = id!(MTest; 1);
 
     let actual: crate::UsizeId<MTest> = id.to_usize_id();
     let expected = usize_id!(MTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_usize_id_truncates_negative_test() {
+    let id = id!(MTest; -1);
+
+    let actual: crate::UsizeId<MTest> = id.to_usize_id();
+    let expected = usize_id!(MTest; usize::MAX);
     assert_eq!(actual, expected);
 }
 

@@ -90,6 +90,21 @@ fn iter_mut_test() {
 }
 
 #[test]
+#[should_panic(expected = "id is out of range for this field")]
+fn iter_mut_out_of_range_panics_test() {
+    let mut ids = U32IdStruct::<MTest>::new();
+    ids.retain();
+
+    let mut field = IdField::<MTest, u32>::new();
+
+    // SAFETY: deliberately misusing the field/ids pairing to exercise the
+    // out-of-range assert in IdFieldIterMut rather than reading uninitialized
+    // storage.
+    let mut iter = unsafe { field.iter_mut(&ids) };
+    let _ = iter.next();
+}
+
+#[test]
 fn new_test() {
     IdField::<MTest, u32>::new();
 }

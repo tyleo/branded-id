@@ -1,3 +1,7 @@
+//! Extension traits that add id-typed views to primitives, slices, arrays,
+//! `Vec`, and raw pointers (for example `as_id_slice` and `to_i32_id`). The
+//! traits are sealed: this crate provides every implementation.
+
 mod array_ext;
 mod bound_pair_ext;
 mod i32_ext;

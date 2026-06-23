@@ -1,3 +1,6 @@
+/// Builds an [`IdVec`](crate::IdVec), mirroring the `vec!` macro. Takes an optional
+/// `Marker` and element type, then either `elem; count` or a comma-separated
+/// list of elements.
 #[macro_export]
 macro_rules! id_vec {
     ($marker: ty; $value: ty) => (

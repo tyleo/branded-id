@@ -21,6 +21,6 @@ impl<TMarker: ?Sized, TValue> IdSliceIndex<IdSlice<TMarker, TValue>> for RangeFu
     }
 
     fn index_mut(self, slice: &mut IdSlice<TMarker, TValue>) -> &mut Self::Output {
-        IdSlice::from_mut_slice(&mut slice.as_mut_slice()[self])
+        IdSlice::from_mut_slice(slice.as_mut_slice())
     }
 }

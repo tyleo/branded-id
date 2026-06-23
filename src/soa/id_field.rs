@@ -13,11 +13,17 @@ use std::{mem, mem::MaybeUninit, ptr::write_bytes};
 /// [`release`](Self::release) it *before* releasing the id. Reading a slot
 /// that has not been retained is undefined behavior, which is why the
 /// accessors are `unsafe`.
+///
+/// Because liveness lives in the paired [`IdStruct`], dropping an `IdField`
+/// does not drop the values still retained in it; call
+/// [`clear`](Self::clear) or [`release_all`](Self::release_all) first to
+/// avoid leaking them. Leaking is safe, just rarely intended.
 pub struct IdField<TMarker: ?Sized, TValue> {
     items: IdVec<TMarker, MaybeUninit<TValue>>,
 }
 
 impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
+    /// Creates a new, empty field that reserves no storage up front.
     pub const fn new() -> Self {
         Self {
             items: IdVec::new(),
@@ -169,6 +175,10 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         self.items.len()
     }
 
+    /// Reserves storage up through `id` and writes `value` into its slot,
+    /// returning a reference to it. Unlike [`set`](Self::set) this does not
+    /// drop a previous value, so it must only be called for an `id` whose slot
+    /// is not currently retained.
     pub fn retain(&mut self, id: impl Id<Marker = TMarker>, value: TValue) -> &mut TValue {
         let id = id.to_usize_id();
         self.reserve(id.to_usize() + 1);

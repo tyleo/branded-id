@@ -9,6 +9,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
+/// A `[TValue; N]` array indexed by marker-typed ids instead of bare `usize`.
 #[repr(transparent)]
 pub struct IdArray<TMarker: ?Sized, TValue, const N: usize> {
     phantom: PhantomData<TMarker>,

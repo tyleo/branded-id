@@ -7,6 +7,7 @@ use std::{
     mem::transmute,
 };
 
+/// A `*const TValue` raw pointer tagged with an id marker.
 #[repr(transparent)]
 pub struct IdPtr<TMarker: ?Sized, TValue: ?Sized> {
     phantom: PhantomData<TMarker>,
@@ -38,13 +39,13 @@ impl<TMarker: ?Sized, TValue: ?Sized> IdPtr<TMarker, TValue> {
 
 impl<TMarker: ?Sized, TValue> IdPtr<TMarker, TValue> {
     /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read
+    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read>
     pub const unsafe fn read(self) -> TValue {
         unsafe { self.to_ptr().read() }
     }
 
     /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned
+    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned>
     pub const unsafe fn read_unaligned(self) -> TValue {
         unsafe { self.to_ptr().read_unaligned() }
     }

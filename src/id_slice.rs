@@ -13,6 +13,9 @@ use std::{
     slice::{Iter, IterMut},
 };
 
+/// A `[TValue]` slice indexed by marker-typed ids ([`UsizeId`] and id ranges)
+/// instead of bare `usize`.
+#[repr(transparent)]
 pub struct IdSlice<TMarker: ?Sized, TValue> {
     phantom: PhantomData<TMarker>,
     repr: [TValue],

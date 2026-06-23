@@ -7,6 +7,7 @@ use std::{
     mem::transmute,
 };
 
+/// A `*mut TValue` raw pointer tagged with an id marker.
 #[repr(transparent)]
 pub struct MutIdPtr<TMarker: ?Sized, TValue: ?Sized> {
     phantom: PhantomData<TMarker>,
@@ -48,25 +49,25 @@ impl<TMarker: ?Sized, TValue: ?Sized> MutIdPtr<TMarker, TValue> {
 
 impl<TMarker: ?Sized, TValue> MutIdPtr<TMarker, TValue> {
     /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read-1
+    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read-1>
     pub const unsafe fn read(self) -> TValue {
         unsafe { self.to_mut_ptr().read() }
     }
 
     /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1
+    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1>
     pub const unsafe fn read_unaligned(self) -> TValue {
         unsafe { self.to_mut_ptr().read_unaligned() }
     }
 
     /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.write
+    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.write>
     pub unsafe fn write(self, val: TValue) {
         unsafe { self.to_mut_ptr().write(val) }
     }
 
     /// # Safety
-    /// See https://doc.rust-lang.org/std/primitive.pointer.html#method.write_unaligned
+    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.write_unaligned>
     pub unsafe fn write_unaligned(self, val: TValue) {
         unsafe { self.to_mut_ptr().write_unaligned(val) }
     }

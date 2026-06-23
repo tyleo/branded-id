@@ -1,3 +1,5 @@
+/// Builds an [`IsizeId`](crate::IsizeId). Forms: `isize_id!(value)` (marker inferred) and
+/// `isize_id!(Marker; value)`.
 #[macro_export]
 macro_rules! isize_id {
     ($id: expr) => {

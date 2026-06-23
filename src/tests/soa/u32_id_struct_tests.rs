@@ -141,6 +141,29 @@ fn into_iter_test() {
 }
 
 #[test]
+fn is_empty_test() {
+    let mut id_struct = U32IdStruct::<MTest>::new();
+    assert!(id_struct.is_empty());
+
+    let id_0 = id_struct.retain();
+    assert!(!id_struct.is_empty());
+
+    id_struct.release(id_0);
+    assert!(id_struct.is_empty());
+}
+
+#[test]
+fn iter_test() {
+    let mut id_struct = U32IdStruct::<MTest>::new();
+    let id_0 = id_struct.retain();
+    let id_1 = id_struct.retain();
+
+    let actual: Vec<_> = id_struct.iter().collect();
+    let expected = vec![id_0, id_1];
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn is_retained_test() {
     let mut id_struct = U32IdStruct::<MTest>::new();
 

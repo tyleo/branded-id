@@ -9,6 +9,8 @@ use std::{
     ops::{Deref, DerefMut, Index, IndexMut},
 };
 
+/// A `Vec<TValue>` indexed by marker-typed ids instead of bare `usize`.
+#[repr(transparent)]
 pub struct IdVec<TMarker: ?Sized, TValue> {
     phantom: PhantomData<TMarker>,
     repr: Vec<TValue>,
@@ -31,8 +33,23 @@ impl<TMarker: ?Sized, TValue> IdVec<TMarker, TValue> {
         &self.repr
     }
 
+    pub fn capacity(&self) -> usize {
+        self.repr.capacity()
+    }
+
+    pub fn clear(&mut self) {
+        self.repr.clear()
+    }
+
     pub fn end(&self) -> UsizeId<TMarker> {
         self.as_id_slice().end()
+    }
+
+    pub fn extend_from_slice(&mut self, other: &[TValue])
+    where
+        TValue: Clone,
+    {
+        self.repr.extend_from_slice(other)
     }
 
     pub fn from_mut_vec(vec: &mut Vec<TValue>) -> &mut Self {
@@ -48,6 +65,10 @@ impl<TMarker: ?Sized, TValue> IdVec<TMarker, TValue> {
 
     pub const fn from_vec_ref(vec: &Vec<TValue>) -> &Self {
         unsafe { transmute(vec) }
+    }
+
+    pub fn insert(&mut self, index: UsizeId<TMarker>, value: TValue) {
+        self.repr.insert(index.to_usize(), value)
     }
 
     pub fn into_vec(self) -> Vec<TValue> {
@@ -66,10 +87,26 @@ impl<TMarker: ?Sized, TValue> IdVec<TMarker, TValue> {
         Self::from_vec(Vec::new())
     }
 
+    pub fn pop(&mut self) -> Option<TValue> {
+        self.repr.pop()
+    }
+
     pub fn push(&mut self, value: TValue) -> UsizeId<TMarker> {
         let res = self.end();
         self.repr.push(value);
         res
+    }
+
+    pub fn remove(&mut self, index: UsizeId<TMarker>) -> TValue {
+        self.repr.remove(index.to_usize())
+    }
+
+    pub fn reserve(&mut self, additional: usize) {
+        self.repr.reserve(additional)
+    }
+
+    pub fn reserve_exact(&mut self, additional: usize) {
+        self.repr.reserve_exact(additional)
     }
 
     pub fn resize(&mut self, new_len: usize, value: TValue)
@@ -77,6 +114,22 @@ impl<TMarker: ?Sized, TValue> IdVec<TMarker, TValue> {
         TValue: Clone,
     {
         self.repr.resize(new_len, value)
+    }
+
+    pub fn shrink_to_fit(&mut self) {
+        self.repr.shrink_to_fit()
+    }
+
+    pub fn swap_remove(&mut self, index: UsizeId<TMarker>) -> TValue {
+        self.repr.swap_remove(index.to_usize())
+    }
+
+    pub fn truncate(&mut self, len: usize) {
+        self.repr.truncate(len)
+    }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self::from_vec(Vec::with_capacity(capacity))
     }
 }
 
