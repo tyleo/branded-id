@@ -97,6 +97,8 @@ impl<TBrand: ?Sized, TValue: ?Sized> Hash for IdPtr<TBrand, TValue> {
     where
         H: Hasher,
     {
+        // SAFETY: IdPtr is #[repr(transparent)] over *const TValue, so &[IdPtr]
+        // and &[*const TValue] share a layout.
         let data = unsafe { transmute::<&[IdPtr<TBrand, TValue>], &[*const TValue]>(data) };
         <*const TValue>::hash_slice(data, state)
     }

@@ -41,10 +41,14 @@ impl<TBrand: ?Sized, TValue, const N: usize> IdArray<TBrand, TValue, N> {
     }
 
     pub const fn from_array_ref(repr: &[TValue; N]) -> &Self {
+        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &[TValue; N]
+        // and &IdArray share a layout.
         unsafe { transmute(repr) }
     }
 
     pub fn from_mut_array(repr: &mut [TValue; N]) -> &mut Self {
+        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &mut [TValue; N]
+        // and &mut IdArray share a layout.
         unsafe { transmute(repr) }
     }
 
@@ -137,6 +141,8 @@ where
     where
         H: Hasher,
     {
+        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &[IdArray]
+        // and &[[TValue; N]] share a layout.
         let data = unsafe { transmute::<&[IdArray<TBrand, TValue, N>], &[[TValue; N]]>(data) };
         <[TValue; N]>::hash_slice(data, state)
     }
@@ -240,12 +246,16 @@ where
     [TValueA; N]: PartialEq<&'a mut [TValueB]>,
 {
     fn eq(&self, other: &&'a mut IdSlice<TBrand, TValueB>) -> bool {
+        // SAFETY: IdSlice is #[repr(transparent)] over [TValueB], so the
+        // reference reinterprets to a &&mut [TValueB] of identical layout.
         let other: &&'a mut _ = unsafe { transmute(other) };
         self.as_array().eq(other)
     }
 
     #[allow(clippy::partialeq_ne_impl)]
     fn ne(&self, other: &&'a mut IdSlice<TBrand, TValueB>) -> bool {
+        // SAFETY: IdSlice is #[repr(transparent)] over [TValueB], so the
+        // reference reinterprets to a &&mut [TValueB] of identical layout.
         let other: &&'a mut _ = unsafe { transmute(other) };
         self.as_array().ne(other)
     }

@@ -53,6 +53,8 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
     }
 
     pub fn from_mut_vec(vec: &mut Vec<TValue>) -> &mut Self {
+        // SAFETY: IdVec is #[repr(transparent)] over Vec<TValue>, so &mut Vec
+        // and &mut IdVec share a layout.
         unsafe { transmute(vec) }
     }
 
@@ -64,6 +66,8 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
     }
 
     pub const fn from_vec_ref(vec: &Vec<TValue>) -> &Self {
+        // SAFETY: IdVec is #[repr(transparent)] over Vec<TValue>, so &Vec and
+        // &IdVec share a layout.
         unsafe { transmute(vec) }
     }
 
@@ -242,6 +246,8 @@ where
     where
         H: Hasher,
     {
+        // SAFETY: IdVec is #[repr(transparent)] over Vec<TValue>, so &[IdVec]
+        // and &[Vec<TValue>] share a layout.
         let data = unsafe { transmute::<&[IdVec<TBrand, TValue>], &[Vec<TValue>]>(data) };
         <Vec<TValue>>::hash_slice(data, state)
     }

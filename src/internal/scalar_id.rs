@@ -103,6 +103,8 @@ macro_rules! scalar_id {
             where
                 H: ::std::hash::Hasher,
             {
+                // SAFETY: $id is #[repr(transparent)] over $prim, so &[$id] and
+                // &[$prim] share a layout.
                 let data = unsafe { ::std::mem::transmute::<&[$id<TBrand>], &[$prim]>(data) };
                 <$prim as ::std::hash::Hash>::hash_slice(data, state)
             }

@@ -26,30 +26,38 @@ impl<TBrand: ?Sized> UsizeId<TBrand> {
     pub(crate) const fn usize_bound_pair(
         bound_pair: (Bound<UsizeId<TBrand>>, Bound<UsizeId<TBrand>>),
     ) -> (Bound<usize>, Bound<usize>) {
+        // SAFETY: UsizeId<TBrand> is #[repr(transparent)] over usize, so a
+        // Bound parameterized by UsizeId has the same layout as one over
+        // usize, and the same holds for the range reinterpretations below.
         unsafe { transmute(bound_pair) }
     }
 
     pub(crate) const fn usize_range(range: Range<UsizeId<TBrand>>) -> Range<usize> {
+        // SAFETY: see usize_bound_pair; UsizeId is #[repr(transparent)] over usize.
         unsafe { transmute(range) }
     }
 
     pub(crate) const fn usize_range_from(range: RangeFrom<UsizeId<TBrand>>) -> RangeFrom<usize> {
+        // SAFETY: see usize_bound_pair; UsizeId is #[repr(transparent)] over usize.
         unsafe { transmute(range) }
     }
 
     pub(crate) const fn usize_range_inclusive(
         range: RangeInclusive<UsizeId<TBrand>>,
     ) -> RangeInclusive<usize> {
+        // SAFETY: see usize_bound_pair; UsizeId is #[repr(transparent)] over usize.
         unsafe { transmute(range) }
     }
 
     pub(crate) const fn usize_range_to(range: RangeTo<UsizeId<TBrand>>) -> RangeTo<usize> {
+        // SAFETY: see usize_bound_pair; UsizeId is #[repr(transparent)] over usize.
         unsafe { transmute(range) }
     }
 
     pub(crate) const fn usize_range_to_inclusive(
         range: RangeToInclusive<UsizeId<TBrand>>,
     ) -> RangeToInclusive<usize> {
+        // SAFETY: see usize_bound_pair; UsizeId is #[repr(transparent)] over usize.
         unsafe { transmute(range) }
     }
 }

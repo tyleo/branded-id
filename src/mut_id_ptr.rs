@@ -104,6 +104,8 @@ impl<TBrand: ?Sized, TValue: ?Sized> Hash for MutIdPtr<TBrand, TValue> {
     where
         H: Hasher,
     {
+        // SAFETY: MutIdPtr is #[repr(transparent)] over *mut TValue, so &[MutIdPtr]
+        // and &[*mut TValue] share a layout.
         let data = unsafe { transmute::<&[MutIdPtr<TBrand, TValue>], &[*mut TValue]>(data) };
         <*mut TValue>::hash_slice(data, state)
     }
