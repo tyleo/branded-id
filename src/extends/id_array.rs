@@ -8,8 +8,9 @@ impl<TMarker: ?Sized, TValue, const N: usize> IdArray<TMarker, TValue, N> {
         IdArray::from_array_ref(self.as_array())
     }
 
-    pub const fn upcast_as<TExtendedMarker: ?Sized>(&self) -> &IdArray<TExtendedMarker, TValue, N>
+    pub const fn upcast_as<TExtendedMarker>(&self) -> &IdArray<TExtendedMarker, TValue, N>
     where
+        TExtendedMarker: ?Sized,
         TMarker: Extends<TExtendedMarker>,
     {
         IdArray::from_array_ref(self.as_array())

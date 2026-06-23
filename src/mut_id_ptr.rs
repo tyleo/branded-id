@@ -21,13 +21,13 @@ impl<TMarker: ?Sized, TValue: ?Sized> MutIdPtr<TMarker, TValue> {
 
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
-    pub unsafe fn deref_ptr<'a>(self) -> &'a mut TValue {
-        unsafe { &mut *self.repr }
+    pub const unsafe fn deref_ptr<'a>(self) -> &'a TValue {
+        unsafe { &*self.repr }
     }
 
     /// # Safety
     /// The same rules apply as dereferencing a raw pointer.
-    pub unsafe fn deref_ptr_mut<'a>(self) -> &'a mut TValue {
+    pub const unsafe fn deref_ptr_mut<'a>(self) -> &'a mut TValue {
         unsafe { &mut *self.repr }
     }
 

@@ -10,8 +10,8 @@ impl<TMarker: ?Sized> I32Id<TMarker> {
 
     pub const fn upcast_to<TExtendedMarker>(self) -> I32Id<TExtendedMarker>
     where
-        TMarker: Extends<TExtendedMarker>,
         TExtendedMarker: ?Sized,
+        TMarker: Extends<TExtendedMarker>,
     {
         I32Id::from_i32(self.to_i32())
     }

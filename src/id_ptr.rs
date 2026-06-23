@@ -176,9 +176,6 @@ impl<TMarker: ?Sized, TValue: ?Sized> PartialOrd for IdPtr<TMarker, TValue> {
 
 impl<TMarker: ?Sized, TValue: ?Sized> Pointer for IdPtr<TMarker, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt_marker_name::<TMarker>(f)?;
-        f.write_char('(')?;
-        Debug::fmt(&self.to_ptr(), f)?;
-        f.write_char(')')
+        Debug::fmt(self, f)
     }
 }
