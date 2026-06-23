@@ -1,6 +1,6 @@
 [package]
 name = "branded-id"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license-file = "LICENSE"
 description = "Provides data structures which can be branded such that they only work with similarly branded integer data types."
