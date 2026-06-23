@@ -7,8 +7,8 @@ use crate::{
 ///
 /// Ids are allocated with [`retain`](Self::retain) and recycled with
 /// [`release`](Self::release). Every id ever handed out lives in a single
-/// `dense` list partitioned by [`count`](Self::count): `dense[..count]` are
-/// the retained ids, packed, and `dense[count..]` are released ids waiting to
+/// `dense` list partitioned by [`len`](Self::len): `dense[..len]` are
+/// the retained ids, packed, and `dense[len..]` are released ids waiting to
 /// be recycled. Releasing swap-removes from the retained region so iteration
 /// only ever visits retained ids.
 ///
@@ -59,11 +59,6 @@ impl<TId: Id> IdStruct<TId> {
         self.live_count = 0;
     }
 
-    /// The number of ids currently retained from this pool.
-    pub fn count(&self) -> usize {
-        self.live_count
-    }
-
     /// Whether the pool currently has no retained ids.
     pub fn is_empty(&self) -> bool {
         self.live_count == 0
@@ -80,6 +75,11 @@ impl<TId: Id> IdStruct<TId> {
     /// `(&self).into_iter()`.
     pub fn iter(&self) -> IdStructIter<'_, TId> {
         self.into_iter()
+    }
+
+    /// The number of ids currently retained from this pool.
+    pub fn len(&self) -> usize {
+        self.live_count
     }
 
     /// Peeks at the next id [`retain`](Self::retain) would return, without

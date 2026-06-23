@@ -33,7 +33,7 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// Creates a new, empty field with room for `capacity` ids reserved up
     /// front. Like [`Vec::with_capacity`], this reserves storage without
     /// populating it, so [`reserved_count`](Self::reserved_count) stays 0.
-    pub fn new_with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(capacity: usize) -> Self {
         Self {
             items: IdVec::from_vec(Vec::with_capacity(capacity)),
         }

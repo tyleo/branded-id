@@ -4,35 +4,35 @@ use crate::{soa::U32IdStruct, tests::util::MTest, u32_id};
 fn new_test() {
     let id_struct = U32IdStruct::<MTest>::new();
 
-    let actual = id_struct.count();
+    let actual = id_struct.len();
     let expected = 0;
     assert_eq!(actual, expected);
 }
 
 #[test]
-fn count_test() {
+fn len_test() {
     let mut id_struct = U32IdStruct::<MTest>::new();
 
-    let actual = id_struct.count();
+    let actual = id_struct.len();
     let expected = 0;
     assert_eq!(actual, expected);
 
     let id_0 = id_struct.retain();
     let id_1 = id_struct.retain();
 
-    let actual = id_struct.count();
+    let actual = id_struct.len();
     let expected = 2;
     assert_eq!(actual, expected);
 
     id_struct.release(id_0);
 
-    let actual = id_struct.count();
+    let actual = id_struct.len();
     let expected = 1;
     assert_eq!(actual, expected);
 
     id_struct.release(id_1);
 
-    let actual = id_struct.count();
+    let actual = id_struct.len();
     let expected = 0;
     assert_eq!(actual, expected);
 }
@@ -220,7 +220,7 @@ fn clear_test() {
 
     id_struct.clear();
 
-    assert_eq!(id_struct.count(), 0);
+    assert_eq!(id_struct.len(), 0);
 
     let actual: Vec<_> = id_struct.into_iter().collect();
     assert_eq!(actual, vec![]);

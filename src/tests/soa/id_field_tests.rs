@@ -110,9 +110,9 @@ fn new_test() {
 }
 
 #[test]
-fn new_with_capacity_test() {
+fn with_capacity_test() {
     // Capacity reserves storage but does not populate it.
-    let field = IdField::<MTest, u32>::new_with_capacity(8);
+    let field = IdField::<MTest, u32>::with_capacity(8);
     assert_eq!(field.reserved_count(), 0);
 }
 
