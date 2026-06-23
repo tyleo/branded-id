@@ -17,7 +17,7 @@ pub struct IdStruct<TId: Id> {
     /// The ids currently retained, packed.
     live: Vec<TId>,
     /// Per-id: the index of the id in `live` plus 1. 0 means "not retained".
-    live_index_plus_one: IdVec<TId::Marker, usize>,
+    live_index_plus_one: IdVec<TId::Brand, usize>,
     /// Released ids available for reuse (LIFO).
     free: Vec<TId>,
 }

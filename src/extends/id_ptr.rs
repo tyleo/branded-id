@@ -1,17 +1,17 @@
 use crate::{IdPtr, extends::Extends};
 
-impl<TMarker: ?Sized, TValue: ?Sized> IdPtr<TMarker, TValue> {
-    pub const fn downcast_to<TExtendedMarker>(self) -> IdPtr<TExtendedMarker, TValue>
+impl<TBrand: ?Sized, TValue: ?Sized> IdPtr<TBrand, TValue> {
+    pub const fn downcast_to<TExtendedBrand>(self) -> IdPtr<TExtendedBrand, TValue>
     where
-        TExtendedMarker: Extends<TMarker> + ?Sized,
+        TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         IdPtr::from_ptr(self.to_ptr())
     }
 
-    pub const fn upcast_to<TExtendedMarker>(self) -> IdPtr<TExtendedMarker, TValue>
+    pub const fn upcast_to<TExtendedBrand>(self) -> IdPtr<TExtendedBrand, TValue>
     where
-        TExtendedMarker: ?Sized,
-        TMarker: Extends<TExtendedMarker>,
+        TExtendedBrand: ?Sized,
+        TBrand: Extends<TExtendedBrand>,
     {
         IdPtr::from_ptr(self.to_ptr())
     }

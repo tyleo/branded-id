@@ -325,13 +325,13 @@ fn fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", empty_id_slice);
-    let expected = "id_sys::tests::util::m_test::MTest[]";
+    let expected = "branded_id::tests::util::m_test::MTest[]";
     assert_eq!(actual, expected);
 
     let nested_id_slice = IdSlice::<MTest, _>::from_slice(&[["Hello"], ["Hi"]]);
 
     let actual: String = format!("{:#?}", nested_id_slice);
-    let expected = "id_sys::tests::util::m_test::MTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
+    let expected = "branded_id::tests::util::m_test::MTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
     assert_eq!(actual, expected);
 
     let id_slice = id_slice![MTest; "Hello", "Hi"];
@@ -357,7 +357,7 @@ fn fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", id_slice);
-    let expected = "id_sys::tests::util::m_test::MTest[\n    \"Hello\",\n    \"Hi\",\n]";
+    let expected = "branded_id::tests::util::m_test::MTest[\n    \"Hello\",\n    \"Hi\",\n]";
     assert_eq!(actual, expected);
 }
 

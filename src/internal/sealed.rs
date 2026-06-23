@@ -18,12 +18,12 @@ impl<TValue> Sealed for Vec<TValue> {}
 impl<TValue> Sealed for *const TValue {}
 impl<TValue> Sealed for *mut TValue {}
 
-impl<TMarker: ?Sized> Sealed for UsizeId<TMarker> {}
+impl<TBrand: ?Sized> Sealed for UsizeId<TBrand> {}
 
-impl<TMarker: ?Sized> Sealed for Range<UsizeId<TMarker>> {}
-impl<TMarker: ?Sized> Sealed for RangeFrom<UsizeId<TMarker>> {}
-impl<TMarker: ?Sized> Sealed for RangeInclusive<UsizeId<TMarker>> {}
-impl<TMarker: ?Sized> Sealed for RangeTo<UsizeId<TMarker>> {}
-impl<TMarker: ?Sized> Sealed for RangeToInclusive<UsizeId<TMarker>> {}
+impl<TBrand: ?Sized> Sealed for Range<UsizeId<TBrand>> {}
+impl<TBrand: ?Sized> Sealed for RangeFrom<UsizeId<TBrand>> {}
+impl<TBrand: ?Sized> Sealed for RangeInclusive<UsizeId<TBrand>> {}
+impl<TBrand: ?Sized> Sealed for RangeTo<UsizeId<TBrand>> {}
+impl<TBrand: ?Sized> Sealed for RangeToInclusive<UsizeId<TBrand>> {}
 impl Sealed for RangeFull {}
-impl<TMarker: ?Sized> Sealed for (Bound<UsizeId<TMarker>>, Bound<UsizeId<TMarker>>) {}
+impl<TBrand: ?Sized> Sealed for (Bound<UsizeId<TBrand>>, Bound<UsizeId<TBrand>>) {}

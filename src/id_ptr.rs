@@ -1,4 +1,4 @@
-use crate::{MutIdPtr, internal::fmt_marker_name};
+use crate::{MutIdPtr, internal::fmt_brand_name};
 use std::{
     cmp::Ordering,
     fmt::{self, Debug, Pointer, Write},
@@ -7,15 +7,15 @@ use std::{
     mem::transmute,
 };
 
-/// A `*const TValue` raw pointer tagged with an id marker.
+/// A `*const TValue` raw pointer tagged with an id brand.
 #[repr(transparent)]
-pub struct IdPtr<TMarker: ?Sized, TValue: ?Sized> {
-    phantom: PhantomData<TMarker>,
+pub struct IdPtr<TBrand: ?Sized, TValue: ?Sized> {
+    phantom: PhantomData<TBrand>,
     repr: *const TValue,
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> IdPtr<TMarker, TValue> {
-    pub const fn cast_to<TValue2>(self) -> IdPtr<TMarker, TValue2> {
+impl<TBrand: ?Sized, TValue: ?Sized> IdPtr<TBrand, TValue> {
+    pub const fn cast_to<TValue2>(self) -> IdPtr<TBrand, TValue2> {
         IdPtr::from_ptr(self.to_ptr() as *const TValue2)
     }
 
@@ -37,7 +37,7 @@ impl<TMarker: ?Sized, TValue: ?Sized> IdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker: ?Sized, TValue> IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue> IdPtr<TBrand, TValue> {
     /// # Safety
     /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read>
     pub const unsafe fn read(self) -> TValue {
@@ -51,44 +51,44 @@ impl<TMarker: ?Sized, TValue> IdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> Clone for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> Clone for IdPtr<TBrand, TValue> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> Copy for IdPtr<TMarker, TValue> {}
+impl<TBrand: ?Sized, TValue: ?Sized> Copy for IdPtr<TBrand, TValue> {}
 
-impl<TMarker: ?Sized, TValue: ?Sized> Debug for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> Debug for IdPtr<TBrand, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt_marker_name::<TMarker>(f)?;
+        fmt_brand_name::<TBrand>(f)?;
         f.write_char('(')?;
         Debug::fmt(&self.to_ptr(), f)?;
         f.write_char(')')
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> Eq for IdPtr<TMarker, TValue> {}
+impl<TBrand: ?Sized, TValue: ?Sized> Eq for IdPtr<TBrand, TValue> {}
 
-impl<TMarker: ?Sized, TValue: ?Sized> From<*const TValue> for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> From<*const TValue> for IdPtr<TBrand, TValue> {
     fn from(value: *const TValue) -> Self {
         Self::from_ptr(value)
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> From<*mut TValue> for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> From<*mut TValue> for IdPtr<TBrand, TValue> {
     fn from(value: *mut TValue) -> Self {
         Self::from_ptr(value)
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> From<MutIdPtr<TMarker, TValue>> for IdPtr<TMarker, TValue> {
-    fn from(value: MutIdPtr<TMarker, TValue>) -> Self {
+impl<TBrand: ?Sized, TValue: ?Sized> From<MutIdPtr<TBrand, TValue>> for IdPtr<TBrand, TValue> {
+    fn from(value: MutIdPtr<TBrand, TValue>) -> Self {
         Self::from_ptr(value.to_mut_ptr())
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> Hash for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> Hash for IdPtr<TBrand, TValue> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.to_ptr().hash(state)
     }
@@ -97,12 +97,12 @@ impl<TMarker: ?Sized, TValue: ?Sized> Hash for IdPtr<TMarker, TValue> {
     where
         H: Hasher,
     {
-        let data = unsafe { transmute::<&[IdPtr<TMarker, TValue>], &[*const TValue]>(data) };
+        let data = unsafe { transmute::<&[IdPtr<TBrand, TValue>], &[*const TValue]>(data) };
         <*const TValue>::hash_slice(data, state)
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> Ord for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> Ord for IdPtr<TBrand, TValue> {
     #[allow(ambiguous_wide_pointer_comparisons)]
     fn cmp(&self, other: &Self) -> Ordering {
         self.to_ptr().cmp(&other.to_ptr())
@@ -133,21 +133,21 @@ impl<TMarker: ?Sized, TValue: ?Sized> Ord for IdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> PartialEq<IdPtr<TMarker, TValue>> for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> PartialEq<IdPtr<TBrand, TValue>> for IdPtr<TBrand, TValue> {
     #[allow(ambiguous_wide_pointer_comparisons)]
-    fn eq(&self, other: &IdPtr<TMarker, TValue>) -> bool {
+    fn eq(&self, other: &IdPtr<TBrand, TValue>) -> bool {
         self.to_ptr().eq(&other.to_ptr())
     }
 
     #[allow(ambiguous_wide_pointer_comparisons)]
     #[allow(clippy::partialeq_ne_impl)]
-    fn ne(&self, other: &IdPtr<TMarker, TValue>) -> bool {
+    fn ne(&self, other: &IdPtr<TBrand, TValue>) -> bool {
         self.to_ptr().ne(&other.to_ptr())
     }
 }
 
 #[allow(clippy::non_canonical_partial_ord_impl)]
-impl<TMarker: ?Sized, TValue: ?Sized> PartialOrd for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> PartialOrd for IdPtr<TBrand, TValue> {
     #[allow(ambiguous_wide_pointer_comparisons)]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.to_ptr().partial_cmp(&other.to_ptr())
@@ -174,7 +174,7 @@ impl<TMarker: ?Sized, TValue: ?Sized> PartialOrd for IdPtr<TMarker, TValue> {
     }
 }
 
-impl<TMarker: ?Sized, TValue: ?Sized> Pointer for IdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: ?Sized> Pointer for IdPtr<TBrand, TValue> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         Debug::fmt(self, f)
     }

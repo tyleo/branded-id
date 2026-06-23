@@ -68,7 +68,7 @@ fn binary_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#b}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(0b10)";
+    let expected = "branded_id::tests::util::m_test::MTest(0b10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25b}", id);
@@ -115,7 +115,7 @@ fn debug_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(1)";
+    let expected = "branded_id::tests::util::m_test::MTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25?}", id);
@@ -152,7 +152,7 @@ fn display_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(1)";
+    let expected = "branded_id::tests::util::m_test::MTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25}", id);
@@ -233,7 +233,7 @@ fn lower_exp_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#e}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(2e0)";
+    let expected = "branded_id::tests::util::m_test::MTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25e}", id);
@@ -270,7 +270,7 @@ fn lower_hex_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#x}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(0xa)";
+    let expected = "branded_id::tests::util::m_test::MTest(0xa)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25x}", id);
@@ -307,7 +307,7 @@ fn octal_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#o}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(0o12)";
+    let expected = "branded_id::tests::util::m_test::MTest(0o12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25o}", id);
@@ -515,7 +515,7 @@ fn upper_exp_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#E}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(2E0)";
+    let expected = "branded_id::tests::util::m_test::MTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25E}", id);
@@ -552,7 +552,7 @@ fn upper_hex_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#X}", id);
-    let expected = "id_sys::tests::util::m_test::MTest(0xA)";
+    let expected = "branded_id::tests::util::m_test::MTest(0xA)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25X}", id);

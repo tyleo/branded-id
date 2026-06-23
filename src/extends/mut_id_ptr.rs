@@ -1,17 +1,17 @@
 use crate::{MutIdPtr, extends::Extends};
 
-impl<TMarker: ?Sized, TValue: ?Sized> MutIdPtr<TMarker, TValue> {
-    pub const fn downcast_to<TExtendedMarker>(self) -> MutIdPtr<TExtendedMarker, TValue>
+impl<TBrand: ?Sized, TValue: ?Sized> MutIdPtr<TBrand, TValue> {
+    pub const fn downcast_to<TExtendedBrand>(self) -> MutIdPtr<TExtendedBrand, TValue>
     where
-        TExtendedMarker: Extends<TMarker> + ?Sized,
+        TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         MutIdPtr::from_mut_ptr(self.to_mut_ptr())
     }
 
-    pub const fn upcast_to<TExtendedMarker>(self) -> MutIdPtr<TExtendedMarker, TValue>
+    pub const fn upcast_to<TExtendedBrand>(self) -> MutIdPtr<TExtendedBrand, TValue>
     where
-        TExtendedMarker: ?Sized,
-        TMarker: Extends<TExtendedMarker>,
+        TExtendedBrand: ?Sized,
+        TBrand: Extends<TExtendedBrand>,
     {
         MutIdPtr::from_mut_ptr(self.to_mut_ptr())
     }

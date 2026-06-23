@@ -161,14 +161,14 @@ fn debug_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", empty_id_array);
-    let expected = "id_sys::tests::util::m_test::MTest[]";
+    let expected = "branded_id::tests::util::m_test::MTest[]";
     assert_eq!(actual, expected);
 
     let array_0 = ["Hello"];
     let nested_id_array = id_array![MTest; array_0, ["Hi"]];
 
     let actual: String = format!("{:#?}", nested_id_array);
-    let expected = "id_sys::tests::util::m_test::MTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
+    let expected = "branded_id::tests::util::m_test::MTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
     assert_eq!(actual, expected);
 
     let id_array = id_array![MTest; "Hello", "Hi"];
@@ -194,7 +194,7 @@ fn debug_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", id_array);
-    let expected = "id_sys::tests::util::m_test::MTest[\n    \"Hello\",\n    \"Hi\",\n]";
+    let expected = "branded_id::tests::util::m_test::MTest[\n    \"Hello\",\n    \"Hi\",\n]";
     assert_eq!(actual, expected);
 }
 

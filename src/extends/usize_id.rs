@@ -1,17 +1,17 @@
 use crate::{UsizeId, extends::Extends};
 
-impl<TMarker: ?Sized> UsizeId<TMarker> {
-    pub const fn downcast_to<TExtendedMarker>(self) -> UsizeId<TExtendedMarker>
+impl<TBrand: ?Sized> UsizeId<TBrand> {
+    pub const fn downcast_to<TExtendedBrand>(self) -> UsizeId<TExtendedBrand>
     where
-        TExtendedMarker: Extends<TMarker> + ?Sized,
+        TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         UsizeId::from_usize(self.to_usize())
     }
 
-    pub const fn upcast_to<TExtendedMarker>(self) -> UsizeId<TExtendedMarker>
+    pub const fn upcast_to<TExtendedBrand>(self) -> UsizeId<TExtendedBrand>
     where
-        TExtendedMarker: ?Sized,
-        TMarker: Extends<TExtendedMarker>,
+        TExtendedBrand: ?Sized,
+        TBrand: Extends<TExtendedBrand>,
     {
         UsizeId::from_usize(self.to_usize())
     }

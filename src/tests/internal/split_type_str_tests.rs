@@ -9,7 +9,7 @@ fn unqualified_name_test() {
 
 #[test]
 fn qualified_path_test() {
-    let actual = split_type_str("id_sys::tests::util::m_test::MTest");
+    let actual = split_type_str("branded_id::tests::util::m_test::MTest");
     let expected = "MTest";
     assert_eq!(actual, expected);
 }

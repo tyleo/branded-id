@@ -100,7 +100,7 @@ fn debug_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", id_ptr);
-    let expected = "id_sys::tests::util::m_test::MTest(0x0000000000000000)";
+    let expected = "branded_id::tests::util::m_test::MTest(0x0000000000000000)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25?}", id_ptr);
@@ -418,7 +418,7 @@ fn pointer_fmt_test() {
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#p}", id_ptr);
-    let expected = "id_sys::tests::util::m_test::MTest(0x0000000000000000)";
+    let expected = "branded_id::tests::util::m_test::MTest(0x0000000000000000)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25p}", id_ptr);

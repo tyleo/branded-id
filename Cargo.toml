@@ -1,12 +1,12 @@
 [package]
-name = "id_sys"
+name = "branded-id"
 version = "0.1.0"
 edition = "2024"
 license-file = "LICENSE"
-description = "Provides data structures which can be marked such that they only work with similarly marked integer data types."
-repository = "https://github.com/tyleo/id_sys"
+description = "Provides data structures which can be branded such that they only work with similarly branded integer data types."
+repository = "https://github.com/tyleo/branded-id"
 readme = "README.md"
-keywords = ["id", "newtype", "marker", "type-safety"]
+keywords = ["id", "newtype", "branded", "type-safety"]
 categories = ["data-structures", "rust-patterns"]
 
 [features]

@@ -1,7 +1,7 @@
-/// Generates a marker-typed scalar id newtype around a primitive integer,
+/// Generates a brand-typed scalar id newtype around a primitive integer,
 /// together with the trait impls shared by every id width.
 ///
-/// The impls are written by hand (rather than derived) so that no `TMarker:
+/// The impls are written by hand (rather than derived) so that no `TBrand:
 /// Trait` bound leaks onto the generated type, and forward to the primitive's
 /// own specialized impls. Type-specific items (cross-width conversions,
 /// `offset`, range converters, `IdSliceIndex`) are added by the caller in a
@@ -11,7 +11,7 @@
 /// the constructor name, and `$to` the accessor name.
 macro_rules! scalar_id {
     ($id:ident, $prim:ty, $from:ident, $to:ident) => {
-        /// A marker-typed integer id. The `TMarker` type parameter makes ids
+        /// A brand-typed integer id. The `TBrand` type parameter makes ids
         /// built for different domains distinct types, so they cannot be mixed
         /// even though they share an integer representation.
         ///
@@ -19,19 +19,19 @@ macro_rules! scalar_id {
         /// which truncates or sign-reinterprets values that do not fit the
         /// target width.
         #[repr(transparent)]
-        pub struct $id<TMarker: ?Sized> {
-            phantom: ::std::marker::PhantomData<TMarker>,
+        pub struct $id<TBrand: ?Sized> {
+            phantom: ::std::marker::PhantomData<TBrand>,
             repr: $prim,
         }
 
-        impl<TMarker: ?Sized> $id<TMarker> {
+        impl<TBrand: ?Sized> $id<TBrand> {
             fn fmt_helper(
                 self,
                 fmt_repr: impl FnOnce(&$prim, &mut ::std::fmt::Formatter) -> ::std::fmt::Result,
                 f: &mut ::std::fmt::Formatter,
             ) -> ::std::fmt::Result {
                 use ::std::fmt::Write as _;
-                $crate::internal::fmt_marker_name::<TMarker>(f)?;
+                $crate::internal::fmt_brand_name::<TBrand>(f)?;
                 f.write_char('(')?;
                 fmt_repr(&self.$to(), f)?;
                 f.write_char(')')
@@ -49,41 +49,41 @@ macro_rules! scalar_id {
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::Binary for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::Binary for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::Binary::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::clone::Clone for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::clone::Clone for $id<TBrand> {
             fn clone(&self) -> Self {
                 *self
             }
         }
 
-        impl<TMarker: ?Sized> ::std::marker::Copy for $id<TMarker> {}
+        impl<TBrand: ?Sized> ::std::marker::Copy for $id<TBrand> {}
 
-        impl<TMarker: ?Sized> ::std::fmt::Debug for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::Debug for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::Debug::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::Display for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::Display for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::Display::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::cmp::Eq for $id<TMarker> {}
+        impl<TBrand: ?Sized> ::std::cmp::Eq for $id<TBrand> {}
 
-        impl<TMarker: ?Sized> ::std::convert::From<$prim> for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::convert::From<$prim> for $id<TBrand> {
             fn from(val: $prim) -> Self {
                 Self::$from(val)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::str::FromStr for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::str::FromStr for $id<TBrand> {
             type Err = <$prim as ::std::str::FromStr>::Err;
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -91,7 +91,7 @@ macro_rules! scalar_id {
             }
         }
 
-        impl<TMarker: ?Sized> ::std::hash::Hash for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::hash::Hash for $id<TBrand> {
             fn hash<H>(&self, state: &mut H)
             where
                 H: ::std::hash::Hasher,
@@ -103,30 +103,30 @@ macro_rules! scalar_id {
             where
                 H: ::std::hash::Hasher,
             {
-                let data = unsafe { ::std::mem::transmute::<&[$id<TMarker>], &[$prim]>(data) };
+                let data = unsafe { ::std::mem::transmute::<&[$id<TBrand>], &[$prim]>(data) };
                 <$prim as ::std::hash::Hash>::hash_slice(data, state)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::LowerExp for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::LowerExp for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::LowerExp::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::LowerHex for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::LowerHex for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::LowerHex::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::Octal for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::Octal for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::Octal::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::cmp::Ord for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::cmp::Ord for $id<TBrand> {
             fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
                 ::std::cmp::Ord::cmp(&self.$to(), &other.$to())
             }
@@ -154,7 +154,7 @@ macro_rules! scalar_id {
             }
         }
 
-        impl<TMarker: ?Sized> ::std::cmp::PartialEq for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::cmp::PartialEq for $id<TBrand> {
             fn eq(&self, other: &Self) -> bool {
                 ::std::cmp::PartialEq::eq(&self.$to(), &other.$to())
             }
@@ -166,7 +166,7 @@ macro_rules! scalar_id {
         }
 
         #[allow(clippy::non_canonical_partial_ord_impl)]
-        impl<TMarker: ?Sized> ::std::cmp::PartialOrd for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::cmp::PartialOrd for $id<TBrand> {
             fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
                 ::std::cmp::PartialOrd::partial_cmp(&self.$to(), &other.$to())
             }
@@ -188,13 +188,13 @@ macro_rules! scalar_id {
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::UpperExp for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::UpperExp for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::UpperExp::fmt, f)
             }
         }
 
-        impl<TMarker: ?Sized> ::std::fmt::UpperHex for $id<TMarker> {
+        impl<TBrand: ?Sized> ::std::fmt::UpperHex for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 self.fmt_helper(::std::fmt::UpperHex::fmt, f)
             }

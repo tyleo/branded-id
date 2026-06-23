@@ -1,14 +1,14 @@
 /// Builds an [`IdPtr`](crate::IdPtr) from a raw pointer. Forms: `id_ptr!(ptr)`,
-/// `id_ptr!(Marker; ptr)`, and `id_ptr!(Marker; Value; ptr)`.
+/// `id_ptr!(Brand; ptr)`, and `id_ptr!(Brand; Value; ptr)`.
 #[macro_export]
 macro_rules! id_ptr {
     ($ptr: expr) => {
         $crate::IdPtr::<_, _>::from_ptr($ptr)
     };
-    ($marker: ty; $ptr: expr) => {
-        $crate::IdPtr::<$marker, _>::from_ptr($ptr)
+    ($brand: ty; $ptr: expr) => {
+        $crate::IdPtr::<$brand, _>::from_ptr($ptr)
     };
-    ($marker: ty; $value: ty; $ptr: expr) => {
-        $crate::IdPtr::<$marker, $value>::from_ptr($ptr)
+    ($brand: ty; $value: ty; $ptr: expr) => {
+        $crate::IdPtr::<$brand, $value>::from_ptr($ptr)
     };
 }

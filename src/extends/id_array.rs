@@ -1,47 +1,47 @@
 use crate::{IdArray, extends::Extends};
 
-impl<TMarker: ?Sized, TValue, const N: usize> IdArray<TMarker, TValue, N> {
-    pub const fn downcast_as<TExtendedMarker>(&self) -> &IdArray<TExtendedMarker, TValue, N>
+impl<TBrand: ?Sized, TValue, const N: usize> IdArray<TBrand, TValue, N> {
+    pub const fn downcast_as<TExtendedBrand>(&self) -> &IdArray<TExtendedBrand, TValue, N>
     where
-        TExtendedMarker: Extends<TMarker> + ?Sized,
+        TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         IdArray::from_array_ref(self.as_array())
     }
 
-    pub const fn upcast_as<TExtendedMarker>(&self) -> &IdArray<TExtendedMarker, TValue, N>
+    pub const fn upcast_as<TExtendedBrand>(&self) -> &IdArray<TExtendedBrand, TValue, N>
     where
-        TExtendedMarker: ?Sized,
-        TMarker: Extends<TExtendedMarker>,
+        TExtendedBrand: ?Sized,
+        TBrand: Extends<TExtendedBrand>,
     {
         IdArray::from_array_ref(self.as_array())
     }
 
-    pub fn downcast_as_mut<TExtendedMarker>(&mut self) -> &mut IdArray<TExtendedMarker, TValue, N>
+    pub fn downcast_as_mut<TExtendedBrand>(&mut self) -> &mut IdArray<TExtendedBrand, TValue, N>
     where
-        TExtendedMarker: Extends<TMarker> + ?Sized,
+        TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         IdArray::from_mut_array(self.as_mut_array())
     }
 
-    pub fn upcast_as_mut<TExtendedMarker>(&mut self) -> &mut IdArray<TExtendedMarker, TValue, N>
+    pub fn upcast_as_mut<TExtendedBrand>(&mut self) -> &mut IdArray<TExtendedBrand, TValue, N>
     where
-        TExtendedMarker: ?Sized,
-        TMarker: Extends<TExtendedMarker>,
+        TExtendedBrand: ?Sized,
+        TBrand: Extends<TExtendedBrand>,
     {
         IdArray::from_mut_array(self.as_mut_array())
     }
 
-    pub fn downcast_into<TExtendedMarker>(self) -> IdArray<TExtendedMarker, TValue, N>
+    pub fn downcast_into<TExtendedBrand>(self) -> IdArray<TExtendedBrand, TValue, N>
     where
-        TExtendedMarker: Extends<TMarker> + ?Sized,
+        TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         IdArray::from_array(self.into_array())
     }
 
-    pub fn upcast_into<TExtendedMarker>(self) -> IdArray<TExtendedMarker, TValue, N>
+    pub fn upcast_into<TExtendedBrand>(self) -> IdArray<TExtendedBrand, TValue, N>
     where
-        TExtendedMarker: ?Sized,
-        TMarker: Extends<TExtendedMarker>,
+        TExtendedBrand: ?Sized,
+        TBrand: Extends<TExtendedBrand>,
     {
         IdArray::from_array(self.into_array())
     }

@@ -1,13 +1,13 @@
-//! Marker-subtyping conversions between id domains.
+//! Brand-subtyping conversions between id domains.
 //!
-//! When one marker [`Extends`] another, the id types and containers can be
-//! cast between the two markers via their `upcast_*` and `downcast_*`
+//! When one brand [`Extends`] another, the id types and containers can be
+//! cast between the two brands via their `upcast_*` and `downcast_*`
 //! methods.
 
-/// Declares a marker-subtyping relationship: `impl Extends<Base> for Derived`
-/// says that ids and containers marked `Derived` may be converted to and from
-/// the `Base` marker through the cast methods on the id types.
-pub trait Extends<TMarker: ?Sized> {}
+/// Declares a brand-subtyping relationship: `impl Extends<Base> for Derived`
+/// says that ids and containers branded `Derived` may be converted to and from
+/// the `Base` brand through the cast methods on the id types.
+pub trait Extends<TBrand: ?Sized> {}
 
 mod i32_id;
 mod id_array;

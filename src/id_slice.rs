@@ -1,4 +1,4 @@
-use crate::{IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId, internal::fmt_marker_name};
+use crate::{IdArray, IdPtr, IdSliceIndex, IdVec, MutIdPtr, UsizeId, internal::fmt_brand_name};
 use std::{
     cmp::Ordering,
     fmt,
@@ -13,16 +13,16 @@ use std::{
     slice::{Iter, IterMut},
 };
 
-/// A `[TValue]` slice indexed by marker-typed ids ([`UsizeId`] and id ranges)
+/// A `[TValue]` slice indexed by brand-typed ids ([`UsizeId`] and id ranges)
 /// instead of bare `usize`.
 #[repr(transparent)]
-pub struct IdSlice<TMarker: ?Sized, TValue> {
-    phantom: PhantomData<TMarker>,
+pub struct IdSlice<TBrand: ?Sized, TValue> {
+    phantom: PhantomData<TBrand>,
     repr: [TValue],
 }
 
-impl<TMarker: ?Sized, TValue> IdSlice<TMarker, TValue> {
-    pub fn as_mut_id_ptr(&mut self) -> MutIdPtr<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue> IdSlice<TBrand, TValue> {
+    pub fn as_mut_id_ptr(&mut self) -> MutIdPtr<TBrand, TValue> {
         MutIdPtr::from_mut_ptr(self.as_mut_slice().as_mut_ptr())
     }
 
@@ -30,7 +30,7 @@ impl<TMarker: ?Sized, TValue> IdSlice<TMarker, TValue> {
         &mut self.repr
     }
 
-    pub const fn as_id_ptr(&self) -> IdPtr<TMarker, TValue> {
+    pub const fn as_id_ptr(&self) -> IdPtr<TBrand, TValue> {
         IdPtr::from_ptr(self.as_slice().as_ptr())
     }
 
@@ -38,7 +38,7 @@ impl<TMarker: ?Sized, TValue> IdSlice<TMarker, TValue> {
         &self.repr
     }
 
-    pub const fn end(&self) -> UsizeId<TMarker> {
+    pub const fn end(&self) -> UsizeId<TBrand> {
         UsizeId::from_usize(self.len())
     }
 
@@ -75,19 +75,19 @@ impl<TMarker: ?Sized, TValue> IdSlice<TMarker, TValue> {
     }
 }
 
-impl<TMarker: ?Sized, TValue> AsMut<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue> AsMut<IdSlice<TBrand, TValue>> for IdSlice<TBrand, TValue> {
     fn as_mut(&mut self) -> &mut Self {
         self
     }
 }
 
-impl<TMarker: ?Sized, TValue> AsRef<IdSlice<TMarker, TValue>> for IdSlice<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue> AsRef<IdSlice<TBrand, TValue>> for IdSlice<TBrand, TValue> {
     fn as_ref(&self) -> &Self {
         self
     }
 }
 
-impl<TMarker: ?Sized> BufRead for &IdSlice<TMarker, u8> {
+impl<TBrand: ?Sized> BufRead for &IdSlice<TBrand, u8> {
     fn fill_buf(&mut self) -> io::Result<&[u8]> {
         let repr: &mut &[u8] = unsafe { transmute(self) };
         repr.fill_buf()
@@ -109,46 +109,46 @@ impl<TMarker: ?Sized> BufRead for &IdSlice<TMarker, u8> {
     }
 }
 
-impl<TMarker: ?Sized, TValue: Debug> Debug for IdSlice<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue: Debug> Debug for IdSlice<TBrand, TValue> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        fmt_marker_name::<TMarker>(f)?;
+        fmt_brand_name::<TBrand>(f)?;
         Debug::fmt(self.as_slice(), f)
     }
 }
 
-impl<TMarker: ?Sized, TValue> Default for &IdSlice<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue> Default for &IdSlice<TBrand, TValue> {
     fn default() -> Self {
         IdSlice::from_slice(&[])
     }
 }
 
-impl<TMarker: ?Sized, TValue> Default for &mut IdSlice<TMarker, TValue> {
+impl<TBrand: ?Sized, TValue> Default for &mut IdSlice<TBrand, TValue> {
     fn default() -> Self {
         IdSlice::from_mut_slice(&mut [])
     }
 }
 
-impl<TMarker: ?Sized, TValue> Eq for IdSlice<TMarker, TValue> where [TValue]: PartialEq {}
+impl<TBrand: ?Sized, TValue> Eq for IdSlice<TBrand, TValue> where [TValue]: PartialEq {}
 
-impl<'a, TMarker: ?Sized, TValue> From<&'a [TValue]> for &'a IdSlice<TMarker, TValue> {
+impl<'a, TBrand: ?Sized, TValue> From<&'a [TValue]> for &'a IdSlice<TBrand, TValue> {
     fn from(value: &'a [TValue]) -> Self {
         IdSlice::from_slice(value)
     }
 }
 
-impl<'a, TMarker: ?Sized, TValue> From<&'a mut [TValue]> for &'a IdSlice<TMarker, TValue> {
+impl<'a, TBrand: ?Sized, TValue> From<&'a mut [TValue]> for &'a IdSlice<TBrand, TValue> {
     fn from(value: &'a mut [TValue]) -> Self {
         IdSlice::from_slice(value)
     }
 }
 
-impl<'a, TMarker: ?Sized, TValue> From<&'a mut [TValue]> for &'a mut IdSlice<TMarker, TValue> {
+impl<'a, TBrand: ?Sized, TValue> From<&'a mut [TValue]> for &'a mut IdSlice<TBrand, TValue> {
     fn from(value: &'a mut [TValue]) -> Self {
         IdSlice::from_mut_slice(value)
     }
 }
 
-impl<TMarker: ?Sized, TValue> Hash for IdSlice<TMarker, TValue>
+impl<TBrand: ?Sized, TValue> Hash for IdSlice<TBrand, TValue>
 where
     [TValue]: Hash,
 {
@@ -157,8 +157,8 @@ where
     }
 }
 
-impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I>
-    for IdSlice<TMarker, TValue>
+impl<TBrand: ?Sized, TValue, I: IdSliceIndex<IdSlice<TBrand, TValue>>> Index<I>
+    for IdSlice<TBrand, TValue>
 {
     type Output = I::Output;
 
@@ -167,8 +167,8 @@ impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> Index<I
     }
 }
 
-impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMut<I>
-    for IdSlice<TMarker, TValue>
+impl<TBrand: ?Sized, TValue, I: IdSliceIndex<IdSlice<TBrand, TValue>>> IndexMut<I>
+    for IdSlice<TBrand, TValue>
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
         index.index_mut(self)
@@ -176,7 +176,7 @@ impl<TMarker: ?Sized, TValue, I: IdSliceIndex<IdSlice<TMarker, TValue>>> IndexMu
 }
 
 #[allow(clippy::into_iter_on_ref)]
-impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a IdSlice<TMarker, TValue> {
+impl<'a, TBrand: ?Sized, TValue> IntoIterator for &'a IdSlice<TBrand, TValue> {
     type Item = <&'a [TValue] as IntoIterator>::Item;
     type IntoIter = <&'a [TValue] as IntoIterator>::IntoIter;
 
@@ -186,7 +186,7 @@ impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a IdSlice<TMarker, TValue> 
 }
 
 #[allow(clippy::into_iter_on_ref)]
-impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a mut IdSlice<TMarker, TValue> {
+impl<'a, TBrand: ?Sized, TValue> IntoIterator for &'a mut IdSlice<TBrand, TValue> {
     type Item = <&'a mut [TValue] as IntoIterator>::Item;
     type IntoIter = <&'a mut [TValue] as IntoIterator>::IntoIter;
 
@@ -195,7 +195,7 @@ impl<'a, TMarker: ?Sized, TValue> IntoIterator for &'a mut IdSlice<TMarker, TVal
     }
 }
 
-impl<TMarker: ?Sized, TValue> Ord for IdSlice<TMarker, TValue>
+impl<TBrand: ?Sized, TValue> Ord for IdSlice<TBrand, TValue>
 where
     [TValue]: Ord,
 {
@@ -204,52 +204,52 @@ where
     }
 }
 
-impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<IdSlice<TMarker, TValueB>>
-    for IdSlice<TMarker, TValueA>
+impl<TBrand: ?Sized, TValueA, TValueB> PartialEq<IdSlice<TBrand, TValueB>>
+    for IdSlice<TBrand, TValueA>
 where
     [TValueA]: PartialEq<[TValueB]>,
 {
-    fn eq(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
+    fn eq(&self, other: &IdSlice<TBrand, TValueB>) -> bool {
         self.as_slice().eq(other.as_slice())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
-    fn ne(&self, other: &IdSlice<TMarker, TValueB>) -> bool {
+    fn ne(&self, other: &IdSlice<TBrand, TValueB>) -> bool {
         self.as_slice().ne(other.as_slice())
     }
 }
 
-impl<TMarker: ?Sized, TValueA, TValueB, const N: usize> PartialEq<IdArray<TMarker, TValueB, N>>
-    for IdSlice<TMarker, TValueA>
+impl<TBrand: ?Sized, TValueA, TValueB, const N: usize> PartialEq<IdArray<TBrand, TValueB, N>>
+    for IdSlice<TBrand, TValueA>
 where
     [TValueA]: PartialEq<[TValueB; N]>,
 {
-    fn eq(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+    fn eq(&self, other: &IdArray<TBrand, TValueB, N>) -> bool {
         self.as_slice().eq(other.as_array())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
-    fn ne(&self, other: &IdArray<TMarker, TValueB, N>) -> bool {
+    fn ne(&self, other: &IdArray<TBrand, TValueB, N>) -> bool {
         self.as_slice().ne(other.as_array())
     }
 }
 
-impl<TMarker: ?Sized, TValueA, TValueB> PartialEq<IdVec<TMarker, TValueB>>
-    for IdSlice<TMarker, TValueA>
+impl<TBrand: ?Sized, TValueA, TValueB> PartialEq<IdVec<TBrand, TValueB>>
+    for IdSlice<TBrand, TValueA>
 where
     [TValueA]: PartialEq<Vec<TValueB>>,
 {
-    fn eq(&self, other: &IdVec<TMarker, TValueB>) -> bool {
+    fn eq(&self, other: &IdVec<TBrand, TValueB>) -> bool {
         self.as_slice().eq(other.as_vec())
     }
 
     #[allow(clippy::partialeq_ne_impl)]
-    fn ne(&self, other: &IdVec<TMarker, TValueB>) -> bool {
+    fn ne(&self, other: &IdVec<TBrand, TValueB>) -> bool {
         self.as_slice().ne(other.as_vec())
     }
 }
 
-impl<TMarker: ?Sized, TValue> PartialOrd for IdSlice<TMarker, TValue>
+impl<TBrand: ?Sized, TValue> PartialOrd for IdSlice<TBrand, TValue>
 where
     [TValue]: PartialOrd,
 {
@@ -274,7 +274,7 @@ where
     }
 }
 
-impl<TMarker: ?Sized> Read for &IdSlice<TMarker, u8> {
+impl<TBrand: ?Sized> Read for &IdSlice<TBrand, u8> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let this: &mut &[u8] = unsafe { transmute(self) };
         this.read(buf)
@@ -301,22 +301,22 @@ impl<TMarker: ?Sized> Read for &IdSlice<TMarker, u8> {
     }
 }
 
-impl<TMarker: ?Sized, TValue> ToOwned for IdSlice<TMarker, TValue>
+impl<TBrand: ?Sized, TValue> ToOwned for IdSlice<TBrand, TValue>
 where
     [TValue]: ToOwned<Owned = Vec<TValue>>,
 {
-    type Owned = IdVec<TMarker, TValue>;
+    type Owned = IdVec<TBrand, TValue>;
 
     fn to_owned(&self) -> Self::Owned {
         IdVec::from_vec(self.as_slice().to_owned())
     }
 
-    fn clone_into(&self, target: &mut IdVec<TMarker, TValue>) {
+    fn clone_into(&self, target: &mut IdVec<TBrand, TValue>) {
         self.as_slice().clone_into(target.as_mut_vec());
     }
 }
 
-impl<'a, TMarker: ?Sized> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
+impl<'a, TBrand: ?Sized> ToSocketAddrs for &'a IdSlice<TBrand, SocketAddr> {
     type Iter = <&'a [SocketAddr] as ToSocketAddrs>::Iter;
 
     fn to_socket_addrs(&self) -> io::Result<Self::Iter> {
@@ -324,7 +324,7 @@ impl<'a, TMarker: ?Sized> ToSocketAddrs for &'a IdSlice<TMarker, SocketAddr> {
     }
 }
 
-impl<TMarker: ?Sized> io::Write for &mut IdSlice<TMarker, u8> {
+impl<TBrand: ?Sized> io::Write for &mut IdSlice<TBrand, u8> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         let this: &mut &mut [u8] = unsafe { transmute(self) };
         this.write(buf)
