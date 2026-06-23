@@ -1,13 +1,16 @@
 use crate::{I32Id, IsizeId, U32Id, UsizeId};
 
-/// A typed integer id that can index the columnar storage behind an
-/// [`IdStruct`](crate::soa::IdStruct) and its
-/// [`IdField`](crate::soa::IdField)s.
+/// A branded integer id of any width, convertible to and from its canonical
+/// [`UsizeId`] form.
 ///
-/// Every id type in this crate implements `Id`, so the id-pool and field
-/// machinery works the same regardless of the integer width chosen for ids.
-/// [`UsizeId`] is the canonical form because it indexes a [`Vec`] directly;
-/// the other widths convert through it.
+/// Every id type in this crate ([`UsizeId`], [`I32Id`], [`U32Id`],
+/// [`IsizeId`]) implements `Id`, so generic code can abstract over the integer
+/// width an id uses. [`UsizeId`] is the canonical form because it indexes a
+/// [`Vec`] or slice directly; the other widths convert through it. Each id also
+/// exposes its raw backing integer via [`to_backing`](Self::to_backing).
+///
+/// The `soa` id pools are one consumer, but `Id` is useful anywhere code needs
+/// to be generic over id width.
 pub trait Id: Copy + Eq {
     /// Brand that ties this id to a specific id domain.
     type Brand: ?Sized;
