@@ -2,7 +2,12 @@ use crate::{
     Id, IdVec, Scalar,
     soa::{IdFieldIter, IdFieldIterMut, IdStruct},
 };
-use std::{mem, mem::MaybeUninit, ptr::write_bytes};
+use std::{
+    fmt::{self, Debug},
+    mem,
+    mem::MaybeUninit,
+    ptr::write_bytes,
+};
 
 /// A sparse, columnar data store keyed by typed ids from an
 /// [`IdStruct`].
@@ -191,6 +196,33 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         let item = &mut self.items[id.to_usize_id()];
         unsafe { MaybeUninit::assume_init_drop(item) }
         item.write(value)
+    }
+}
+
+impl<TBrand: ?Sized, TValue: Copy> Clone for IdField<TBrand, TValue> {
+    fn clone(&self) -> Self {
+        // `MaybeUninit<TValue>: Clone` exists only for `TValue: Copy`, where it
+        // is a bytewise copy. That faithfully duplicates the reserved slots
+        // (including any still-uninitialized ones) and the live values. A
+        // non-`Copy` value can't be cloned here because liveness lives in the
+        // paired `IdStruct`, so this type can't tell which slots are
+        // initialized; a deep clone would have to be a method taking the pool.
+        Self {
+            items: self.items.clone(),
+        }
+    }
+}
+
+impl<TBrand: ?Sized, TValue> Debug for IdField<TBrand, TValue> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // The values can't be shown: liveness lives in the paired `IdStruct`,
+        // so which slots hold an initialized `TValue` isn't known here and
+        // reading an unwritten slot would be undefined behavior. Only the
+        // reserved-slot count is safe to report, so there is no `TValue: Debug`
+        // bound and the struct is formatted as non-exhaustive.
+        f.debug_struct("IdField")
+            .field("reserved_count", &self.reserved_count())
+            .finish_non_exhaustive()
     }
 }
 

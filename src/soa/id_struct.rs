@@ -2,6 +2,10 @@ use crate::{
     Id, IdVec, Scalar,
     soa::{IdStructIter, IdStructRawParts},
 };
+use std::{
+    fmt::{self, Debug},
+    hash::{Hash, Hasher},
+};
 
 /// An id pool that hands out and recycles typed integer handles.
 ///
@@ -166,9 +170,49 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     }
 }
 
+impl<TBrand: ?Sized, TNum: Scalar> Clone for IdStruct<TBrand, TNum> {
+    fn clone(&self) -> Self {
+        Self {
+            dense: self.dense.clone(),
+            sparse: self.sparse.clone(),
+            live_count: self.live_count,
+        }
+    }
+}
+
+impl<TBrand: ?Sized, TNum: Scalar> Debug for IdStruct<TBrand, TNum>
+where
+    TNum::Id<TBrand>: Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // `sparse` is the inverse permutation of `dense`, so it adds nothing
+        // beyond the retained (`live`) and recycled-next (`free`) partitions of
+        // `dense` and is left out; only the ids need to be `Debug`, not `TNum`.
+        let (live, free) = self.dense.split_at(self.live_count);
+        f.debug_struct("IdStruct")
+            .field("live", &live)
+            .field("free", &free)
+            .finish()
+    }
+}
+
 impl<TBrand: ?Sized, TNum: Scalar> Default for IdStruct<TBrand, TNum> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<TBrand: ?Sized, TNum: Scalar> Eq for IdStruct<TBrand, TNum> {}
+
+impl<TBrand: ?Sized, TNum: Scalar> Hash for IdStruct<TBrand, TNum>
+where
+    TNum::Id<TBrand>: Hash,
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        // Hash the same data `PartialEq` compares; `sparse` is derived from
+        // `dense` so omitting it keeps Hash and Eq in agreement.
+        self.dense.hash(state);
+        self.live_count.hash(state);
     }
 }
 
@@ -178,5 +222,20 @@ impl<'a, TBrand: ?Sized, TNum: Scalar> IntoIterator for &'a IdStruct<TBrand, TNu
 
     fn into_iter(self) -> Self::IntoIter {
         IdStructIter::from_live(&self.dense[..self.live_count])
+    }
+}
+
+impl<TBrand: ?Sized, TNum: Scalar> PartialEq for IdStruct<TBrand, TNum> {
+    fn eq(&self, other: &Self) -> bool {
+        // Structural equality over the full internal layout: `dense` (whose
+        // inverse `sparse` is redundant) plus the live/free boundary. Two pools
+        // that retain the same ids but reached that state through a different
+        // release history compare unequal.
+        self.live_count == other.live_count && self.dense == other.dense
+    }
+
+    #[allow(clippy::partialeq_ne_impl)]
+    fn ne(&self, other: &Self) -> bool {
+        self.live_count != other.live_count || self.dense != other.dense
     }
 }

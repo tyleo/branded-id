@@ -1,5 +1,5 @@
 use crate::Id;
-use std::slice;
+use std::{fmt, slice};
 
 /// Iterates the ids currently retained by an [`IdStruct`](super::IdStruct),
 /// in the order they appear in the packed `live` list.
@@ -10,6 +10,24 @@ pub struct IdStructIter<'a, TId> {
 impl<'a, TId> IdStructIter<'a, TId> {
     pub(super) fn from_live(live: &'a [TId]) -> Self {
         Self { live: live.iter() }
+    }
+}
+
+impl<TId> Clone for IdStructIter<'_, TId> {
+    fn clone(&self) -> Self {
+        // `slice::Iter` is `Clone` for any element type, so no `TId` bound is
+        // needed; the clone is an independent cursor over the same ids.
+        Self {
+            live: self.live.clone(),
+        }
+    }
+}
+
+impl<TId: fmt::Debug> fmt::Debug for IdStructIter<'_, TId> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_tuple("IdStructIter")
+            .field(&self.live.as_slice())
+            .finish()
     }
 }
 

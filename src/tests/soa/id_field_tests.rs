@@ -233,3 +233,37 @@ fn retain_test() {
 
     assert_eq!(actual, expected);
 }
+
+// Cloning a field of Copy values duplicates the reserved storage bytewise, so
+// the clone reads back the same values at the live ids.
+#[test]
+fn clone_test() {
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, u32>::new();
+
+    let id_0 = ids.retain();
+    field.retain(id_0, 10);
+    let id_1 = ids.retain();
+    field.retain(id_1, 20);
+
+    let clone = field.clone();
+
+    assert_eq!(clone.reserved_count(), field.reserved_count());
+    // SAFETY: `clone` is a faithful copy of `field`, which is in sync with `ids`,
+    // so id_0 and id_1 are initialized in the clone too.
+    assert_eq!(*unsafe { clone.get(id_0) }, 10);
+    assert_eq!(*unsafe { clone.get(id_1) }, 20);
+}
+
+// Debug reports only the reserved-slot count: the values aren't shown because
+// liveness lives in the paired IdStruct, not the field.
+#[test]
+fn debug_test() {
+    let mut field = IdField::<BTest, u32>::new();
+    field.retain(u32_id!(BTest; 0), 7);
+    field.retain(u32_id!(BTest; 2), 9);
+
+    let actual = format!("{:?}", field);
+    let expected = "IdField { reserved_count: 3, .. }";
+    assert_eq!(actual, expected);
+}

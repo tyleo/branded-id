@@ -19,6 +19,18 @@ impl<'a, TId: Id, TValue> IdFieldIter<'a, TId, TValue> {
     }
 }
 
+impl<'a, TId: Id, TValue> Clone for IdFieldIter<'a, TId, TValue> {
+    fn clone(&self) -> Self {
+        // Only the shared slice reference (`Copy`) and the id cursor are
+        // duplicated; the values are never touched, so no `TValue` bound is
+        // needed and the clone hands out the same shared references.
+        Self {
+            items: self.items,
+            ids: self.ids.clone(),
+        }
+    }
+}
+
 impl<'a, TId: Id, TValue> Iterator for IdFieldIter<'a, TId, TValue> {
     type Item = &'a TValue;
 
