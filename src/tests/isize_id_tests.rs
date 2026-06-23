@@ -1,5 +1,5 @@
 use crate::{
-    I32Id, IsizeId, U32Id, UsizeId, i32_id, isize_id as id, tests::util::MTest, u32_id, usize_id,
+    I32Id, IsizeId, U32Id, UsizeId, i32_id, isize_id as id, tests::util::BTest, u32_id, usize_id,
 };
 use std::{
     cmp::Ordering,
@@ -10,36 +10,36 @@ use std::{
 
 #[test]
 fn from_isize_test() {
-    let actual: IsizeId<MTest> = IsizeId::<MTest>::from_isize(1);
-    let expected = id!(MTest; 1);
+    let actual: IsizeId<BTest> = IsizeId::<BTest>::from_isize(1);
+    let expected = id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn offset_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
-    let actual: IsizeId<MTest> = id.offset(1);
-    let expected = id!(MTest; 2);
+    let actual: IsizeId<BTest> = id.offset(1);
+    let expected = id!(BTest; 2);
     assert_eq!(actual, expected);
 
-    let actual: IsizeId<MTest> = id.offset(-1);
-    let expected = id!(MTest; 0);
+    let actual: IsizeId<BTest> = id.offset(-1);
+    let expected = id!(BTest; 0);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn to_i32_id_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
-    let actual: I32Id<MTest> = id.to_i32_id();
-    let expected = i32_id!(MTest; 1);
+    let actual: I32Id<BTest> = id.to_i32_id();
+    let expected = i32_id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn to_isize_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
     let actual: isize = id.to_isize();
     let expected = 1;
@@ -48,160 +48,160 @@ fn to_isize_test() {
 
 #[test]
 fn to_u32_id_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
-    let actual: U32Id<MTest> = id.to_u32_id();
-    let expected = u32_id!(MTest; 1);
+    let actual: U32Id<BTest> = id.to_u32_id();
+    let expected = u32_id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn to_usize_id_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
-    let actual: UsizeId<MTest> = id.to_usize_id();
-    let expected = usize_id!(MTest; 1);
+    let actual: UsizeId<BTest> = id.to_usize_id();
+    let expected = usize_id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn binary_fmt_test() {
-    let id = id!(MTest; 2);
+    let id = id!(BTest; 2);
 
     let actual: String = format!("{:b}", id);
-    let expected = "MTest(10)";
+    let expected = "BTest(10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+b}", id);
-    let expected = "MTest(+10)";
+    let expected = "BTest(+10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-b}", id);
-    let expected = "MTest(10)";
+    let expected = "BTest(10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#b}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(0b10)";
+    let expected = "branded_id::tests::util::b_test::BTest(0b10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25b}", id);
-    let expected = "MTest(                       10)";
+    let expected = "BTest(                       10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25b}", id);
-    let expected = "MTest(10                       )";
+    let expected = "BTest(10                       )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25b}", id);
-    let expected = "MTest(                       10)";
+    let expected = "BTest(                       10)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25b}", id);
-    let expected = "MTest(           10            )";
+    let expected = "BTest(           10            )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 #[allow(clippy::clone_on_copy)]
 fn clone_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
-    let actual: IsizeId<MTest> = id.clone();
-    let expected = id!(MTest; 1);
+    let actual: IsizeId<BTest> = id.clone();
+    let expected = id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn debug_fmt_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
     let actual: String = format!("{:?}", id);
-    let expected = "MTest(1)";
+    let expected = "BTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+?}", id);
-    let expected = "MTest(+1)";
+    let expected = "BTest(+1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-?}", id);
-    let expected = "MTest(1)";
+    let expected = "BTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(1)";
+    let expected = "branded_id::tests::util::b_test::BTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25?}", id);
-    let expected = "MTest(                        1)";
+    let expected = "BTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25?}", id);
-    let expected = "MTest(1                        )";
+    let expected = "BTest(1                        )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25?}", id);
-    let expected = "MTest(                        1)";
+    let expected = "BTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25?}", id);
-    let expected = "MTest(            1            )";
+    let expected = "BTest(            1            )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn display_fmt_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
 
     let actual: String = format!("{}", id);
-    let expected = "MTest(1)";
+    let expected = "BTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+}", id);
-    let expected = "MTest(+1)";
+    let expected = "BTest(+1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-}", id);
-    let expected = "MTest(1)";
+    let expected = "BTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(1)";
+    let expected = "branded_id::tests::util::b_test::BTest(1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25}", id);
-    let expected = "MTest(                        1)";
+    let expected = "BTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25}", id);
-    let expected = "MTest(1                        )";
+    let expected = "BTest(1                        )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25}", id);
-    let expected = "MTest(                        1)";
+    let expected = "BTest(                        1)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25}", id);
-    let expected = "MTest(            1            )";
+    let expected = "BTest(            1            )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn from_test() {
-    let actual: IsizeId<MTest> = From::from(1);
-    let expected = id!(MTest; 1);
+    let actual: IsizeId<BTest> = From::from(1);
+    let expected = id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn from_str_test() {
-    let actual: IsizeId<MTest> = <IsizeId<MTest> as FromStr>::from_str("1").unwrap();
-    let expected = id!(MTest; 1);
+    let actual: IsizeId<BTest> = <IsizeId<BTest> as FromStr>::from_str("1").unwrap();
+    let expected = id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn hash_test() {
-    let id = id!(MTest; 1);
+    let id = id!(BTest; 1);
     let mut hasher_0 = DefaultHasher::new();
     id.hash(&mut hasher_0);
 
@@ -216,7 +216,7 @@ fn hash_test() {
 
 #[test]
 fn hash_slice_test() {
-    let ids = [id!(MTest; 1), id!(MTest; 2)];
+    let ids = [id!(BTest; 1), id!(BTest; 2)];
     let mut hasher_0 = DefaultHasher::new();
     ids.hash(&mut hasher_0);
 
@@ -231,119 +231,119 @@ fn hash_slice_test() {
 
 #[test]
 fn lower_exp_fmt_test() {
-    let id = id!(MTest; 2);
+    let id = id!(BTest; 2);
 
     let actual: String = format!("{:e}", id);
-    let expected = "MTest(2e0)";
+    let expected = "BTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+e}", id);
-    let expected = "MTest(+2e0)";
+    let expected = "BTest(+2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-e}", id);
-    let expected = "MTest(2e0)";
+    let expected = "BTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#e}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(2e0)";
+    let expected = "branded_id::tests::util::b_test::BTest(2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25e}", id);
-    let expected = "MTest(                      2e0)";
+    let expected = "BTest(                      2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25e}", id);
-    let expected = "MTest(2e0                      )";
+    let expected = "BTest(2e0                      )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25e}", id);
-    let expected = "MTest(                      2e0)";
+    let expected = "BTest(                      2e0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25e}", id);
-    let expected = "MTest(           2e0           )";
+    let expected = "BTest(           2e0           )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn lower_hex_fmt_test() {
-    let id = id!(MTest; 10);
+    let id = id!(BTest; 10);
 
     let actual: String = format!("{:x}", id);
-    let expected = "MTest(a)";
+    let expected = "BTest(a)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+x}", id);
-    let expected = "MTest(+a)";
+    let expected = "BTest(+a)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-x}", id);
-    let expected = "MTest(a)";
+    let expected = "BTest(a)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#x}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(0xa)";
+    let expected = "branded_id::tests::util::b_test::BTest(0xa)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25x}", id);
-    let expected = "MTest(                        a)";
+    let expected = "BTest(                        a)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25x}", id);
-    let expected = "MTest(a                        )";
+    let expected = "BTest(a                        )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25x}", id);
-    let expected = "MTest(                        a)";
+    let expected = "BTest(                        a)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25x}", id);
-    let expected = "MTest(            a            )";
+    let expected = "BTest(            a            )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn octal_fmt_test() {
-    let id = id!(MTest; 10);
+    let id = id!(BTest; 10);
 
     let actual: String = format!("{:o}", id);
-    let expected = "MTest(12)";
+    let expected = "BTest(12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+o}", id);
-    let expected = "MTest(+12)";
+    let expected = "BTest(+12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-o}", id);
-    let expected = "MTest(12)";
+    let expected = "BTest(12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#o}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(0o12)";
+    let expected = "branded_id::tests::util::b_test::BTest(0o12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25o}", id);
-    let expected = "MTest(                       12)";
+    let expected = "BTest(                       12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25o}", id);
-    let expected = "MTest(12                       )";
+    let expected = "BTest(12                       )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25o}", id);
-    let expected = "MTest(                       12)";
+    let expected = "BTest(                       12)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25o}", id);
-    let expected = "MTest(           12            )";
+    let expected = "BTest(           12            )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn cmp_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: Ordering = id_0.cmp(&id_0);
     let expected = Ordering::Equal;
@@ -360,43 +360,43 @@ fn cmp_test() {
 
 #[test]
 fn max_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
-    let actual: IsizeId<MTest> = id_0.max(id_1);
+    let actual: IsizeId<BTest> = id_0.max(id_1);
     let expected = id!(2);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn min_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
-    let actual: IsizeId<MTest> = id_0.min(id_1);
+    let actual: IsizeId<BTest> = id_0.min(id_1);
     let expected = id!(1);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn clamp_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
-    let id_2 = id!(MTest; 3);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
+    let id_2 = id!(BTest; 3);
 
-    let actual: IsizeId<MTest> = id_0.clamp(id_1, id_2);
+    let actual: IsizeId<BTest> = id_0.clamp(id_1, id_2);
     let expected = id!(2);
     assert_eq!(actual, expected);
 
-    let actual: IsizeId<MTest> = id_2.clamp(id_0, id_1);
+    let actual: IsizeId<BTest> = id_2.clamp(id_0, id_1);
     let expected = id!(2);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn eq_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: bool = id_0.eq(&id_0);
     let expected = true;
@@ -409,8 +409,8 @@ fn eq_test() {
 
 #[test]
 fn ne_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: bool = id_0.ne(&id_0);
     let expected = false;
@@ -423,8 +423,8 @@ fn ne_test() {
 
 #[test]
 fn partial_cmp_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: Option<Ordering> = id_0.partial_cmp(&id_0);
     let expected = Some(Ordering::Equal);
@@ -441,8 +441,8 @@ fn partial_cmp_test() {
 
 #[test]
 fn lt_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: bool = id_0 < id_0;
     let expected = false;
@@ -459,8 +459,8 @@ fn lt_test() {
 
 #[test]
 fn le_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: bool = id_0 <= id_0;
     let expected = true;
@@ -477,8 +477,8 @@ fn le_test() {
 
 #[test]
 fn gt_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: bool = id_0 > id_0;
     let expected = false;
@@ -495,8 +495,8 @@ fn gt_test() {
 
 #[test]
 fn ge_test() {
-    let id_0 = id!(MTest; 1);
-    let id_1 = id!(MTest; 2);
+    let id_0 = id!(BTest; 1);
+    let id_1 = id!(BTest; 2);
 
     let actual: bool = id_0 >= id_0;
     let expected = true;
@@ -513,74 +513,74 @@ fn ge_test() {
 
 #[test]
 fn upper_exp_fmt_test() {
-    let id = id!(MTest; 2);
+    let id = id!(BTest; 2);
 
     let actual: String = format!("{:E}", id);
-    let expected = "MTest(2E0)";
+    let expected = "BTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+E}", id);
-    let expected = "MTest(+2E0)";
+    let expected = "BTest(+2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-E}", id);
-    let expected = "MTest(2E0)";
+    let expected = "BTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#E}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(2E0)";
+    let expected = "branded_id::tests::util::b_test::BTest(2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25E}", id);
-    let expected = "MTest(                      2E0)";
+    let expected = "BTest(                      2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25E}", id);
-    let expected = "MTest(2E0                      )";
+    let expected = "BTest(2E0                      )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25E}", id);
-    let expected = "MTest(                      2E0)";
+    let expected = "BTest(                      2E0)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25E}", id);
-    let expected = "MTest(           2E0           )";
+    let expected = "BTest(           2E0           )";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn upper_hex_fmt_test() {
-    let id = id!(MTest; 10);
+    let id = id!(BTest; 10);
 
     let actual: String = format!("{:X}", id);
-    let expected = "MTest(A)";
+    let expected = "BTest(A)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+X}", id);
-    let expected = "MTest(+A)";
+    let expected = "BTest(+A)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-X}", id);
-    let expected = "MTest(A)";
+    let expected = "BTest(A)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#X}", id);
-    let expected = "branded_id::tests::util::m_test::MTest(0xA)";
+    let expected = "branded_id::tests::util::b_test::BTest(0xA)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25X}", id);
-    let expected = "MTest(                        A)";
+    let expected = "BTest(                        A)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25X}", id);
-    let expected = "MTest(A                        )";
+    let expected = "BTest(A                        )";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25X}", id);
-    let expected = "MTest(                        A)";
+    let expected = "BTest(                        A)";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25X}", id);
-    let expected = "MTest(            A            )";
+    let expected = "BTest(            A            )";
     assert_eq!(actual, expected);
 }

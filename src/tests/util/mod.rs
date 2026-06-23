@@ -1,6 +1,6 @@
-mod m_test;
+mod b_test;
 
-pub use m_test::*;
+pub use b_test::*;
 
 #[cfg(feature = "extends")]
 pub mod extends;

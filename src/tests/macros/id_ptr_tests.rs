@@ -1,9 +1,9 @@
-use crate::{IdPtr, id_ptr, tests::util::MTest};
+use crate::{IdPtr, id_ptr, tests::util::BTest};
 
 #[test]
 fn id_ptr_0_test() {
     let ptr: *const _ = &0;
-    let actual: IdPtr<MTest, _> = id_ptr!(ptr);
+    let actual: IdPtr<BTest, _> = id_ptr!(ptr);
     let expected = IdPtr::from_ptr(ptr);
     assert_eq!(actual, expected);
 }
@@ -11,7 +11,7 @@ fn id_ptr_0_test() {
 #[test]
 fn id_ptr_1_test() {
     let ptr: *const _ = &0;
-    let actual = id_ptr!(MTest; ptr);
+    let actual = id_ptr!(BTest; ptr);
     let expected = IdPtr::from_ptr(ptr);
     assert_eq!(actual, expected);
 }
@@ -19,7 +19,7 @@ fn id_ptr_1_test() {
 #[test]
 fn id_ptr_2_test() {
     let ptr: *const _ = &0;
-    let actual = id_ptr!(MTest; i32; ptr);
+    let actual = id_ptr!(BTest; i32; ptr);
     let expected = IdPtr::from_ptr(ptr);
     assert_eq!(actual, expected);
 }

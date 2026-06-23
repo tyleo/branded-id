@@ -5,9 +5,9 @@
 /// # Examples
 /// ```rust
 /// use branded_id::{id_array, usize_id, IdArray, UsizeId};
-/// struct Row;
-/// let a: IdArray<Row, i32, 3> = id_array![Row; 1, 2, 3];
-/// let id: UsizeId<Row> = usize_id!(Row; 2);
+/// struct BRow;
+/// let a: IdArray<BRow, i32, 3> = id_array![BRow; 1, 2, 3];
+/// let id: UsizeId<BRow> = usize_id!(BRow; 2);
 /// assert_eq!(a[id], 3);
 /// ```
 #[macro_export]

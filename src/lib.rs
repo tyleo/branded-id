@@ -10,11 +10,11 @@
 //! ```
 //! use branded_id::{UsizeId, usize_id};
 //!
-//! struct Apples;
-//! struct Oranges;
+//! struct BApples;
+//! struct BOranges;
 //!
-//! let apple: UsizeId<Apples> = usize_id!(Apples; 2);
-//! let orange: UsizeId<Oranges> = usize_id!(Oranges; 2);
+//! let apple: UsizeId<BApples> = usize_id!(BApples; 2);
+//! let orange: UsizeId<BOranges> = usize_id!(BOranges; 2);
 //!
 //! // Same underlying integer, but the brand keeps the domains apart.
 //! assert_eq!(apple.to_usize(), orange.to_usize());

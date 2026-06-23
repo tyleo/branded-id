@@ -5,8 +5,8 @@
 /// # Examples
 /// ```rust
 /// use branded_id::{id_slice, IdSlice};
-/// struct Row;
-/// let s: &IdSlice<Row, i32> = id_slice![Row; 1, 2, 3];
+/// struct BRow;
+/// let s: &IdSlice<BRow, i32> = id_slice![BRow; 1, 2, 3];
 /// assert_eq!(s.len(), 3);
 /// ```
 #[macro_export]

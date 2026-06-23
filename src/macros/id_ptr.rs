@@ -4,9 +4,9 @@
 /// # Examples
 /// ```rust
 /// use branded_id::{id_ptr, IdPtr};
-/// struct Row;
+/// struct BRow;
 /// let x = 5i32;
-/// let p: IdPtr<Row, i32> = id_ptr!(Row; &x as *const i32);
+/// let p: IdPtr<BRow, i32> = id_ptr!(BRow; &x as *const i32);
 /// assert_eq!(unsafe { *p.to_ptr() }, 5);
 /// ```
 #[macro_export]

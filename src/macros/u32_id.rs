@@ -4,8 +4,8 @@
 /// # Examples
 /// ```rust
 /// use branded_id::{u32_id, U32Id};
-/// struct Row;
-/// let id: U32Id<Row> = u32_id!(Row; 3);
+/// struct BRow;
+/// let id: U32Id<BRow> = u32_id!(BRow; 3);
 /// assert_eq!(id.to_u32(), 3);
 /// ```
 #[macro_export]

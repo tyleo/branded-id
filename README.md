@@ -7,9 +7,9 @@ Every id and container carries a `TBrand` type parameter. Two ids built for diff
 ```rust
 use branded_id::{UsizeId, usize_id};
 
-struct Apples;
+struct BApples;
 
-let id: UsizeId<Apples> = usize_id!(Apples; 2);
+let id: UsizeId<BApples> = usize_id!(BApples; 2);
 assert_eq!(id.to_usize(), 2);
 ```
 

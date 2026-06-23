@@ -2,7 +2,7 @@ use crate::{
     IdPtr, IdSlice, IdVec, MutIdPtr, UsizeId,
     ext::{MutPtrExt, PtrExt, SliceExt},
     id_array, id_slice, id_vec,
-    tests::util::MTest,
+    tests::util::BTest,
     usize_id as id,
 };
 use std::{
@@ -21,17 +21,17 @@ use std::{
 fn as_mut_id_ptr_test() {
     let slice = &mut [1];
 
-    let id_slice = slice.as_mut_id_slice::<MTest>();
+    let id_slice = slice.as_mut_id_slice::<BTest>();
 
-    let actual: MutIdPtr<MTest, i32> = id_slice.as_mut_id_ptr();
-    let expected = slice.as_mut_ptr().to_mut_id_ptr::<MTest>();
+    let actual: MutIdPtr<BTest, i32> = id_slice.as_mut_id_ptr();
+    let expected = slice.as_mut_ptr().to_mut_id_ptr::<BTest>();
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn as_mut_slice_test() {
     let slice = &mut [1];
-    let id_slice = slice.as_mut_id_slice::<MTest>();
+    let id_slice = slice.as_mut_id_slice::<BTest>();
 
     let actual: &mut [i32] = id_slice.as_mut_slice();
     actual[0] = 2;
@@ -44,16 +44,16 @@ fn as_mut_slice_test() {
 fn as_id_ptr_test() {
     let slice = &[1];
 
-    let id_slice = slice.as_id_slice::<MTest>();
+    let id_slice = slice.as_id_slice::<BTest>();
 
-    let actual: IdPtr<MTest, i32> = id_slice.as_id_ptr();
-    let expected = slice.as_ptr().to_id_ptr::<MTest>();
+    let actual: IdPtr<BTest, i32> = id_slice.as_id_ptr();
+    let expected = slice.as_ptr().to_id_ptr::<BTest>();
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn as_slice_test() {
-    let id_slice = id_slice!(MTest; 1);
+    let id_slice = id_slice!(BTest; 1);
 
     let actual: &[i32] = id_slice.as_slice();
     let expected = &[1];
@@ -62,9 +62,9 @@ fn as_slice_test() {
 
 #[test]
 fn end_test() {
-    let id_slice = id_slice![MTest; 1];
+    let id_slice = id_slice![BTest; 1];
 
-    let actual: UsizeId<MTest> = id_slice.end();
+    let actual: UsizeId<BTest> = id_slice.end();
     let expected = id!(1);
     assert_eq!(actual, expected);
 }
@@ -74,10 +74,10 @@ fn from_mut_slice() {
     let array = &mut [1];
     let slice = array.as_mut_slice();
 
-    let actual: &mut IdSlice<MTest, i32> = IdSlice::from_mut_slice(slice);
+    let actual: &mut IdSlice<BTest, i32> = IdSlice::from_mut_slice(slice);
     actual[id!(0)] = 2;
 
-    let mut id_array = id_array![MTest; i32; 2];
+    let mut id_array = id_array![BTest; i32; 2];
     let expected = id_array.as_mut();
 
     assert_eq!(actual, expected);
@@ -87,40 +87,40 @@ fn from_mut_slice() {
 fn from_slice_test() {
     let slice = [1].as_slice();
 
-    let actual: &IdSlice<MTest, i32> = IdSlice::from_slice(slice);
-    let expected = id_slice![MTest; i32; 1];
+    let actual: &IdSlice<BTest, i32> = IdSlice::from_slice(slice);
+    let expected = id_slice![BTest; i32; 1];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn get_test() {
-    let id_slice = id_slice![MTest; 0, 1, 2, 3];
+    let id_slice = id_slice![BTest; 0, 1, 2, 3];
 
     let actual: Option<&i32> = id_slice.get(id!(1));
     let expected = Some(&1);
     assert_eq!(actual, expected);
 
-    let actual: Option<&IdSlice<MTest, i32>> = id_slice.get(id!(1)..id!(3));
+    let actual: Option<&IdSlice<BTest, i32>> = id_slice.get(id!(1)..id!(3));
     let expected = Some(id_slice![1, 2]);
     assert_eq!(actual, expected);
 
-    let actual: Option<&IdSlice<MTest, i32>> = id_slice.get(id!(1)..);
+    let actual: Option<&IdSlice<BTest, i32>> = id_slice.get(id!(1)..);
     let expected = Some(id_slice![1, 2, 3]);
     assert_eq!(actual, expected);
 
-    let actual: Option<&IdSlice<MTest, i32>> = id_slice.get(..);
+    let actual: Option<&IdSlice<BTest, i32>> = id_slice.get(..);
     let expected = Some(id_slice![0, 1, 2, 3]);
     assert_eq!(actual, expected);
 
-    let actual: Option<&IdSlice<MTest, i32>> = id_slice.get(id!(1)..=id!(3));
+    let actual: Option<&IdSlice<BTest, i32>> = id_slice.get(id!(1)..=id!(3));
     let expected = Some(id_slice![1, 2, 3]);
     assert_eq!(actual, expected);
 
-    let actual: Option<&IdSlice<MTest, i32>> = id_slice.get(..id!(3));
+    let actual: Option<&IdSlice<BTest, i32>> = id_slice.get(..id!(3));
     let expected = Some(id_slice![0, 1, 2]);
     assert_eq!(actual, expected);
 
-    let actual: Option<&IdSlice<MTest, i32>> = id_slice.get(..=id!(3));
+    let actual: Option<&IdSlice<BTest, i32>> = id_slice.get(..=id!(3));
     let expected = Some(id_slice![0, 1, 2, 3]);
     assert_eq!(actual, expected);
 }
@@ -128,39 +128,39 @@ fn get_test() {
 #[test]
 fn get_mut_test() {
     let mut mut_array = [0, 1, 2, 3];
-    let id_slice = mut_array.as_mut_id_slice::<MTest>();
+    let id_slice = mut_array.as_mut_id_slice::<BTest>();
 
     let actual: Option<&mut i32> = id_slice.get_mut(id!(1));
     let mut expected = 1;
     let expected = Some(&mut expected);
     assert_eq!(actual, expected);
 
-    let actual: Option<&mut IdSlice<MTest, i32>> = id_slice.get_mut(id!(1)..id!(3));
+    let actual: Option<&mut IdSlice<BTest, i32>> = id_slice.get_mut(id!(1)..id!(3));
     let mut expected = [1, 2];
     let expected = Some(IdSlice::from_mut_slice(&mut expected));
     assert_eq!(actual, expected);
 
-    let actual: Option<&mut IdSlice<MTest, i32>> = id_slice.get_mut(id!(1)..);
+    let actual: Option<&mut IdSlice<BTest, i32>> = id_slice.get_mut(id!(1)..);
     let mut expected = [1, 2, 3];
     let expected = Some(IdSlice::from_mut_slice(&mut expected));
     assert_eq!(actual, expected);
 
-    let actual: Option<&mut IdSlice<MTest, i32>> = id_slice.get_mut(..);
+    let actual: Option<&mut IdSlice<BTest, i32>> = id_slice.get_mut(..);
     let mut expected = [0, 1, 2, 3];
     let expected = Some(IdSlice::from_mut_slice(&mut expected));
     assert_eq!(actual, expected);
 
-    let actual: Option<&mut IdSlice<MTest, i32>> = id_slice.get_mut(id!(1)..=id!(3));
+    let actual: Option<&mut IdSlice<BTest, i32>> = id_slice.get_mut(id!(1)..=id!(3));
     let mut expected = [1, 2, 3];
     let expected = Some(IdSlice::from_mut_slice(&mut expected));
     assert_eq!(actual, expected);
 
-    let actual: Option<&mut IdSlice<MTest, i32>> = id_slice.get_mut(..id!(3));
+    let actual: Option<&mut IdSlice<BTest, i32>> = id_slice.get_mut(..id!(3));
     let mut expected = [0, 1, 2];
     let expected = Some(IdSlice::from_mut_slice(&mut expected));
     assert_eq!(actual, expected);
 
-    let actual: Option<&mut IdSlice<MTest, i32>> = id_slice.get_mut(..=id!(3));
+    let actual: Option<&mut IdSlice<BTest, i32>> = id_slice.get_mut(..=id!(3));
     let mut expected = [0, 1, 2, 3];
     let expected = Some(IdSlice::from_mut_slice(&mut expected));
     assert_eq!(actual, expected);
@@ -168,13 +168,13 @@ fn get_mut_test() {
 
 #[test]
 fn is_empty_test() {
-    let id_slice = id_slice![MTest; i32];
+    let id_slice = id_slice![BTest; i32];
 
     let actual: bool = id_slice.is_empty();
     let expected = true;
     assert_eq!(actual, expected);
 
-    let id_slice = id_slice![MTest; 1];
+    let id_slice = id_slice![BTest; 1];
 
     let actual: bool = id_slice.is_empty();
     let expected = false;
@@ -183,7 +183,7 @@ fn is_empty_test() {
 
 #[test]
 fn iter_test() {
-    let id_slice = id_slice![MTest; 0, 1, 2];
+    let id_slice = id_slice![BTest; 0, 1, 2];
 
     let actual: Iter<i32> = id_slice.iter();
     let expected = [0, 1, 2].as_slice().iter();
@@ -192,7 +192,7 @@ fn iter_test() {
 
 #[test]
 fn iter_mut_test() {
-    let mut array = id_array![MTest; 0, 1, 2];
+    let mut array = id_array![BTest; 0, 1, 2];
     let slice = array.as_mut_id_slice();
 
     let actual: IterMut<i32> = slice.iter_mut();
@@ -202,13 +202,13 @@ fn iter_mut_test() {
 
 #[test]
 fn len_test() {
-    let id_slice = id_slice![MTest; i32];
+    let id_slice = id_slice![BTest; i32];
 
     let actual: usize = id_slice.len();
     let expected = 0;
     assert_eq!(actual, expected);
 
-    let id_slice = id_slice![MTest; 1];
+    let id_slice = id_slice![BTest; 1];
 
     let actual: usize = id_slice.len();
     let expected = 1;
@@ -219,12 +219,12 @@ fn len_test() {
 #[allow(clippy::useless_asref)]
 fn as_mut_test() {
     let slice = &mut [1];
-    let id_slice = slice.as_mut_id_slice::<MTest>();
+    let id_slice = slice.as_mut_id_slice::<BTest>();
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.as_mut();
+    let actual: &mut IdSlice<BTest, i32> = id_slice.as_mut();
     actual[id!(0)] = 2;
 
-    let mut expected = id_array![MTest; 2];
+    let mut expected = id_array![BTest; 2];
     let expected = expected.as_mut();
     assert_eq!(actual, expected);
 }
@@ -232,40 +232,40 @@ fn as_mut_test() {
 #[test]
 #[allow(clippy::useless_asref)]
 fn as_ref_test() {
-    let id_slice = id_slice![MTest; 1];
+    let id_slice = id_slice![BTest; 1];
 
-    let actual: &IdSlice<MTest, i32> = id_slice.as_ref();
-    let expected = id_slice![MTest; 1];
+    let actual: &IdSlice<BTest, i32> = id_slice.as_ref();
+    let expected = id_slice![BTest; 1];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn fill_buf_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2];
+    let id_slice = &mut id_slice![BTest; 1, 2];
 
     let actual: &[u8] = id_slice.fill_buf().unwrap();
     let expected = &[1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![1, 2];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn consume_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2];
+    let id_slice = &mut id_slice![BTest; 1, 2];
 
     id_slice.consume(2);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn read_until_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2, 3];
+    let id_slice = &mut id_slice![BTest; 1, 2, 3];
 
     let mut buf = vec![];
 
@@ -277,14 +277,14 @@ fn read_until_test() {
     let expected = &[1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![3];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn read_line_test() {
-    let id_slice = &mut id_slice![MTest; 0xA];
+    let id_slice = &mut id_slice![BTest; 0xA];
 
     let mut buf = String::new();
 
@@ -296,82 +296,82 @@ fn read_line_test() {
     let expected = &String::from_str("\n").unwrap();
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn fmt_test() {
-    let empty_id_slice = id_slice![MTest; i32];
+    let empty_id_slice = id_slice![BTest; i32];
     let actual: String = format!("{:?}", empty_id_slice);
-    let expected = "MTest[]";
+    let expected = "BTest[]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:10?}", empty_id_slice);
-    let expected = "MTest[]";
+    let expected = "BTest[]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>10?}", empty_id_slice);
-    let expected = "MTest[]";
+    let expected = "BTest[]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^10?}", empty_id_slice);
-    let expected = "MTest[]";
+    let expected = "BTest[]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:.1?}", empty_id_slice);
-    let expected = "MTest[]";
+    let expected = "BTest[]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", empty_id_slice);
-    let expected = "branded_id::tests::util::m_test::MTest[]";
+    let expected = "branded_id::tests::util::b_test::BTest[]";
     assert_eq!(actual, expected);
 
-    let nested_id_slice = IdSlice::<MTest, _>::from_slice(&[["Hello"], ["Hi"]]);
+    let nested_id_slice = IdSlice::<BTest, _>::from_slice(&[["Hello"], ["Hi"]]);
 
     let actual: String = format!("{:#?}", nested_id_slice);
-    let expected = "branded_id::tests::util::m_test::MTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
+    let expected = "branded_id::tests::util::b_test::BTest[\n    [\n        \"Hello\",\n    ],\n    [\n        \"Hi\",\n    ],\n]";
     assert_eq!(actual, expected);
 
-    let id_slice = id_slice![MTest; "Hello", "Hi"];
+    let id_slice = id_slice![BTest; "Hello", "Hi"];
 
     let actual: String = format!("{:?}", id_slice);
-    let expected = "MTest[\"Hello\", \"Hi\"]";
+    let expected = "BTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:10?}", id_slice);
-    let expected = "MTest[\"Hello\", \"Hi\"]";
+    let expected = "BTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>10?}", id_slice);
-    let expected = "MTest[\"Hello\", \"Hi\"]";
+    let expected = "BTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^10?}", id_slice);
-    let expected = "MTest[\"Hello\", \"Hi\"]";
+    let expected = "BTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:.1?}", id_slice);
-    let expected = "MTest[\"Hello\", \"Hi\"]";
+    let expected = "BTest[\"Hello\", \"Hi\"]";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#?}", id_slice);
-    let expected = "branded_id::tests::util::m_test::MTest[\n    \"Hello\",\n    \"Hi\",\n]";
+    let expected = "branded_id::tests::util::b_test::BTest[\n    \"Hello\",\n    \"Hi\",\n]";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn default_test() {
-    let actual: &IdSlice<MTest, i32> = <&IdSlice<MTest, i32>>::default();
-    let expected = id_slice![MTest; i32];
+    let actual: &IdSlice<BTest, i32> = <&IdSlice<BTest, i32>>::default();
+    let expected = id_slice![BTest; i32];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn default_mut_slice_test() {
-    let actual: &mut IdSlice<MTest, i32> = <&mut IdSlice<MTest, i32>>::default();
-    let expected = id_slice![MTest; i32];
+    let actual: &mut IdSlice<BTest, i32> = <&mut IdSlice<BTest, i32>>::default();
+    let expected = id_slice![BTest; i32];
     assert_eq!(actual, expected);
 }
 
@@ -379,8 +379,8 @@ fn default_mut_slice_test() {
 fn id_slice_from_slice_test() {
     let slice: &[i32] = &[0];
 
-    let actual: &IdSlice<MTest, i32> = From::from(slice);
-    let expected = id_slice!(MTest; i32; 0);
+    let actual: &IdSlice<BTest, i32> = From::from(slice);
+    let expected = id_slice!(BTest; i32; 0);
     assert_eq!(actual, expected);
 }
 
@@ -388,8 +388,8 @@ fn id_slice_from_slice_test() {
 fn id_slice_from_mut_slice_test() {
     let slice: &mut [i32] = &mut [0];
 
-    let actual: &IdSlice<MTest, i32> = From::from(slice);
-    let expected = id_slice!(MTest; i32; 0);
+    let actual: &IdSlice<BTest, i32> = From::from(slice);
+    let expected = id_slice!(BTest; i32; 0);
     assert_eq!(actual, expected);
 }
 
@@ -397,14 +397,14 @@ fn id_slice_from_mut_slice_test() {
 fn mut_id_slice_from_mut_slice_test() {
     let slice: &mut [i32] = &mut [0];
 
-    let actual: &mut IdSlice<MTest, i32> = From::from(slice);
-    let expected = id_slice!(MTest; i32; 0);
+    let actual: &mut IdSlice<BTest, i32> = From::from(slice);
+    let expected = id_slice!(BTest; i32; 0);
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn hash_test() {
-    let id_slice = id_slice!(MTest; 1);
+    let id_slice = id_slice!(BTest; 1);
     let mut hasher_0 = DefaultHasher::new();
     id_slice.hash(&mut hasher_0);
 
@@ -419,33 +419,33 @@ fn hash_test() {
 
 #[test]
 fn index_test() {
-    let id_slice = id_slice![MTest; 0, 1, 2, 3];
+    let id_slice = id_slice![BTest; 0, 1, 2, 3];
 
     let actual: &i32 = id_slice.index(id!(1));
     let expected = &1;
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, i32> = id_slice.index(id!(1)..id!(3));
+    let actual: &IdSlice<BTest, i32> = id_slice.index(id!(1)..id!(3));
     let expected = id_slice![1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, i32> = id_slice.index(id!(1)..);
+    let actual: &IdSlice<BTest, i32> = id_slice.index(id!(1)..);
     let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, i32> = id_slice.index(..);
+    let actual: &IdSlice<BTest, i32> = id_slice.index(..);
     let expected = id_slice![0, 1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, i32> = id_slice.index(id!(1)..=id!(3));
+    let actual: &IdSlice<BTest, i32> = id_slice.index(id!(1)..=id!(3));
     let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, i32> = id_slice.index(..id!(3));
+    let actual: &IdSlice<BTest, i32> = id_slice.index(..id!(3));
     let expected = id_slice![0, 1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, i32> = id_slice.index(..=id!(3));
+    let actual: &IdSlice<BTest, i32> = id_slice.index(..=id!(3));
     let expected = id_slice![0, 1, 2, 3];
     assert_eq!(actual, expected);
 }
@@ -454,33 +454,33 @@ fn index_test() {
 #[allow(clippy::redundant_slicing)]
 fn index_mut_test() {
     let mut mut_array = [0, 1, 2, 3];
-    let id_slice = mut_array.as_mut_id_slice::<MTest>();
+    let id_slice = mut_array.as_mut_id_slice::<BTest>();
 
     let actual: &mut i32 = id_slice.index_mut(id!(1));
     let expected = &1;
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.index_mut(id!(1)..id!(3));
+    let actual: &mut IdSlice<BTest, i32> = id_slice.index_mut(id!(1)..id!(3));
     let expected = id_slice![1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.index_mut(id!(1)..);
+    let actual: &mut IdSlice<BTest, i32> = id_slice.index_mut(id!(1)..);
     let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.index_mut(..);
+    let actual: &mut IdSlice<BTest, i32> = id_slice.index_mut(..);
     let expected = id_slice![0, 1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.index_mut(id!(1)..=id!(3));
+    let actual: &mut IdSlice<BTest, i32> = id_slice.index_mut(id!(1)..=id!(3));
     let expected = id_slice![1, 2, 3];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.index_mut(..id!(3));
+    let actual: &mut IdSlice<BTest, i32> = id_slice.index_mut(..id!(3));
     let expected = id_slice![0, 1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &mut IdSlice<MTest, i32> = id_slice.index_mut(..=id!(3));
+    let actual: &mut IdSlice<BTest, i32> = id_slice.index_mut(..=id!(3));
     let expected = id_slice![0, 1, 2, 3];
     assert_eq!(actual, expected);
 }
@@ -488,7 +488,7 @@ fn index_mut_test() {
 #[test]
 #[allow(clippy::into_iter_on_ref)]
 fn into_iter_test() {
-    let id_slice = id_slice![MTest; 0, 1, 2];
+    let id_slice = id_slice![BTest; 0, 1, 2];
 
     let actual: Iter<i32> = id_slice.into_iter();
     let expected = [0, 1, 2].iter();
@@ -498,7 +498,7 @@ fn into_iter_test() {
 #[test]
 #[allow(clippy::into_iter_on_ref)]
 fn into_iter_mut_test() {
-    let mut array = id_array![MTest; 0, 1, 2];
+    let mut array = id_array![BTest; 0, 1, 2];
     let slice = array.as_mut_id_slice();
 
     let actual: IterMut<i32> = slice.into_iter();
@@ -508,8 +508,8 @@ fn into_iter_mut_test() {
 
 #[test]
 fn cmp_test() {
-    let slice_0 = id_slice![MTest; 1];
-    let slice_1 = id_slice![MTest; 2];
+    let slice_0 = id_slice![BTest; 1];
+    let slice_1 = id_slice![BTest; 2];
 
     let actual: Ordering = slice_0.cmp(slice_0);
     let expected = Ordering::Equal;
@@ -526,7 +526,7 @@ fn cmp_test() {
 
 #[test]
 fn eq_test() {
-    let id_slice_0 = id_slice![MTest; 1];
+    let id_slice_0 = id_slice![BTest; 1];
     let id_slice_1 = id_slice![2];
 
     let actual: bool = id_slice_0.eq(id_slice_0);
@@ -540,7 +540,7 @@ fn eq_test() {
 
 #[test]
 fn ne_test() {
-    let id_slice_0 = id_slice![MTest; 1];
+    let id_slice_0 = id_slice![BTest; 1];
     let id_slice_1 = id_slice![2];
 
     let actual: bool = id_slice_0.ne(id_slice_0);
@@ -554,7 +554,7 @@ fn ne_test() {
 
 #[test]
 fn eq_id_array_test() {
-    let id_slice_0 = id_slice![MTest; 1];
+    let id_slice_0 = id_slice![BTest; 1];
     let id_array_1 = id_array![1];
     let id_array_2 = id_array![2];
 
@@ -569,7 +569,7 @@ fn eq_id_array_test() {
 
 #[test]
 fn ne_id_array_test() {
-    let id_slice_0 = id_slice![MTest; 1];
+    let id_slice_0 = id_slice![BTest; 1];
     let id_array_1 = id_array![1];
     let id_array_2 = id_array![2];
 
@@ -584,7 +584,7 @@ fn ne_id_array_test() {
 
 #[test]
 fn eq_id_vec_test() {
-    let id_slice_0 = id_slice![MTest; 1];
+    let id_slice_0 = id_slice![BTest; 1];
     let id_vec_1 = id_vec![1];
     let id_vec_2 = id_vec![2];
 
@@ -599,7 +599,7 @@ fn eq_id_vec_test() {
 
 #[test]
 fn ne_id_vec_test() {
-    let id_slice_0 = id_slice![MTest; 1];
+    let id_slice_0 = id_slice![BTest; 1];
     let id_vec_1 = id_vec![1];
     let id_vec_2 = id_vec![2];
 
@@ -614,8 +614,8 @@ fn ne_id_vec_test() {
 
 #[test]
 fn partial_cmp_test() {
-    let id_slice_0 = id_slice![MTest; 1];
-    let id_slice_1 = id_slice![MTest; 2];
+    let id_slice_0 = id_slice![BTest; 1];
+    let id_slice_1 = id_slice![BTest; 2];
 
     let actual: Option<Ordering> = id_slice_0.partial_cmp(id_slice_0);
     let expected = Some(Ordering::Equal);
@@ -632,8 +632,8 @@ fn partial_cmp_test() {
 
 #[test]
 fn lt_test() {
-    let id_slice_0 = id_slice![MTest; 1];
-    let id_slice_1 = id_slice![MTest; 2];
+    let id_slice_0 = id_slice![BTest; 1];
+    let id_slice_1 = id_slice![BTest; 2];
 
     let actual: bool = id_slice_0 < id_slice_0;
     let expected = false;
@@ -650,8 +650,8 @@ fn lt_test() {
 
 #[test]
 fn le_test() {
-    let id_slice_0 = id_slice![MTest; 1];
-    let id_slice_1 = id_slice![MTest; 2];
+    let id_slice_0 = id_slice![BTest; 1];
+    let id_slice_1 = id_slice![BTest; 2];
 
     let actual: bool = id_slice_0 <= id_slice_0;
     let expected = true;
@@ -668,8 +668,8 @@ fn le_test() {
 
 #[test]
 fn gt_test() {
-    let id_slice_0 = id_slice![MTest; 1];
-    let id_slice_1 = id_slice![MTest; 2];
+    let id_slice_0 = id_slice![BTest; 1];
+    let id_slice_1 = id_slice![BTest; 2];
 
     let actual: bool = id_slice_0 > id_slice_0;
     let expected = false;
@@ -686,8 +686,8 @@ fn gt_test() {
 
 #[test]
 fn ge_test() {
-    let id_slice_0 = id_slice![MTest; 1];
-    let id_slice_1 = id_slice![MTest; 2];
+    let id_slice_0 = id_slice![BTest; 1];
+    let id_slice_1 = id_slice![BTest; 2];
 
     let actual: bool = id_slice_0 >= id_slice_0;
     let expected = true;
@@ -704,7 +704,7 @@ fn ge_test() {
 
 #[test]
 fn read_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2];
+    let id_slice = &mut id_slice![BTest; 1, 2];
 
     let buf = &mut [0, 0];
 
@@ -716,14 +716,14 @@ fn read_test() {
     let expected = &[1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn read_vectored_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2];
+    let id_slice = &mut id_slice![BTest; 1, 2];
 
     let mut buf_slice = [0, 0];
     let buf = &mut [IoSliceMut::new(&mut buf_slice)];
@@ -736,14 +736,14 @@ fn read_vectored_test() {
     let expected = &[1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn read_exact_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2];
+    let id_slice = &mut id_slice![BTest; 1, 2];
 
     let buf = &mut [0, 0];
 
@@ -753,14 +753,14 @@ fn read_exact_test() {
     let expected = &[1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn read_to_end_test() {
-    let id_slice = &mut id_slice![MTest; 1, 2];
+    let id_slice = &mut id_slice![BTest; 1, 2];
 
     let buf = &mut vec![];
 
@@ -772,14 +772,14 @@ fn read_to_end_test() {
     let expected = &[1, 2];
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn read_to_string_test() {
-    let id_slice = &mut id_slice![MTest; 0];
+    let id_slice = &mut id_slice![BTest; 0];
 
     let buf = &mut String::new();
 
@@ -791,35 +791,35 @@ fn read_to_string_test() {
     let expected = &String::from_str("\0").unwrap();
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn to_owned_test() {
-    let id_slice = &mut id_slice![MTest; 1];
+    let id_slice = &mut id_slice![BTest; 1];
 
-    let actual: IdVec<MTest, i32> = id_slice.to_owned();
-    let expected = id_vec![MTest; 1];
+    let actual: IdVec<BTest, i32> = id_slice.to_owned();
+    let expected = id_vec![BTest; 1];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn clone_into_test() {
     let slice = &mut [1];
-    let id_slice = slice.as_mut_id_slice::<MTest>();
+    let id_slice = slice.as_mut_id_slice::<BTest>();
 
-    let actual: &mut IdVec<MTest, i32> = &mut id_vec![];
+    let actual: &mut IdVec<BTest, i32> = &mut id_vec![];
     id_slice.clone_into(actual);
 
-    let expected = &id_vec![MTest; 1];
+    let expected = &id_vec![BTest; 1];
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn to_socket_addrs_test() {
-    let id_slice = id_slice![MTest; SocketAddr];
+    let id_slice = id_slice![BTest; SocketAddr];
 
     let actual: Cloned<Iter<SocketAddr>> = id_slice.to_socket_addrs().unwrap();
     let expected = [];
@@ -829,7 +829,7 @@ fn to_socket_addrs_test() {
 #[test]
 fn write_test() {
     let slice = &mut [0, 0];
-    let id_slice = &mut slice.as_mut_id_slice::<MTest>();
+    let id_slice = &mut slice.as_mut_id_slice::<BTest>();
 
     let buf = &[1, 2];
 
@@ -837,7 +837,7 @@ fn write_test() {
     let expected = 2;
     assert_eq!(actual, expected);
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 
@@ -849,7 +849,7 @@ fn write_test() {
 #[test]
 fn write_vectored_test() {
     let slice = &mut [0, 0];
-    let id_slice = &mut slice.as_mut_id_slice::<MTest>();
+    let id_slice = &mut slice.as_mut_id_slice::<BTest>();
 
     let bufs = &[IoSlice::new(&[1, 2])];
 
@@ -865,13 +865,13 @@ fn write_vectored_test() {
 #[test]
 fn write_all_test() {
     let slice = &mut [0, 0];
-    let id_slice = &mut slice.as_mut_id_slice::<MTest>();
+    let id_slice = &mut slice.as_mut_id_slice::<BTest>();
 
     let buf = &[1, 2];
 
     id_slice.write_all(buf).unwrap();
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![];
     assert_eq!(actual, expected);
 
@@ -883,7 +883,7 @@ fn write_all_test() {
 #[test]
 fn flush_test() {
     let slice = &mut [0, 0];
-    let id_slice = &mut slice.as_mut_id_slice::<MTest>();
+    let id_slice = &mut slice.as_mut_id_slice::<BTest>();
 
     id_slice.flush().unwrap();
 }
@@ -891,13 +891,13 @@ fn flush_test() {
 #[test]
 fn write_fmt() {
     let slice = &mut [1, 2];
-    let id_slice = &mut slice.as_mut_id_slice::<MTest>();
+    let id_slice = &mut slice.as_mut_id_slice::<BTest>();
 
     let arguments = format_args!("\0");
 
     id_slice.write_fmt(arguments).unwrap();
 
-    let actual: &IdSlice<MTest, u8> = id_slice;
+    let actual: &IdSlice<BTest, u8> = id_slice;
     let expected = id_slice![2];
     assert_eq!(actual, expected);
 

@@ -1,6 +1,6 @@
 use crate::{
     soa::{IdField, U32IdStruct},
-    tests::util::MTest,
+    tests::util::BTest,
     u32_id,
 };
 
@@ -8,8 +8,8 @@ use crate::{
 fn clear_test() {
     use std::rc::Rc;
 
-    let mut ids = U32IdStruct::<MTest>::new();
-    let mut field = IdField::<MTest, Rc<()>>::new();
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, Rc<()>>::new();
 
     let token = Rc::new(());
 
@@ -44,20 +44,20 @@ fn clear_test() {
 
 #[test]
 fn is_reserved_test() {
-    let mut field = IdField::<MTest, u32>::new();
+    let mut field = IdField::<BTest, u32>::new();
 
-    assert!(!field.is_reserved(u32_id!(MTest; 0)));
+    assert!(!field.is_reserved(u32_id!(BTest; 0)));
 
-    field.retain(u32_id!(MTest; 0), 1);
+    field.retain(u32_id!(BTest; 0), 1);
 
-    assert!(field.is_reserved(u32_id!(MTest; 0)));
-    assert!(!field.is_reserved(u32_id!(MTest; 1)));
+    assert!(field.is_reserved(u32_id!(BTest; 0)));
+    assert!(!field.is_reserved(u32_id!(BTest; 1)));
 }
 
 #[test]
 fn iter_test() {
-    let mut ids = U32IdStruct::<MTest>::new();
-    let mut field = IdField::<MTest, u32>::new();
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, u32>::new();
 
     let id_0 = ids.retain();
     field.retain(id_0, 10);
@@ -73,8 +73,8 @@ fn iter_test() {
 
 #[test]
 fn iter_mut_test() {
-    let mut ids = U32IdStruct::<MTest>::new();
-    let mut field = IdField::<MTest, u32>::new();
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, u32>::new();
 
     let id_0 = ids.retain();
     field.retain(id_0, 1);
@@ -92,10 +92,10 @@ fn iter_mut_test() {
 #[test]
 #[should_panic(expected = "id is out of range for this field")]
 fn iter_mut_out_of_range_panics_test() {
-    let mut ids = U32IdStruct::<MTest>::new();
+    let mut ids = U32IdStruct::<BTest>::new();
     ids.retain();
 
-    let mut field = IdField::<MTest, u32>::new();
+    let mut field = IdField::<BTest, u32>::new();
 
     // SAFETY: deliberately misusing the field/ids pairing to exercise the
     // out-of-range assert in IdFieldIterMut rather than reading uninitialized
@@ -106,19 +106,19 @@ fn iter_mut_out_of_range_panics_test() {
 
 #[test]
 fn new_test() {
-    IdField::<MTest, u32>::new();
+    IdField::<BTest, u32>::new();
 }
 
 #[test]
 fn with_capacity_test() {
     // Capacity reserves storage but does not populate it.
-    let field = IdField::<MTest, u32>::with_capacity(8);
+    let field = IdField::<BTest, u32>::with_capacity(8);
     assert_eq!(field.reserved_count(), 0);
 }
 
 #[test]
 fn release_test() {
-    let mut obj = U32IdStruct::<MTest>::new();
+    let mut obj = U32IdStruct::<BTest>::new();
     let mut health = IdField::new();
 
     let id_0 = obj.retain();
@@ -142,8 +142,8 @@ fn release_test() {
 fn release_all_test() {
     use std::rc::Rc;
 
-    let mut ids = U32IdStruct::<MTest>::new();
-    let mut field = IdField::<MTest, Rc<()>>::new();
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, Rc<()>>::new();
 
     let token = Rc::new(());
 
@@ -165,8 +165,8 @@ fn release_all_test() {
 
 #[test]
 fn release_all_zeroed_test() {
-    let mut ids = U32IdStruct::<MTest>::new();
-    let mut field = IdField::<MTest, u32>::new();
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, u32>::new();
 
     let id_0 = ids.retain();
     field.retain(id_0, 7);
@@ -184,8 +184,8 @@ fn release_all_zeroed_test() {
 
 #[test]
 fn release_zeroed_test() {
-    let mut field = IdField::<MTest, u32>::new();
-    let id_0 = u32_id!(MTest; 0);
+    let mut field = IdField::<BTest, u32>::new();
+    let id_0 = u32_id!(BTest; 0);
 
     field.retain(id_0, 7);
     unsafe { field.release_zeroed(id_0) };
@@ -197,7 +197,7 @@ fn release_zeroed_test() {
 
 #[test]
 fn reserve_test() {
-    let mut field = IdField::<MTest, u32>::new();
+    let mut field = IdField::<BTest, u32>::new();
 
     field.reserve(4);
     assert_eq!(field.reserved_count(), 4);
@@ -209,20 +209,20 @@ fn reserve_test() {
 
 #[test]
 fn reserved_count_test() {
-    let mut field = IdField::<MTest, u32>::new();
+    let mut field = IdField::<BTest, u32>::new();
     assert_eq!(field.reserved_count(), 0);
 
-    field.retain(u32_id!(MTest; 0), 10);
+    field.retain(u32_id!(BTest; 0), 10);
     assert_eq!(field.reserved_count(), 1);
 
     // Retaining a higher id reserves every slot up to it.
-    field.retain(u32_id!(MTest; 5), 20);
+    field.retain(u32_id!(BTest; 5), 20);
     assert_eq!(field.reserved_count(), 6);
 }
 
 #[test]
 fn retain_test() {
-    let mut obj = U32IdStruct::<MTest>::new();
+    let mut obj = U32IdStruct::<BTest>::new();
     let mut health = IdField::new();
 
     let id_0 = obj.retain();

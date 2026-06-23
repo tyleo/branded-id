@@ -2,15 +2,15 @@ use crate::internal::split_type_str;
 
 #[test]
 fn unqualified_name_test() {
-    let actual = split_type_str("MTest");
-    let expected = "MTest";
+    let actual = split_type_str("BTest");
+    let expected = "BTest";
     assert_eq!(actual, expected);
 }
 
 #[test]
 fn qualified_path_test() {
-    let actual = split_type_str("branded_id::tests::util::m_test::MTest");
-    let expected = "MTest";
+    let actual = split_type_str("branded_id::tests::util::b_test::BTest");
+    let expected = "BTest";
     assert_eq!(actual, expected);
 }
 

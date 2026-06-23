@@ -5,8 +5,8 @@
 /// # Examples
 /// ```rust
 /// use branded_id::{id_vec, IdVec};
-/// struct Row;
-/// let v: IdVec<Row, i32> = id_vec![Row; 1, 2, 3];
+/// struct BRow;
+/// let v: IdVec<BRow, i32> = id_vec![BRow; 1, 2, 3];
 /// assert_eq!(v.len(), 3);
 /// ```
 #[macro_export]
