@@ -1,4 +1,4 @@
-use crate::{IdVec, UsizeId};
+use crate::{IdVec, UsizeId, soa::UsizeIdStruct};
 use std::{mem, mem::MaybeUninit, ptr::write_bytes};
 
 /// A sparse, columnar data store keyed by typed ids from a
@@ -29,13 +29,21 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         }
     }
 
-    /// Resets the field to empty.
+    /// Drops the value for every id retained by `ids`, then resets the
+    /// field to empty, releasing its storage.
     ///
-    /// This does **not** drop the stored values — `MaybeUninit` has no
-    /// destructor and the field does not know which slots are live, so any
-    /// still-retained value is leaked. [`release`](Self::release) every
-    /// retained value first.
-    pub fn clear(&mut self) {
+    /// `ids` supplies the liveness the field itself does not track, so the
+    /// live values are dropped rather than leaked. See
+    /// [`release_all`](Self::release_all) to drop the values but keep the
+    /// reserved storage.
+    ///
+    /// # Safety
+    /// `ids` must be the id pool this field is paired with, in sync with
+    /// it: every id retained by `ids` must have a value `retain`'d in this
+    /// field that has not since been released.
+    pub unsafe fn clear(&mut self, ids: &UsizeIdStruct<TMarker>) {
+        // SAFETY: `ids` must be the in-sync pool for this field.
+        unsafe { self.release_all(ids) };
         self.items.as_mut_vec().clear();
     }
 
@@ -61,7 +69,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         unsafe { &mut *item.as_mut_ptr() }
     }
 
-    /// Whether the backing storage reserves a slot for `id` — *not* whether
+    /// Whether the backing storage reserves a slot for `id`, not whether
     /// a value has actually been written there.
     pub fn is_reserved(&self, id: UsizeId<TMarker>) -> bool {
         id.to_usize() < self.reserved_count()
@@ -72,6 +80,21 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     pub unsafe fn release(&mut self, id: UsizeId<TMarker>) {
         let item = &mut self.items[id];
         unsafe { MaybeUninit::assume_init_drop(item) }
+    }
+
+    /// Drops the value for every id retained by `ids`, leaving the slots
+    /// reserved. Unlike [`clear`](Self::clear), this does not shrink the
+    /// backing storage.
+    ///
+    /// # Safety
+    /// `ids` must be the id pool this field is paired with, in sync with
+    /// it: every id retained by `ids` must have a value `retain`'d in this
+    /// field that has not since been released.
+    pub unsafe fn release_all(&mut self, ids: &UsizeIdStruct<TMarker>) {
+        for id in ids {
+            // SAFETY: by contract, every id live in `ids` has a value here.
+            unsafe { self.release(id) };
+        }
     }
 
     /// Drops the value at `id`, then clobbers its backing bytes with zeros.

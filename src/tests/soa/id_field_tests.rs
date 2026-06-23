@@ -6,19 +6,40 @@ use crate::{
 
 #[test]
 fn clear_test() {
-    let mut field = IdField::<MTest, u32>::new();
+    use std::rc::Rc;
 
-    field.retain(usize_id!(MTest; 0), 1);
-    field.retain(usize_id!(MTest; 1), 2);
+    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut field = IdField::<MTest, Rc<()>>::new();
+
+    let token = Rc::new(());
+
+    let id_0 = ids.retain();
+    field.retain(id_0, Rc::clone(&token));
+    let id_1 = ids.retain();
+    field.retain(id_1, Rc::clone(&token));
+
+    // token + the two stored clones.
+    assert_eq!(Rc::strong_count(&token), 3);
     assert_eq!(field.reserved_count(), 2);
 
-    field.clear();
+    // SAFETY: `field` and `ids` are in sync.
+    unsafe { field.clear(&ids) };
+    ids.clear();
+
+    // The stored clones were dropped, not leaked; the field is empty.
+    assert_eq!(Rc::strong_count(&token), 1);
     assert_eq!(field.reserved_count(), 0);
 
-    // Usable again after clear; allocation starts fresh.
-    let actual = *field.retain(usize_id!(MTest; 0), 42);
-    assert_eq!(actual, 42);
-    assert_eq!(*unsafe { field.get(usize_id!(MTest; 0)) }, 42);
+    // Usable again after clearing.
+    let id_0 = ids.retain();
+    let actual = Rc::clone(field.retain(id_0, Rc::clone(&token)));
+    assert_eq!(actual, token);
+    assert_eq!(Rc::strong_count(&token), 3);
+
+    // Tidy up so the stored clone isn't leaked.
+    unsafe { field.clear(&ids) };
+    drop(actual);
+    assert_eq!(Rc::strong_count(&token), 1);
 }
 
 #[test]
@@ -77,6 +98,31 @@ fn release_test() {
     let expected = 1;
 
     assert_eq!(actual, expected);
+}
+
+#[test]
+fn release_all_test() {
+    use std::rc::Rc;
+
+    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut field = IdField::<MTest, Rc<()>>::new();
+
+    let token = Rc::new(());
+
+    let id_0 = ids.retain();
+    field.retain(id_0, Rc::clone(&token));
+    let id_1 = ids.retain();
+    field.retain(id_1, Rc::clone(&token));
+
+    assert_eq!(Rc::strong_count(&token), 3);
+
+    // SAFETY: `field` and `ids` are in sync.
+    unsafe { field.release_all(&ids) };
+    ids.clear();
+
+    // Values dropped, but the reserved slots are kept (unlike clear).
+    assert_eq!(Rc::strong_count(&token), 1);
+    assert_eq!(field.reserved_count(), 2);
 }
 
 #[test]
