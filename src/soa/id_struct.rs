@@ -20,9 +20,11 @@ pub struct IdStruct<TId: Id> {
     /// packed; `dense[live_count..]` are released, with the next id to be
     /// recycled at `dense[live_count]`.
     dense: Vec<TId>,
+
     /// Per-id: its index in `dense`. Valid for every id handed out; a freed
     /// id keeps pointing at its slot in the released region.
     sparse: IdVec<TId::Brand, usize>,
+
     /// The number of retained ids, i.e. the boundary between the retained and
     /// released regions of `dense`.
     live_count: usize,

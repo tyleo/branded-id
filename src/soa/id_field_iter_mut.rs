@@ -10,8 +10,11 @@ use super::IdStructIter;
 /// references. Created by [`IdField::iter_mut`](super::IdField::iter_mut).
 pub struct IdFieldIterMut<'a, TId: Id, TValue> {
     items: *mut MaybeUninit<TValue>,
+
     len: usize,
+
     ids: IdStructIter<'a, TId>,
+
     marker: PhantomData<&'a mut [MaybeUninit<TValue>]>,
 }
 

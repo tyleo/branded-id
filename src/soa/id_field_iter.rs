@@ -9,6 +9,7 @@ use super::IdStructIter;
 /// references. Created by [`IdField::iter`](super::IdField::iter).
 pub struct IdFieldIter<'a, TId: Id, TValue> {
     items: &'a [MaybeUninit<TValue>],
+
     ids: IdStructIter<'a, TId>,
 }
 
