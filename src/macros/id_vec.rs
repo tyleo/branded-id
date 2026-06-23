@@ -3,31 +3,31 @@
 /// list of elements.
 #[macro_export]
 macro_rules! id_vec {
-    ($brand: ty; $value: ty) => (
+    ($brand:ty; $value:ty) => (
         $crate::IdVec::<$brand, $value>::from_vec(vec![])
     );
-    ($brand: ty; $value: ty; $elem: expr; $n: expr) => (
+    ($brand:ty; $value:ty; $elem:expr; $n:expr) => (
         $crate::IdVec::<$brand, $value>::from_vec(vec![$elem; $n])
     );
-    ($brand: ty; $value: ty; $($x: expr),+ $(,)?) => (
+    ($brand:ty; $value:ty; $($x:expr),+ $(,)?) => (
         $crate::IdVec::<$brand, $value>::from_vec(vec![$($x),+])
     );
-    ($brand: ty) => (
+    ($brand:ty) => (
         $crate::IdVec::<$brand, _>::from_vec(vec![])
     );
-    ($brand: ty; $elem: expr; $n: expr) => (
+    ($brand:ty; $elem:expr; $n:expr) => (
         $crate::IdVec::<$brand, _>::from_vec(vec![$elem; $n])
     );
-    ($brand: ty; $($x: expr),+ $(,)?) => (
+    ($brand:ty; $($x:expr),+ $(,)?) => (
         $crate::IdVec::<$brand, _>::from_vec(vec![$($x),+])
     );
     () => (
         $crate::IdVec::<_, _>::from_vec(vec![])
     );
-    ($elem: expr; $n: expr) => (
+    ($elem:expr; $n:expr) => (
         $crate::IdVec::<_, _>::from_vec(vec![$elem; $n])
     );
-    ($($x: expr),+ $(,)?) => (
+    ($($x:expr),+ $(,)?) => (
         $crate::IdVec::<_, _>::from_vec(vec![$($x),+])
     );
 }

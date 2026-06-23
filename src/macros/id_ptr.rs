@@ -2,13 +2,13 @@
 /// `id_ptr!(Brand; ptr)`, and `id_ptr!(Brand; Value; ptr)`.
 #[macro_export]
 macro_rules! id_ptr {
-    ($ptr: expr) => {
+    ($ptr:expr) => {
         $crate::IdPtr::<_, _>::from_ptr($ptr)
     };
-    ($brand: ty; $ptr: expr) => {
+    ($brand:ty; $ptr:expr) => {
         $crate::IdPtr::<$brand, _>::from_ptr($ptr)
     };
-    ($brand: ty; $value: ty; $ptr: expr) => {
+    ($brand:ty; $value:ty; $ptr:expr) => {
         $crate::IdPtr::<$brand, $value>::from_ptr($ptr)
     };
 }

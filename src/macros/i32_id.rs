@@ -2,10 +2,10 @@
 /// `i32_id!(Brand; value)`.
 #[macro_export]
 macro_rules! i32_id {
-    ($id: expr) => {
+    ($id:expr) => {
         $crate::I32Id::<_>::from_i32($id)
     };
-    ($brand: ty; $id: expr) => {
+    ($brand:ty; $id:expr) => {
         $crate::I32Id::<$brand>::from_i32($id)
     };
 }

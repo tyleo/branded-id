@@ -3,31 +3,31 @@
 /// list of elements; the length `N` is inferred.
 #[macro_export]
 macro_rules! id_array {
-    ($brand: ty; $value: ty) => (
+    ($brand:ty; $value:ty) => (
         $crate::IdArray::<$brand, $value, 0>::from_array([])
     );
-    ($brand: ty; $value: ty; $elem: expr; $n: expr) => (
+    ($brand:ty; $value:ty; $elem:expr; $n:expr) => (
         $crate::IdArray::<$brand, $value, $n>::from_array([$elem; $n])
     );
-    ($brand: ty; $value: ty; $($x: expr),+ $(,)?) => (
+    ($brand:ty; $value:ty; $($x:expr),+ $(,)?) => (
         $crate::IdArray::<$brand, $value, _>::from_array([$($x),+])
     );
-    ($brand: ty) => (
+    ($brand:ty) => (
         $crate::IdArray::<$brand, _, 0>::from_array([])
     );
-    ($brand: ty; $elem: expr; $n: expr) => (
+    ($brand:ty; $elem:expr; $n:expr) => (
         $crate::IdArray::<$brand, _, $n>::from_array([$elem; $n])
     );
-    ($brand: ty; $($x: expr),+ $(,)?) => (
+    ($brand:ty; $($x:expr),+ $(,)?) => (
         $crate::IdArray::<$brand, _, _>::from_array([$($x),+])
     );
     () => (
         $crate::IdArray::<_, _, 0>::from_array([])
     );
-    ($elem: expr; $n: expr) => (
+    ($elem:expr; $n:expr) => (
         $crate::IdArray::<_, _, $n>::from_array([$elem; $n])
     );
-    ($($x: expr),+ $(,)?) => (
+    ($($x:expr),+ $(,)?) => (
         $crate::IdArray::<_, _, _>::from_array([$($x),+])
     );
 }

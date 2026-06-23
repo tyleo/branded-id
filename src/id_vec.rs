@@ -75,6 +75,7 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         self.repr.insert(index.to_usize(), value)
     }
 
+    #[must_use]
     pub fn into_vec(self) -> Vec<TValue> {
         self.repr
     }

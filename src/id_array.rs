@@ -7,6 +7,7 @@ use std::{
     marker::PhantomData,
     mem::transmute,
     ops::{Index, IndexMut},
+    slice::{Iter, IterMut},
 };
 
 /// A `[TValue; N]` array indexed by brand-typed ids instead of bare `usize`.
@@ -52,8 +53,17 @@ impl<TBrand: ?Sized, TValue, const N: usize> IdArray<TBrand, TValue, N> {
         unsafe { transmute(repr) }
     }
 
+    #[must_use]
     pub fn into_array(self) -> [TValue; N] {
         self.repr
+    }
+
+    pub fn iter(&self) -> Iter<'_, TValue> {
+        self.as_array().iter()
+    }
+
+    pub fn iter_mut(&mut self) -> IterMut<'_, TValue> {
+        self.as_mut_array().iter_mut()
     }
 }
 

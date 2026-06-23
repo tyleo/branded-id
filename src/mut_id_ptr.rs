@@ -50,12 +50,14 @@ impl<TBrand: ?Sized, TValue: ?Sized> MutIdPtr<TBrand, TValue> {
 impl<TBrand: ?Sized, TValue> MutIdPtr<TBrand, TValue> {
     /// # Safety
     /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read-1>
+    #[must_use]
     pub const unsafe fn read(self) -> TValue {
         unsafe { self.to_mut_ptr().read() }
     }
 
     /// # Safety
     /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1>
+    #[must_use]
     pub const unsafe fn read_unaligned(self) -> TValue {
         unsafe { self.to_mut_ptr().read_unaligned() }
     }

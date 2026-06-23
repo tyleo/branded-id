@@ -342,6 +342,24 @@ fn into_iter_test() {
 }
 
 #[test]
+fn iter_test() {
+    let id_array = id_array![MTest; 0, 1, 2];
+
+    let actual: Iter<i32> = id_array.iter();
+    let expected = [0, 1, 2].as_slice().iter();
+    assert!(actual.eq(expected));
+}
+
+#[test]
+fn iter_mut_test() {
+    let mut id_array = id_array![MTest; 0, 1, 2];
+
+    let actual: IterMut<i32> = id_array.iter_mut();
+    let expected = [0, 1, 2].as_slice().iter();
+    assert!(actual.eq(expected));
+}
+
+#[test]
 fn cmp_test() {
     let array_0 = id_array![MTest; 1];
     let array_1 = id_array![MTest; 2];

@@ -2,10 +2,10 @@
 /// `isize_id!(Brand; value)`.
 #[macro_export]
 macro_rules! isize_id {
-    ($id: expr) => {
+    ($id:expr) => {
         $crate::IsizeId::<_>::from_isize($id)
     };
-    ($brand: ty; $id: expr) => {
+    ($brand:ty; $id:expr) => {
         $crate::IsizeId::<$brand>::from_isize($id)
     };
 }
