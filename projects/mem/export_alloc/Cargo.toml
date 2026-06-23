@@ -1,8 +1,0 @@
-[package]
-name = "export_alloc"
-description = "Exports memory allocation functions for use across module boundaries. In particular, this can be useful for sharing memory between multiple WASM modules."
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-safe_alloc = "0.1.0"

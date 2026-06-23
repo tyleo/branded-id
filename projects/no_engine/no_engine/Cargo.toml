@@ -1,8 +1,0 @@
-[package]
-name = "no_engine"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-id_sys = "0.1.0"
-no_engine_abstractions = "0.1.0"

@@ -1,51 +1,11 @@
-[workspace]
-members = [
-    "projects/id_sys",
-    "projects/mem/cross_mem",
-    "projects/mem/export_alloc",
-    "projects/mem/extern_mem",
-    "projects/mem/import_alloc",
-    "projects/mem/safe_alloc",
-    "projects/no_engine/no_engine",
-    "projects/no_engine/no_engine_abstractions",
-    "projects/no_engine/no_engine_impl_bevy",
-    "projects/no_engine/no_engine_impl_extern",
-    "projects/no_engine_test_game",
-    "projects/prototype/memory_borrower_test_module",
-    "projects/prototype/memory_owner_test_module",
-]
-resolver = "2"
+[package]
+name = "id_sys"
+version = "0.1.0"
+edition = "2024"
+license-file = "LICENSE"
+description = "Provides data structures which can be marked such that they only work with similarly marked integer data types."
 
-[patch.crates-io]
-cross_mem = { path = "projects/mem/cross_mem" }
-export_alloc = { path = "projects/mem/export_alloc" }
-extern_mem = { path = "projects/mem/extern_mem" }
-import_alloc = { path = "projects/mem/import_alloc" }
-safe_alloc = { path = "projects/mem/safe_alloc" }
-id_sys = { path = "projects/id_sys" }
-no_engine = { path = "projects/no_engine/no_engine" }
-no_engine_abstractions = { path = "projects/no_engine/no_engine_abstractions" }
-no_engine_impl_bevy = { path = "projects/no_engine/no_engine_impl_bevy" }
-no_engine_impl_extern = { path = "projects/no_engine/no_engine_impl_extern" }
-no_engine_test_game = { path = "projects/no_engine_test_game" }
-memory_borrower_test_module = { path = "projects/prototype/memory_borrower_test_module" }
-memory_owner_test_module = { path = "projects/prototype/memory_owner_test_module" }
-
-# Enable more optimization in the release profile at the cost of compile time.
-[profile.release]
-# Compile the entire crate as one unit.
-# Slows compile times, marginal improvements.
-codegen-units = 1
-# Do a second optimization pass over the entire program, including dependencies.
-# Slows compile times, marginal improvements.
-lto = "thin"
-
-# Optimize for size in the wasm_release profile to reduce load times and bandwidth usage on web.
-[profile.release-wasm]
-# Default to release profile values.
-inherits = "release"
-# Optimize with size in mind (also try "z", sometimes it is better).
-# Slightly slows compile times, great improvements to file size and runtime performance.
-opt-level = "s"
-# Strip all debugging information from the binary to slightly reduce file size.
-strip = "debuginfo"
+[features]
+default = ["extends", "soa"]
+extends = []
+soa = []
