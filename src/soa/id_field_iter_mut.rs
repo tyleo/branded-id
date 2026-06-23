@@ -1,23 +1,25 @@
 use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 
-use super::UsizeIdStructIter;
+use crate::Id;
+
+use super::IdStructIter;
 
 /// Iterates the values of an [`IdField`](super::IdField) for the ids
-/// retained by a [`UsizeIdStruct`](super::UsizeIdStruct), yielding mutable
+/// retained by an [`IdStruct`](super::IdStruct), yielding mutable
 /// references. Created by [`IdField::iter_mut`](super::IdField::iter_mut).
-pub struct IdFieldIterMut<'a, TMarker: ?Sized, TValue> {
+pub struct IdFieldIterMut<'a, TId: Id, TValue> {
     items: *mut MaybeUninit<TValue>,
     len: usize,
-    ids: UsizeIdStructIter<'a, TMarker>,
+    ids: IdStructIter<'a, TId>,
     marker: PhantomData<&'a mut [MaybeUninit<TValue>]>,
 }
 
-impl<'a, TMarker: ?Sized, TValue> IdFieldIterMut<'a, TMarker, TValue> {
+impl<'a, TId: Id, TValue> IdFieldIterMut<'a, TId, TValue> {
     pub(super) fn new(
         items: *mut MaybeUninit<TValue>,
         len: usize,
-        ids: UsizeIdStructIter<'a, TMarker>,
+        ids: IdStructIter<'a, TId>,
     ) -> Self {
         Self {
             items,
@@ -38,7 +40,7 @@ impl<'a, TMarker: ?Sized, TValue> IdFieldIterMut<'a, TMarker, TValue> {
     }
 }
 
-impl<'a, TMarker: ?Sized, TValue> Iterator for IdFieldIterMut<'a, TMarker, TValue> {
+impl<'a, TId: Id, TValue> Iterator for IdFieldIterMut<'a, TId, TValue> {
     type Item = &'a mut TValue;
 
     fn next(&mut self) -> Option<&'a mut TValue> {
@@ -47,7 +49,7 @@ impl<'a, TMarker: ?Sized, TValue> Iterator for IdFieldIterMut<'a, TMarker, TValu
         // reference points at a distinct slot; by the IdField::iter_mut
         // contract each retained id has an initialized value, and the field
         // stays borrowed for 'a so the pointer stays valid.
-        Some(unsafe { self.at(id.to_usize()) })
+        Some(unsafe { self.at(id.to_usize_id().to_usize()) })
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -55,12 +57,12 @@ impl<'a, TMarker: ?Sized, TValue> Iterator for IdFieldIterMut<'a, TMarker, TValu
     }
 }
 
-impl<'a, TMarker: ?Sized, TValue> DoubleEndedIterator for IdFieldIterMut<'a, TMarker, TValue> {
+impl<'a, TId: Id, TValue> DoubleEndedIterator for IdFieldIterMut<'a, TId, TValue> {
     fn next_back(&mut self) -> Option<&'a mut TValue> {
         let id = self.ids.next_back()?;
         // SAFETY: see `next`.
-        Some(unsafe { self.at(id.to_usize()) })
+        Some(unsafe { self.at(id.to_usize_id().to_usize()) })
     }
 }
 
-impl<TMarker: ?Sized, TValue> ExactSizeIterator for IdFieldIterMut<'_, TMarker, TValue> {}
+impl<TId: Id, TValue> ExactSizeIterator for IdFieldIterMut<'_, TId, TValue> {}

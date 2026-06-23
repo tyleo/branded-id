@@ -1,25 +1,24 @@
 use std::mem::MaybeUninit;
 
-use super::UsizeIdStructIter;
+use crate::Id;
+
+use super::IdStructIter;
 
 /// Iterates the values of an [`IdField`](super::IdField) for the ids
-/// retained by a [`UsizeIdStruct`](super::UsizeIdStruct), yielding shared
+/// retained by an [`IdStruct`](super::IdStruct), yielding shared
 /// references. Created by [`IdField::iter`](super::IdField::iter).
-pub struct IdFieldIter<'a, TMarker: ?Sized, TValue> {
+pub struct IdFieldIter<'a, TId: Id, TValue> {
     items: &'a [MaybeUninit<TValue>],
-    ids: UsizeIdStructIter<'a, TMarker>,
+    ids: IdStructIter<'a, TId>,
 }
 
-impl<'a, TMarker: ?Sized, TValue> IdFieldIter<'a, TMarker, TValue> {
-    pub(super) fn new(
-        items: &'a [MaybeUninit<TValue>],
-        ids: UsizeIdStructIter<'a, TMarker>,
-    ) -> Self {
+impl<'a, TId: Id, TValue> IdFieldIter<'a, TId, TValue> {
+    pub(super) fn new(items: &'a [MaybeUninit<TValue>], ids: IdStructIter<'a, TId>) -> Self {
         Self { items, ids }
     }
 }
 
-impl<'a, TMarker: ?Sized, TValue> Iterator for IdFieldIter<'a, TMarker, TValue> {
+impl<'a, TId: Id, TValue> Iterator for IdFieldIter<'a, TId, TValue> {
     type Item = &'a TValue;
 
     fn next(&mut self) -> Option<&'a TValue> {
@@ -27,7 +26,7 @@ impl<'a, TMarker: ?Sized, TValue> Iterator for IdFieldIter<'a, TMarker, TValue> 
         let items = self.items;
         // SAFETY: by the IdField::iter contract, every id retained by the
         // pool has an initialized value in this field.
-        Some(unsafe { items[id.to_usize()].assume_init_ref() })
+        Some(unsafe { items[id.to_usize_id().to_usize()].assume_init_ref() })
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -35,13 +34,13 @@ impl<'a, TMarker: ?Sized, TValue> Iterator for IdFieldIter<'a, TMarker, TValue> 
     }
 }
 
-impl<'a, TMarker: ?Sized, TValue> DoubleEndedIterator for IdFieldIter<'a, TMarker, TValue> {
+impl<'a, TId: Id, TValue> DoubleEndedIterator for IdFieldIter<'a, TId, TValue> {
     fn next_back(&mut self) -> Option<&'a TValue> {
         let id = self.ids.next_back()?;
         let items = self.items;
         // SAFETY: see `next`.
-        Some(unsafe { items[id.to_usize()].assume_init_ref() })
+        Some(unsafe { items[id.to_usize_id().to_usize()].assume_init_ref() })
     }
 }
 
-impl<TMarker: ?Sized, TValue> ExactSizeIterator for IdFieldIter<'_, TMarker, TValue> {}
+impl<TId: Id, TValue> ExactSizeIterator for IdFieldIter<'_, TId, TValue> {}

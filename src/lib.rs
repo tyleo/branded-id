@@ -4,6 +4,7 @@ mod macros;
 pub mod ext;
 
 mod i32_id;
+mod id;
 mod id_array;
 mod id_ptr;
 mod id_slice;
@@ -15,6 +16,7 @@ mod u32_id;
 mod usize_id;
 
 pub use i32_id::*;
+pub use id::*;
 pub use id_array::*;
 pub use id_ptr::*;
 pub use id_slice::*;

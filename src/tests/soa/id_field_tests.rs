@@ -1,14 +1,14 @@
 use crate::{
-    soa::{IdField, UsizeIdStruct},
+    soa::{IdField, U32IdStruct},
     tests::util::MTest,
-    usize_id,
+    u32_id,
 };
 
 #[test]
 fn clear_test() {
     use std::rc::Rc;
 
-    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut ids = U32IdStruct::<MTest>::new();
     let mut field = IdField::<MTest, Rc<()>>::new();
 
     let token = Rc::new(());
@@ -46,17 +46,17 @@ fn clear_test() {
 fn is_reserved_test() {
     let mut field = IdField::<MTest, u32>::new();
 
-    assert!(!field.is_reserved(usize_id!(MTest; 0)));
+    assert!(!field.is_reserved(u32_id!(MTest; 0)));
 
-    field.retain(usize_id!(MTest; 0), 1);
+    field.retain(u32_id!(MTest; 0), 1);
 
-    assert!(field.is_reserved(usize_id!(MTest; 0)));
-    assert!(!field.is_reserved(usize_id!(MTest; 1)));
+    assert!(field.is_reserved(u32_id!(MTest; 0)));
+    assert!(!field.is_reserved(u32_id!(MTest; 1)));
 }
 
 #[test]
 fn iter_test() {
-    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut ids = U32IdStruct::<MTest>::new();
     let mut field = IdField::<MTest, u32>::new();
 
     let id_0 = ids.retain();
@@ -73,7 +73,7 @@ fn iter_test() {
 
 #[test]
 fn iter_mut_test() {
-    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut ids = U32IdStruct::<MTest>::new();
     let mut field = IdField::<MTest, u32>::new();
 
     let id_0 = ids.retain();
@@ -103,7 +103,7 @@ fn new_with_capacity_test() {
 
 #[test]
 fn release_test() {
-    let mut obj = UsizeIdStruct::<MTest>::new();
+    let mut obj = U32IdStruct::<MTest>::new();
     let mut health = IdField::new();
 
     let id_0 = obj.retain();
@@ -127,7 +127,7 @@ fn release_test() {
 fn release_all_test() {
     use std::rc::Rc;
 
-    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut ids = U32IdStruct::<MTest>::new();
     let mut field = IdField::<MTest, Rc<()>>::new();
 
     let token = Rc::new(());
@@ -150,7 +150,7 @@ fn release_all_test() {
 
 #[test]
 fn release_all_zeroed_test() {
-    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut ids = U32IdStruct::<MTest>::new();
     let mut field = IdField::<MTest, u32>::new();
 
     let id_0 = ids.retain();
@@ -170,7 +170,7 @@ fn release_all_zeroed_test() {
 #[test]
 fn release_zeroed_test() {
     let mut field = IdField::<MTest, u32>::new();
-    let id_0 = usize_id!(MTest; 0);
+    let id_0 = u32_id!(MTest; 0);
 
     field.retain(id_0, 7);
     unsafe { field.release_zeroed(id_0) };
@@ -197,17 +197,17 @@ fn reserved_count_test() {
     let mut field = IdField::<MTest, u32>::new();
     assert_eq!(field.reserved_count(), 0);
 
-    field.retain(usize_id!(MTest; 0), 10);
+    field.retain(u32_id!(MTest; 0), 10);
     assert_eq!(field.reserved_count(), 1);
 
     // Retaining a higher id reserves every slot up to it.
-    field.retain(usize_id!(MTest; 5), 20);
+    field.retain(u32_id!(MTest; 5), 20);
     assert_eq!(field.reserved_count(), 6);
 }
 
 #[test]
 fn retain_test() {
-    let mut obj = UsizeIdStruct::<MTest>::new();
+    let mut obj = U32IdStruct::<MTest>::new();
     let mut health = IdField::new();
 
     let id_0 = obj.retain();

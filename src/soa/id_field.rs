@@ -1,13 +1,13 @@
 use crate::{
-    IdVec, UsizeId,
-    soa::{IdFieldIter, IdFieldIterMut, UsizeIdStruct},
+    Id, IdVec,
+    soa::{IdFieldIter, IdFieldIterMut, IdStruct},
 };
 use std::{mem, mem::MaybeUninit, ptr::write_bytes};
 
-/// A sparse, columnar data store keyed by typed ids from a
-/// [`UsizeIdStruct`].
+/// A sparse, columnar data store keyed by typed ids from an
+/// [`IdStruct`].
 ///
-/// Liveness is tracked externally by the paired [`UsizeIdStruct`], so this
+/// Liveness is tracked externally by the paired [`IdStruct`], so this
 /// is a thin per-id store backed by uninitialized storage:
 /// [`retain`](Self::retain) a value *after* retaining the id, and
 /// [`release`](Self::release) it *before* releasing the id. Reading a slot
@@ -45,7 +45,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn clear(&mut self, ids: &UsizeIdStruct<TMarker>) {
+    pub unsafe fn clear(&mut self, ids: &IdStruct<impl Id<Marker = TMarker>>) {
         // SAFETY: `ids` must be the in-sync pool for this field.
         unsafe { self.release_all(ids) };
         self.items.as_mut_vec().clear();
@@ -53,22 +53,22 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
 
     /// # Safety
     /// A value must be `retain`'d at the id for `get` to be safe to call.
-    pub unsafe fn get(&self, id: UsizeId<TMarker>) -> &TValue {
-        let item = &self.items[id];
+    pub unsafe fn get(&self, id: impl Id<Marker = TMarker>) -> &TValue {
+        let item = &self.items[id.to_usize_id()];
         unsafe { &*item.as_ptr() }
     }
 
     /// # Safety
     /// A value must be `retain`'d at the id for `get_mut` to be safe to call.
-    pub unsafe fn get_mut(&mut self, id: UsizeId<TMarker>) -> &mut TValue {
-        let item = &mut self.items[id];
+    pub unsafe fn get_mut(&mut self, id: impl Id<Marker = TMarker>) -> &mut TValue {
+        let item = &mut self.items[id.to_usize_id()];
         unsafe { &mut *item.as_mut_ptr() }
     }
 
     /// Whether the backing storage reserves a slot for `id`, not whether
     /// a value has actually been written there.
-    pub fn is_reserved(&self, id: UsizeId<TMarker>) -> bool {
-        id.to_usize() < self.reserved_count()
+    pub fn is_reserved(&self, id: impl Id<Marker = TMarker>) -> bool {
+        id.to_usize_id().to_usize() < self.reserved_count()
     }
 
     /// Iterates the values for every id retained by `ids`, yielding shared
@@ -78,10 +78,10 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn iter<'a>(
+    pub unsafe fn iter<'a, TId: Id<Marker = TMarker>>(
         &'a self,
-        ids: &'a UsizeIdStruct<TMarker>,
-    ) -> IdFieldIter<'a, TMarker, TValue> {
+        ids: &'a IdStruct<TId>,
+    ) -> IdFieldIter<'a, TId, TValue> {
         IdFieldIter::new(self.items.as_vec(), ids.into_iter())
     }
 
@@ -92,10 +92,10 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn iter_mut<'a>(
+    pub unsafe fn iter_mut<'a, TId: Id<Marker = TMarker>>(
         &'a mut self,
-        ids: &'a UsizeIdStruct<TMarker>,
-    ) -> IdFieldIterMut<'a, TMarker, TValue> {
+        ids: &'a IdStruct<TId>,
+    ) -> IdFieldIterMut<'a, TId, TValue> {
         let len = self.items.len();
         let items = self.items.as_mut_vec().as_mut_ptr();
         IdFieldIterMut::new(items, len, ids.into_iter())
@@ -103,8 +103,8 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
 
     /// # Safety
     /// A value must be `retain`'d at the id for `release` to be safe to call.
-    pub unsafe fn release(&mut self, id: UsizeId<TMarker>) {
-        let item = &mut self.items[id];
+    pub unsafe fn release(&mut self, id: impl Id<Marker = TMarker>) {
+        let item = &mut self.items[id.to_usize_id()];
         unsafe { MaybeUninit::assume_init_drop(item) }
     }
 
@@ -116,7 +116,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn release_all(&mut self, ids: &UsizeIdStruct<TMarker>) {
+    pub unsafe fn release_all(&mut self, ids: &IdStruct<impl Id<Marker = TMarker>>) {
         for id in ids {
             // SAFETY: by contract, every id live in `ids` has a value here.
             unsafe { self.release(id) };
@@ -130,7 +130,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn release_all_zeroed(&mut self, ids: &UsizeIdStruct<TMarker>) {
+    pub unsafe fn release_all_zeroed(&mut self, ids: &IdStruct<impl Id<Marker = TMarker>>) {
         for id in ids {
             // SAFETY: by contract, every id live in `ids` has a value here.
             unsafe { self.release_zeroed(id) };
@@ -144,8 +144,8 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// # Safety
     /// A value must be `retain`'d at the id for `release_zeroed` to be safe
     /// to call.
-    pub unsafe fn release_zeroed(&mut self, id: UsizeId<TMarker>) {
-        let item = &mut self.items[id];
+    pub unsafe fn release_zeroed(&mut self, id: impl Id<Marker = TMarker>) {
+        let item = &mut self.items[id.to_usize_id()];
         unsafe { MaybeUninit::assume_init_drop(item) }
 
         let size = mem::size_of::<TValue>();
@@ -169,15 +169,16 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         self.items.len()
     }
 
-    pub fn retain(&mut self, id: UsizeId<TMarker>, value: TValue) -> &mut TValue {
+    pub fn retain(&mut self, id: impl Id<Marker = TMarker>, value: TValue) -> &mut TValue {
+        let id = id.to_usize_id();
         self.reserve(id.to_usize() + 1);
         self.items[id].write(value)
     }
 
     /// # Safety
     /// A value must be `retain`'d at the id for `set` to be safe to call.
-    pub unsafe fn set(&mut self, id: UsizeId<TMarker>, value: TValue) -> &mut TValue {
-        let item = &mut self.items[id];
+    pub unsafe fn set(&mut self, id: impl Id<Marker = TMarker>, value: TValue) -> &mut TValue {
+        let item = &mut self.items[id.to_usize_id()];
         unsafe { MaybeUninit::assume_init_drop(item) }
         item.write(value)
     }
