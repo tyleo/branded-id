@@ -1,14 +1,18 @@
-use crate::{IdVec, UsizeId, soa::UsizeIdStruct};
+use crate::{
+    IdVec, UsizeId,
+    soa::{IdFieldIter, IdFieldIterMut, UsizeIdStruct},
+};
 use std::{mem, mem::MaybeUninit, ptr::write_bytes};
 
 /// A sparse, columnar data store keyed by typed ids from a
 /// [`UsizeIdStruct`].
 ///
 /// Liveness is tracked externally by the paired [`UsizeIdStruct`], so this
-/// is a thin per-id store backed by uninitialized storage: [`retain`] a
-/// value *after* retaining the id, and [`release`] it *before* releasing
-/// the id. Reading a slot that has not been retained is undefined
-/// behavior, which is why the accessors are `unsafe`.
+/// is a thin per-id store backed by uninitialized storage:
+/// [`retain`](Self::retain) a value *after* retaining the id, and
+/// [`release`](Self::release) it *before* releasing the id. Reading a slot
+/// that has not been retained is undefined behavior, which is why the
+/// accessors are `unsafe`.
 pub struct IdField<TMarker: ?Sized, TValue> {
     items: IdVec<TMarker, MaybeUninit<TValue>>,
 }
@@ -47,14 +51,6 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         self.items.as_mut_vec().clear();
     }
 
-    /// Ensures the field reserves at least `count` id slots, growing with
-    /// uninitialized storage if needed. Never shrinks.
-    pub fn ensure_count(&mut self, count: usize) {
-        while self.items.len() < count {
-            self.items.push(MaybeUninit::uninit());
-        }
-    }
-
     /// # Safety
     /// A value must be `retain`'d at the id for `get` to be safe to call.
     pub unsafe fn get(&self, id: UsizeId<TMarker>) -> &TValue {
@@ -73,6 +69,36 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
     /// a value has actually been written there.
     pub fn is_reserved(&self, id: UsizeId<TMarker>) -> bool {
         id.to_usize() < self.reserved_count()
+    }
+
+    /// Iterates the values for every id retained by `ids`, yielding shared
+    /// references in the order `ids` iterates.
+    ///
+    /// # Safety
+    /// `ids` must be the id pool this field is paired with, in sync with
+    /// it: every id retained by `ids` must have a value `retain`'d in this
+    /// field that has not since been released.
+    pub unsafe fn iter<'a>(
+        &'a self,
+        ids: &'a UsizeIdStruct<TMarker>,
+    ) -> IdFieldIter<'a, TMarker, TValue> {
+        IdFieldIter::new(self.items.as_vec(), ids.into_iter())
+    }
+
+    /// Iterates the values for every id retained by `ids`, yielding mutable
+    /// references in the order `ids` iterates.
+    ///
+    /// # Safety
+    /// `ids` must be the id pool this field is paired with, in sync with
+    /// it: every id retained by `ids` must have a value `retain`'d in this
+    /// field that has not since been released.
+    pub unsafe fn iter_mut<'a>(
+        &'a mut self,
+        ids: &'a UsizeIdStruct<TMarker>,
+    ) -> IdFieldIterMut<'a, TMarker, TValue> {
+        let len = self.items.len();
+        let items = self.items.as_mut_vec().as_mut_ptr();
+        IdFieldIterMut::new(items, len, ids.into_iter())
     }
 
     /// # Safety
@@ -97,6 +123,20 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         }
     }
 
+    /// Like [`release_all`](Self::release_all), but also clobbers each
+    /// dropped slot's backing bytes with zeros.
+    ///
+    /// # Safety
+    /// `ids` must be the id pool this field is paired with, in sync with
+    /// it: every id retained by `ids` must have a value `retain`'d in this
+    /// field that has not since been released.
+    pub unsafe fn release_all_zeroed(&mut self, ids: &UsizeIdStruct<TMarker>) {
+        for id in ids {
+            // SAFETY: by contract, every id live in `ids` has a value here.
+            unsafe { self.release_zeroed(id) };
+        }
+    }
+
     /// Drops the value at `id`, then clobbers its backing bytes with zeros.
     /// This does not reinitialize the slot; reading it afterward is still
     /// undefined behavior.
@@ -115,13 +155,22 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         }
     }
 
+    /// Ensures at least `count` id slots are reserved (so
+    /// [`reserved_count`](Self::reserved_count) is at least `count`),
+    /// growing with uninitialized storage if needed. Never shrinks.
+    pub fn reserve(&mut self, count: usize) {
+        while self.items.len() < count {
+            self.items.push(MaybeUninit::uninit());
+        }
+    }
+
     /// The number of id slots currently reserved (not necessarily written).
     pub fn reserved_count(&self) -> usize {
         self.items.len()
     }
 
     pub fn retain(&mut self, id: UsizeId<TMarker>, value: TValue) -> &mut TValue {
-        self.ensure_count(id.to_usize() + 1);
+        self.reserve(id.to_usize() + 1);
         self.items[id].write(value)
     }
 

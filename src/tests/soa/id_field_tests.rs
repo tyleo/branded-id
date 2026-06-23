@@ -43,18 +43,6 @@ fn clear_test() {
 }
 
 #[test]
-fn ensure_count_test() {
-    let mut field = IdField::<MTest, u32>::new();
-
-    field.ensure_count(4);
-    assert_eq!(field.reserved_count(), 4);
-
-    // Never shrinks.
-    field.ensure_count(2);
-    assert_eq!(field.reserved_count(), 4);
-}
-
-#[test]
 fn is_reserved_test() {
     let mut field = IdField::<MTest, u32>::new();
 
@@ -64,6 +52,41 @@ fn is_reserved_test() {
 
     assert!(field.is_reserved(usize_id!(MTest; 0)));
     assert!(!field.is_reserved(usize_id!(MTest; 1)));
+}
+
+#[test]
+fn iter_test() {
+    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut field = IdField::<MTest, u32>::new();
+
+    let id_0 = ids.retain();
+    field.retain(id_0, 10);
+    let id_1 = ids.retain();
+    field.retain(id_1, 20);
+    let id_2 = ids.retain();
+    field.retain(id_2, 30);
+
+    // `ids` iterates in live order: id_0, id_1, id_2.
+    let actual: Vec<u32> = unsafe { field.iter(&ids) }.copied().collect();
+    assert_eq!(actual, vec![10, 20, 30]);
+}
+
+#[test]
+fn iter_mut_test() {
+    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut field = IdField::<MTest, u32>::new();
+
+    let id_0 = ids.retain();
+    field.retain(id_0, 1);
+    let id_1 = ids.retain();
+    field.retain(id_1, 2);
+
+    for value in unsafe { field.iter_mut(&ids) } {
+        *value *= 10;
+    }
+
+    assert_eq!(*unsafe { field.get(id_0) }, 10);
+    assert_eq!(*unsafe { field.get(id_1) }, 20);
 }
 
 #[test]
@@ -126,6 +149,25 @@ fn release_all_test() {
 }
 
 #[test]
+fn release_all_zeroed_test() {
+    let mut ids = UsizeIdStruct::<MTest>::new();
+    let mut field = IdField::<MTest, u32>::new();
+
+    let id_0 = ids.retain();
+    field.retain(id_0, 7);
+    let id_1 = ids.retain();
+    field.retain(id_1, 9);
+
+    // SAFETY: `field` and `ids` are in sync.
+    unsafe { field.release_all_zeroed(&ids) };
+
+    // Slots kept, but their bytes were clobbered with zeros.
+    assert_eq!(field.reserved_count(), 2);
+    assert_eq!(*unsafe { field.get(id_0) }, 0);
+    assert_eq!(*unsafe { field.get(id_1) }, 0);
+}
+
+#[test]
 fn release_zeroed_test() {
     let mut field = IdField::<MTest, u32>::new();
     let id_0 = usize_id!(MTest; 0);
@@ -136,6 +178,18 @@ fn release_zeroed_test() {
     // The slot stays reserved, but its bytes were clobbered with zeros.
     assert_eq!(field.reserved_count(), 1);
     assert_eq!(*unsafe { field.get(id_0) }, 0);
+}
+
+#[test]
+fn reserve_test() {
+    let mut field = IdField::<MTest, u32>::new();
+
+    field.reserve(4);
+    assert_eq!(field.reserved_count(), 4);
+
+    // Never shrinks.
+    field.reserve(2);
+    assert_eq!(field.reserved_count(), 4);
 }
 
 #[test]
