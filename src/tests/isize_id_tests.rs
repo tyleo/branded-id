@@ -1,5 +1,5 @@
 use crate::{
-    i32_id, isize_id as id, tests::util::MTest, u32_id, usize_id, I32Id, IsizeId, U32Id, UsizeId,
+    I32Id, IsizeId, U32Id, UsizeId, i32_id, isize_id as id, tests::util::MTest, u32_id, usize_id,
 };
 use std::{
     cmp::Ordering,

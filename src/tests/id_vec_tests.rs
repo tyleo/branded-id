@@ -1,5 +1,5 @@
 use crate::{
-    id_array, id_slice, id_vec, tests::util::MTest, usize_id as id, IdSlice, IdVec, UsizeId,
+    IdSlice, IdVec, UsizeId, id_array, id_slice, id_vec, tests::util::MTest, usize_id as id,
 };
 use std::{
     borrow::{Borrow, BorrowMut},

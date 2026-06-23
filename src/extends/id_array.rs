@@ -1,4 +1,4 @@
-use crate::{extends::Extends, IdArray};
+use crate::{IdArray, extends::Extends};
 
 impl<TMarker: ?Sized, TValue, const N: usize> IdArray<TMarker, TValue, N> {
     pub const fn downcast_as<TExtendedMarker>(&self) -> &IdArray<TExtendedMarker, TValue, N>

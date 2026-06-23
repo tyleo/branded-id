@@ -1,7 +1,6 @@
 use crate::{
-    id_ptr,
-    tests::util::{extends::MTestBase, MTest},
-    IdPtr,
+    IdPtr, id_ptr,
+    tests::util::{MTest, extends::MTestBase},
 };
 
 #[test]

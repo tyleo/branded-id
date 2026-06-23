@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, IdArray};
+use crate::{IdArray, internal::Sealed};
 
 pub trait ArrayExt<TValue, const N: usize>: Sealed {
     fn as_id_array<TMarker: ?Sized>(&self) -> &IdArray<TMarker, TValue, N>;

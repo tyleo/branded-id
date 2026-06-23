@@ -1,4 +1,4 @@
-use crate::{extends::Extends, I32Id};
+use crate::{I32Id, extends::Extends};
 
 impl<TMarker: ?Sized> I32Id<TMarker> {
     pub const fn downcast_to<TExtendedMarker>(self) -> I32Id<TExtendedMarker>

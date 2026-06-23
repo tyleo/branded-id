@@ -1,89 +1,105 @@
-use crate::{UsizeId, ext::UsizeExt};
-use std::default::Default;
+use crate::{
+    IdVec, UsizeId,
+    ext::UsizeExt,
+    soa::{UsizeIdStructIter, UsizeIdStructRawParts},
+};
 
-use super::{BitAccessInfo, UsizeIdStructIter};
-
+/// An id pool that hands out and recycles typed integer handles.
+///
+/// Ids are allocated with [`retain`](Self::retain) and recycled with
+/// [`release`](Self::release). Retained ids are kept in a packed `live`
+/// list; releasing swap-removes from that list so iteration only ever
+/// visits retained ids (in swap-remove order, not sorted).
 pub struct UsizeIdStruct<TMarker: ?Sized> {
-    used_ids: Vec<u64>,
-    free_ids: Vec<UsizeId<TMarker>>,
-    next_id: UsizeId<TMarker>,
+    /// The ids currently retained, packed.
+    live: Vec<UsizeId<TMarker>>,
+    /// Per-id: the index of the id in `live` plus 1. 0 means "not retained".
+    live_index_plus_one: IdVec<TMarker, usize>,
+    /// Released ids available for reuse (LIFO).
+    free: Vec<UsizeId<TMarker>>,
 }
 
 impl<TMarker: ?Sized> UsizeIdStruct<TMarker> {
     pub const fn new() -> Self {
         Self {
-            used_ids: Vec::new(),
-            free_ids: Vec::new(),
-            next_id: UsizeId::from_usize(0usize),
+            live: Vec::new(),
+            live_index_plus_one: IdVec::new(),
+            free: Vec::new(),
         }
     }
 
+    /// Exposes the internal lists for advanced usage.
+    pub fn as_raw_parts(&self) -> UsizeIdStructRawParts<'_, TMarker> {
+        UsizeIdStructRawParts {
+            live: &self.live,
+            live_index_plus_one: &self.live_index_plus_one,
+            free: &self.free,
+        }
+    }
+
+    /// Releases every retained id and resets the pool to empty.
+    pub fn clear(&mut self) {
+        self.live.clear();
+        self.live_index_plus_one.as_mut_vec().clear();
+        self.free.clear();
+    }
+
+    /// The number of ids currently retained from this pool.
     pub fn count(&self) -> usize {
-        self.next_id.to_usize() - self.free_ids.len()
-    }
-
-    pub fn retain(&mut self) -> UsizeId<TMarker> {
-        let result = if let Some(free_id) = self.free_ids.pop() {
-            // If we have a free id, use it
-            free_id
-        } else {
-            // Otherwise, get the next id
-            let result = self.next_id;
-            self.next_id = (self.next_id.to_usize() + 1).to_usize_id();
-            result
-        };
-
-        // Set the bit associated with the id
-        set_bit(&mut self.used_ids, result.to_usize());
-
-        result
-    }
-
-    pub fn release(&mut self, id: UsizeId<TMarker>) {
-        clear_bit(&mut self.used_ids, id.to_usize());
-        self.free_ids.push(id);
+        self.live.len()
     }
 
     pub fn is_retained(&self, id: UsizeId<TMarker>) -> bool {
-        is_bit_set(&self.used_ids, id.to_usize())
-    }
-}
-
-fn clear_bit(used_ids: &mut [u64], index: usize) {
-    let bit_access_info = BitAccessInfo::from_index(index);
-
-    // Clear the bit
-    let old_pattern = used_ids[bit_access_info.slice_index];
-    let new_pattern = old_pattern & (!bit_access_info.u64_pattern);
-    used_ids[bit_access_info.slice_index] = new_pattern;
-}
-
-fn set_bit(used_ids: &mut Vec<u64>, index: usize) {
-    let bit_access_info = BitAccessInfo::from_index(index);
-
-    // Ensure the bit we need to set actually exists
-    ensure_size(used_ids, bit_access_info.slice_index + 1);
-
-    // Set the bit
-    let old_pattern = used_ids[bit_access_info.slice_index];
-    let new_pattern = old_pattern | bit_access_info.u64_pattern;
-    used_ids[bit_access_info.slice_index] = new_pattern;
-}
-
-fn is_bit_set(used_ids: &[u64], index: usize) -> bool {
-    let bit_access_info = BitAccessInfo::from_index(index);
-
-    if bit_access_info.slice_index >= used_ids.len() {
-        return false;
+        id.to_usize() < self.live_index_plus_one.len() && self.live_index_plus_one[id] != 0
     }
 
-    let pattern = used_ids[bit_access_info.slice_index];
-    (pattern & bit_access_info.u64_pattern) != 0
-}
+    /// Peeks at the next id [`retain`](Self::retain) would return, without
+    /// actually retaining it.
+    pub fn peek_next(&self) -> UsizeId<TMarker> {
+        match self.free.last() {
+            Some(&id) => id,
+            None => self.peek_next_fresh(),
+        }
+    }
 
-fn ensure_size(items: &mut Vec<u64>, desired_size: usize) {
-    while items.len() < desired_size {
-        items.push(0);
+    /// Peeks at the next id that would be freshly allocated, ignoring the
+    /// free list.
+    pub fn peek_next_fresh(&self) -> UsizeId<TMarker> {
+        self.live_index_plus_one.len().to_usize_id()
+    }
+
+    pub fn retain(&mut self) -> UsizeId<TMarker> {
+        // Recycle a freed id if one is available; otherwise allocate a
+        // brand-new one (which also grows the reverse-index list).
+        let id = match self.free.pop() {
+            Some(free_id) => free_id,
+            None => self.live_index_plus_one.push(0),
+        };
+
+        self.live.push(id);
+        // Store index + 1 so that 0 can mean "not retained".
+        self.live_index_plus_one[id] = self.live.len();
+
+        id
+    }
+
+    pub fn release(&mut self, id: UsizeId<TMarker>) {
+        let live_index_plus_one = self.live_index_plus_one[id];
+
+        // Mark the id as no longer retained and push it onto the free list
+        // for future recycling.
+        self.live_index_plus_one[id] = 0;
+        self.free.push(id);
+
+        // Swap-remove: move the last live id into the slot vacated by the
+        // released id to keep `live` packed.
+        let last_id = self.live.pop().expect("released an id from an empty pool");
+        if id == last_id {
+            return;
+        }
+
+        self.live_index_plus_one[last_id] = live_index_plus_one;
+        self.live[live_index_plus_one - 1] = last_id;
     }
 }
 
@@ -98,6 +114,6 @@ impl<'a, TMarker: ?Sized> IntoIterator for &'a UsizeIdStruct<TMarker> {
     type IntoIter = UsizeIdStructIter<'a, TMarker>;
 
     fn into_iter(self) -> Self::IntoIter {
-        UsizeIdStructIter::from_used_ids(&self.used_ids)
+        UsizeIdStructIter::from_live(&self.live)
     }
 }

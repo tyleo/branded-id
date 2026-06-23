@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, IdVec};
+use crate::{IdVec, internal::Sealed};
 
 pub trait VecExt<TValue>: Sealed {
     fn as_id_vec<TMarker: ?Sized>(&self) -> &IdVec<TMarker, TValue>;

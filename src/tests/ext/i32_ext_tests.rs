@@ -1,4 +1,4 @@
-use crate::{ext::I32Ext, i32_id as id, tests::util::MTest, I32Id};
+use crate::{I32Id, ext::I32Ext, i32_id as id, tests::util::MTest};
 
 #[test]
 fn to_i32_id_test() {

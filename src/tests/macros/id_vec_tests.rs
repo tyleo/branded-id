@@ -1,4 +1,4 @@
-use crate::{id_vec, tests::util::MTest, IdVec};
+use crate::{IdVec, id_vec, tests::util::MTest};
 
 #[test]
 fn id_vec_0_test() {

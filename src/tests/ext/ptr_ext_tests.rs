@@ -1,4 +1,4 @@
-use crate::{ext::PtrExt, id_ptr, tests::util::MTest, IdPtr};
+use crate::{IdPtr, ext::PtrExt, id_ptr, tests::util::MTest};
 
 #[test]
 fn to_ptr_id_test() {

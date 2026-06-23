@@ -1,4 +1,4 @@
-use crate::{id_array, id_slice, tests::util::MTest, usize_id as id, IdArray, IdSlice};
+use crate::{IdArray, IdSlice, id_array, id_slice, tests::util::MTest, usize_id as id};
 use std::{
     array::IntoIter,
     borrow::{Borrow, BorrowMut},

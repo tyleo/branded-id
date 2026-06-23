@@ -1,4 +1,4 @@
-use crate::{extends::Extends, IdSlice};
+use crate::{IdSlice, extends::Extends};
 
 impl<TMarker: ?Sized, TValue> IdSlice<TMarker, TValue> {
     pub const fn downcast_as<TExtendedMarker>(&self) -> &IdSlice<TExtendedMarker, TValue>

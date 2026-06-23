@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, MutIdPtr};
+use crate::{MutIdPtr, internal::Sealed};
 
 pub trait MutPtrExt<TValue>: Sealed {
     fn to_mut_id_ptr<TMarker: ?Sized>(self) -> MutIdPtr<TMarker, TValue>;

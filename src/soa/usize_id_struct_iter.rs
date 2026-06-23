@@ -1,40 +1,36 @@
-use crate::{ext::UsizeExt, soa::BitAccessInfo, UsizeId};
-use std::marker::PhantomData;
+use crate::UsizeId;
+use std::slice;
 
+/// Iterates the ids currently retained by a [`UsizeIdStruct`], in the
+/// order they appear in the packed `live` list (swap-remove order).
+///
+/// [`UsizeIdStruct`]: super::UsizeIdStruct
 pub struct UsizeIdStructIter<'a, TMarker: ?Sized> {
-    used_ids: &'a Vec<u64>,
-    idx: usize,
-    phantom: PhantomData<TMarker>,
+    live: slice::Iter<'a, UsizeId<TMarker>>,
 }
 
 impl<'a, TMarker: ?Sized> UsizeIdStructIter<'a, TMarker> {
-    pub fn from_used_ids(used_ids: &'a Vec<u64>) -> Self {
-        Self {
-            used_ids,
-            idx: 0,
-            phantom: PhantomData,
-        }
+    pub fn from_live(live: &'a [UsizeId<TMarker>]) -> Self {
+        Self { live: live.iter() }
     }
 }
 
-impl<'a, TMarker: ?Sized> Iterator for UsizeIdStructIter<'a, TMarker> {
+impl<TMarker: ?Sized> Iterator for UsizeIdStructIter<'_, TMarker> {
     type Item = UsizeId<TMarker>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut bit_access_info = BitAccessInfo::from_index(self.idx);
+        self.live.next().copied()
+    }
 
-        while bit_access_info.slice_index < self.used_ids.len() {
-            // Advance the index
-            self.idx += 1;
-
-            if self.used_ids[bit_access_info.slice_index] & bit_access_info.u64_pattern != 0 {
-                return Some((self.idx - 1).to_usize_id());
-            }
-
-            // Get the next `BitAccessInfo`.
-            bit_access_info = BitAccessInfo::from_index(self.idx);
-        }
-
-        None
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.live.size_hint()
     }
 }
+
+impl<TMarker: ?Sized> DoubleEndedIterator for UsizeIdStructIter<'_, TMarker> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.live.next_back().copied()
+    }
+}
+
+impl<TMarker: ?Sized> ExactSizeIterator for UsizeIdStructIter<'_, TMarker> {}

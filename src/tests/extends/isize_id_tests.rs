@@ -1,7 +1,6 @@
 use crate::{
-    isize_id as id,
-    tests::util::{extends::MTestBase, MTest},
-    IsizeId,
+    IsizeId, isize_id as id,
+    tests::util::{MTest, extends::MTestBase},
 };
 
 #[test]

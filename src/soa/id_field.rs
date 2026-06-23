@@ -1,5 +1,5 @@
 use crate::{IdVec, UsizeId};
-use std::{mem::MaybeUninit, ptr::write_bytes};
+use std::{mem, mem::MaybeUninit, ptr::write_bytes};
 
 pub struct IdField<TMarker: ?Sized, TValue> {
     items: IdVec<TMarker, MaybeUninit<TValue>>,
@@ -30,7 +30,7 @@ impl<TMarker: ?Sized, TValue> IdField<TMarker, TValue> {
         let item = &mut self.items[id];
         unsafe { MaybeUninit::assume_init_drop(item) }
 
-        let size = core::mem::size_of::<TValue>();
+        let size = mem::size_of::<TValue>();
         if size != 0 {
             let p = item.as_mut_ptr() as *mut u8;
             // This does not reinitialize the value; it just clobbers the backing bytes.

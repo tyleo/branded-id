@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, I32Id};
+use crate::{I32Id, internal::Sealed};
 
 pub trait I32Ext: Sealed {
     fn to_i32_id<TMarker: ?Sized>(self) -> I32Id<TMarker>;

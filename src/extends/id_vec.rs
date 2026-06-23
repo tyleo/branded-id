@@ -1,4 +1,4 @@
-use crate::{extends::Extends, IdVec};
+use crate::{IdVec, extends::Extends};
 
 impl<TMarker: ?Sized, TValue> IdVec<TMarker, TValue> {
     pub const fn downcast_as<TExtendedMarker>(&self) -> &IdVec<TExtendedMarker, TValue>

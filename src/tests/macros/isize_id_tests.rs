@@ -1,4 +1,4 @@
-use crate::{isize_id, tests::util::MTest, IsizeId};
+use crate::{IsizeId, isize_id, tests::util::MTest};
 
 #[test]
 fn isize_id_0_test() {

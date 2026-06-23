@@ -1,6 +1,6 @@
 use crate::{
     extends::Extends,
-    tests::util::{extends::MTestBase, MTest},
+    tests::util::{MTest, extends::MTestBase},
 };
 
 impl Extends<MTestBase> for MTest {}

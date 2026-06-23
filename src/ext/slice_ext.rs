@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, IdSlice};
+use crate::{IdSlice, internal::Sealed};
 
 pub trait SliceExt<TValue>: Sealed {
     fn as_id_slice<TMarker: ?Sized>(&self) -> &IdSlice<TMarker, TValue>;

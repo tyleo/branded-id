@@ -1,4 +1,4 @@
-use crate::{id_slice, tests::util::MTest, usize_id as id, IdSlice};
+use crate::{IdSlice, id_slice, tests::util::MTest, usize_id as id};
 use std::ops::{Bound, Index, IndexMut};
 
 #[test]

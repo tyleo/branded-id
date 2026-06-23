@@ -1,6 +1,6 @@
 use crate::{
-    i32_id, id_slice, isize_id, tests::util::MTest, u32_id, usize_id as id, I32Id, IdSlice,
-    IdSliceIndex, IsizeId, U32Id, UsizeId,
+    I32Id, IdSlice, IdSliceIndex, IsizeId, U32Id, UsizeId, i32_id, id_slice, isize_id,
+    tests::util::MTest, u32_id, usize_id as id,
 };
 use std::{
     cmp::Ordering,

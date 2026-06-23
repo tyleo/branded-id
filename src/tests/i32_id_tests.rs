@@ -1,4 +1,4 @@
-use crate::{i32_id as id, isize_id, tests::util::MTest, u32_id, usize_id, I32Id, IsizeId, U32Id};
+use crate::{I32Id, IsizeId, U32Id, i32_id as id, isize_id, tests::util::MTest, u32_id, usize_id};
 use std::{
     cmp::Ordering,
     collections::hash_map::DefaultHasher,

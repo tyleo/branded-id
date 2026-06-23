@@ -1,4 +1,4 @@
-use crate::{internal::Sealed, IdPtr};
+use crate::{IdPtr, internal::Sealed};
 
 pub trait PtrExt<TValue>: Sealed {
     fn to_id_ptr<TMarker: ?Sized>(self) -> IdPtr<TMarker, TValue>;

@@ -1,4 +1,4 @@
-use crate::{ext::VecExt, id_vec, tests::util::MTest, IdVec};
+use crate::{IdVec, ext::VecExt, id_vec, tests::util::MTest};
 
 #[test]
 fn as_id_vec_test() {

@@ -1,4 +1,4 @@
-use crate::{id_slice, tests::util::MTest, IdSlice};
+use crate::{IdSlice, id_slice, tests::util::MTest};
 
 #[test]
 fn id_slice_0_test() {

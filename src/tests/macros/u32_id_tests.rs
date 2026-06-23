@@ -1,4 +1,4 @@
-use crate::{tests::util::MTest, u32_id, U32Id};
+use crate::{U32Id, tests::util::MTest, u32_id};
 
 #[test]
 fn u32_id_0_test() {

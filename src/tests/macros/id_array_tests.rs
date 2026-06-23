@@ -1,4 +1,4 @@
-use crate::{id_array, tests::util::MTest, IdArray};
+use crate::{IdArray, id_array, tests::util::MTest};
 
 #[test]
 fn id_array_0_test() {

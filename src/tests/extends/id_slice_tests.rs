@@ -1,7 +1,6 @@
 use crate::{
-    id_slice,
-    tests::util::{extends::MTestBase, MTest},
-    IdSlice,
+    IdSlice, id_slice,
+    tests::util::{MTest, extends::MTestBase},
 };
 
 #[test]

@@ -1,6 +1,7 @@
 use crate::{
-    tests::util::{extends::MTestBase, MTest},
-    usize_id as id, UsizeId,
+    UsizeId,
+    tests::util::{MTest, extends::MTestBase},
+    usize_id as id,
 };
 
 #[test]

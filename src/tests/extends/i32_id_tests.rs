@@ -1,7 +1,6 @@
 use crate::{
-    i32_id as id,
-    tests::util::{extends::MTestBase, MTest},
-    I32Id,
+    I32Id, i32_id as id,
+    tests::util::{MTest, extends::MTestBase},
 };
 
 #[test]
