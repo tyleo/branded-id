@@ -6,8 +6,9 @@ pub struct IdStructRawParts<'a, TId: Id> {
     /// The ids currently retained, packed.
     pub live: &'a [TId],
 
-    /// Per-id: its index in the dense list (`live` followed by `free`).
-    pub sparse: &'a IdVec<TId::Brand, usize>,
+    /// Per-id: its index in the dense list (`live` followed by `free`),
+    /// stored in the id's backing integer ([`Id::Backing`]).
+    pub sparse: &'a IdVec<TId::Brand, TId::Backing>,
 
     /// Released ids available for reuse; the next id to be recycled is first.
     pub free: &'a [TId],

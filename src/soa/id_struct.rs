@@ -21,9 +21,11 @@ pub struct IdStruct<TId: Id> {
     /// recycled at `dense[live_count]`.
     dense: Vec<TId>,
 
-    /// Per-id: its index in `dense`. Valid for every id handed out; a freed
-    /// id keeps pointing at its slot in the released region.
-    sparse: IdVec<TId::Brand, usize>,
+    /// Per-id: its index in `dense`, stored in the id's backing integer
+    /// ([`Id::Backing`]) so the reverse index is no wider than it needs to be
+    /// (e.g. `u32` for a `u32`-keyed pool). Valid for every id handed out; a
+    /// freed id keeps pointing at its slot in the released region.
+    sparse: IdVec<TId::Brand, TId::Backing>,
 
     /// The number of retained ids, i.e. the boundary between the retained and
     /// released regions of `dense`.
@@ -71,7 +73,7 @@ impl<TId: Id> IdStruct<TId> {
     /// never handed out or have already been released.
     pub fn is_retained(&self, id: TId) -> bool {
         let id = id.to_usize_id();
-        id.to_usize() < self.sparse.len() && self.sparse[id] < self.live_count
+        id.to_usize() < self.sparse.len() && Self::index_of(self.sparse[id]) < self.live_count
     }
 
     /// Iterates the retained ids in their packed `live` order, the same as
@@ -100,7 +102,8 @@ impl<TId: Id> IdStruct<TId> {
     /// swap-removing it from the packed retained region of `dense`.
     pub fn release(&mut self, id: TId) {
         let usize_id = id.to_usize_id();
-        let index = self.sparse[usize_id];
+        let index_backing = self.sparse[usize_id];
+        let index = Self::index_of(index_backing);
 
         let last_live = self
             .live_count
@@ -110,14 +113,19 @@ impl<TId: Id> IdStruct<TId> {
         // Move the last retained id into the released id's slot, keeping
         // `dense[..live_count]` packed, then drop the released id into the
         // vacated boundary slot so it sits at the front of the released
-        // region. When `id` is already the last retained id these writes are
-        // self-assignments, so no special case is needed.
+        // region. The two `sparse` writes swap the stored positions as-is, so
+        // no usize round-trip is needed; and when `id` is already the last
+        // retained id every write is a self-assignment, so no special case is
+        // needed either.
         let last_id = self.dense[last_live];
+        let last_id_usize = last_id.to_usize_id();
+        let last_live_backing = self.sparse[last_id_usize];
+
         self.dense[index] = last_id;
-        self.sparse[last_id.to_usize_id()] = index;
+        self.sparse[last_id_usize] = index_backing;
 
         self.dense[last_live] = id;
-        self.sparse[usize_id] = last_live;
+        self.sparse[usize_id] = last_live_backing;
 
         self.live_count = last_live;
     }
@@ -132,9 +140,11 @@ impl<TId: Id> IdStruct<TId> {
             self.dense[self.live_count]
         } else {
             // Allocate a brand-new id, growing both lists in lock-step. The
-            // new id lands at index `live_count`, which is where `sparse`
-            // records it.
-            let id = TId::from_usize_id(self.sparse.push(self.live_count));
+            // new id lands at index `live_count`, and its own value is that
+            // index, so `sparse` records the id's backing integer as its
+            // position.
+            let id = TId::from_usize_id(self.sparse.end());
+            self.sparse.push(id.to_backing());
             self.dense.push(id);
             id
         };
@@ -142,6 +152,11 @@ impl<TId: Id> IdStruct<TId> {
         self.live_count += 1;
 
         id
+    }
+
+    /// Decodes a value stored in `sparse` back into a `usize` index.
+    fn index_of(backing: TId::Backing) -> usize {
+        TId::from_backing(backing).to_usize_id().to_usize()
     }
 }
 
