@@ -43,6 +43,7 @@ mod id_slice_index;
 mod id_vec;
 mod isize_id;
 mod mut_id_ptr;
+mod scalar;
 mod u32_id;
 mod usize_id;
 
@@ -55,6 +56,7 @@ pub use id_slice_index::*;
 pub use id_vec::*;
 pub use isize_id::*;
 pub use mut_id_ptr::*;
+pub use scalar::*;
 pub use u32_id::*;
 pub use usize_id::*;
 

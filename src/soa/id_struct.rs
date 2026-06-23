@@ -1,5 +1,5 @@
 use crate::{
-    Id, IdVec,
+    Id, IdVec, Scalar,
     soa::{IdStructIter, IdStructRawParts},
 };
 
@@ -12,27 +12,29 @@ use crate::{
 /// be recycled. Releasing swap-removes from the retained region so iteration
 /// only ever visits retained ids.
 ///
-/// The pool is generic over the id type `TId`: see
-/// [`U32IdStruct`](super::U32IdStruct) for the common `u32`-keyed
-/// specialization.
-pub struct IdStruct<TId: Id> {
+/// The pool is keyed by the brand `TBrand` alone; the integer width it stores
+/// indices in is the separate `TNum` parameter, which defaults to `u32`. So
+/// `IdStruct<BFoo>` hands out [`U32Id<BFoo>`](crate::U32Id) while
+/// `IdStruct<BFoo, usize>` hands out [`UsizeId<BFoo>`](crate::UsizeId); see
+/// [`Scalar`] for the width-to-id mapping.
+pub struct IdStruct<TBrand: ?Sized, TNum: Scalar = u32> {
     /// Every id ever handed out. `dense[..live_count]` are retained and
     /// packed; `dense[live_count..]` are released, with the next id to be
     /// recycled at `dense[live_count]`.
-    dense: Vec<TId>,
+    dense: Vec<TNum::Id<TBrand>>,
 
-    /// Per-id: its index in `dense`, stored in the id's backing integer
-    /// ([`Id::Backing`]) so the reverse index is no wider than it needs to be
-    /// (e.g. `u32` for a `u32`-keyed pool). Valid for every id handed out; a
-    /// freed id keeps pointing at its slot in the released region.
-    sparse: IdVec<TId::Brand, TId::Backing>,
+    /// Per-id: its index in `dense`, stored in the pool's integer width `TNum`
+    /// so the reverse index is no wider than it needs to be (e.g. `u32` for a
+    /// `u32`-keyed pool). Valid for every id handed out; a freed id keeps
+    /// pointing at its slot in the released region.
+    sparse: IdVec<TBrand, TNum>,
 
     /// The number of retained ids, i.e. the boundary between the retained and
     /// released regions of `dense`.
     live_count: usize,
 }
 
-impl<TId: Id> IdStruct<TId> {
+impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Creates an empty id pool.
     pub const fn new() -> Self {
         Self {
@@ -43,7 +45,7 @@ impl<TId: Id> IdStruct<TId> {
     }
 
     /// Exposes the internal lists for advanced usage.
-    pub fn as_raw_parts(&self) -> IdStructRawParts<'_, TId> {
+    pub fn as_raw_parts(&self) -> IdStructRawParts<'_, TBrand, TNum> {
         let (live, free) = self.dense.split_at(self.live_count);
         IdStructRawParts {
             live,
@@ -66,14 +68,14 @@ impl<TId: Id> IdStruct<TId> {
 
     /// Whether `id` is currently retained. Safe and `false` for ids that were
     /// never handed out or have already been released.
-    pub fn is_retained(&self, id: TId) -> bool {
+    pub fn is_retained(&self, id: TNum::Id<TBrand>) -> bool {
         let id = id.to_usize_id();
         id.to_usize() < self.sparse.len() && Self::index_of(self.sparse[id]) < self.live_count
     }
 
     /// Iterates the retained ids in their packed `live` order, the same as
     /// `(&self).into_iter()`.
-    pub fn iter(&self) -> IdStructIter<'_, TId> {
+    pub fn iter(&self) -> IdStructIter<'_, TNum::Id<TBrand>> {
         self.into_iter()
     }
 
@@ -84,7 +86,7 @@ impl<TId: Id> IdStruct<TId> {
 
     /// Peeks at the next id [`retain`](Self::retain) would return, without
     /// actually retaining it.
-    pub fn peek_next(&self) -> TId {
+    pub fn peek_next(&self) -> TNum::Id<TBrand> {
         if self.live_count < self.dense.len() {
             self.dense[self.live_count]
         } else {
@@ -94,8 +96,8 @@ impl<TId: Id> IdStruct<TId> {
 
     /// Peeks at the next id that would be freshly allocated, ignoring the
     /// released ids available for recycling.
-    pub fn peek_next_fresh(&self) -> TId {
-        TId::from_usize_id(self.sparse.end())
+    pub fn peek_next_fresh(&self) -> TNum::Id<TBrand> {
+        <TNum::Id<TBrand> as Id>::from_usize_id(self.sparse.end())
     }
 
     /// Releases `id`, recycling it for a future [`retain`](Self::retain) and
@@ -104,7 +106,7 @@ impl<TId: Id> IdStruct<TId> {
     /// # Panics
     /// Panics if `id` is not currently retained, including when the pool is
     /// empty.
-    pub fn release(&mut self, id: TId) {
+    pub fn release(&mut self, id: TNum::Id<TBrand>) {
         let usize_id = id.to_usize_id();
         let index_backing = self.sparse[usize_id];
         let index = Self::index_of(index_backing);
@@ -136,7 +138,7 @@ impl<TId: Id> IdStruct<TId> {
 
     /// Retains and returns an id, reusing a previously released id when one
     /// is available and otherwise allocating a fresh one.
-    pub fn retain(&mut self) -> TId {
+    pub fn retain(&mut self) -> TNum::Id<TBrand> {
         let id = if self.live_count < self.dense.len() {
             // Recycle the id at the front of the released region. Its `sparse`
             // entry already points at this slot, so growing the retained
@@ -145,10 +147,10 @@ impl<TId: Id> IdStruct<TId> {
         } else {
             // Allocate a brand-new id, growing both lists in lock-step. The
             // new id lands at index `live_count`, and its own value is that
-            // index, so `sparse` records the id's backing integer as its
-            // position.
-            let id = TId::from_usize_id(self.sparse.end());
-            self.sparse.push(id.to_backing());
+            // index, so `sparse` records that index as the id's position.
+            let index = self.sparse.end();
+            let id = <TNum::Id<TBrand> as Id>::from_usize_id(index);
+            self.sparse.push(TNum::from_usize(index.to_usize()));
             self.dense.push(id);
             id
         };
@@ -158,21 +160,21 @@ impl<TId: Id> IdStruct<TId> {
         id
     }
 
-    /// Decodes a value stored in `sparse` back into a `usize` index.
-    fn index_of(backing: TId::Backing) -> usize {
-        TId::from_backing(backing).to_usize_id().to_usize()
+    /// Decodes a position stored in `sparse` back into a `usize` index.
+    fn index_of(backing: TNum) -> usize {
+        backing.to_usize()
     }
 }
 
-impl<TId: Id> Default for IdStruct<TId> {
+impl<TBrand: ?Sized, TNum: Scalar> Default for IdStruct<TBrand, TNum> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'a, TId: Id> IntoIterator for &'a IdStruct<TId> {
-    type Item = TId;
-    type IntoIter = IdStructIter<'a, TId>;
+impl<'a, TBrand: ?Sized, TNum: Scalar> IntoIterator for &'a IdStruct<TBrand, TNum> {
+    type Item = TNum::Id<TBrand>;
+    type IntoIter = IdStructIter<'a, TNum::Id<TBrand>>;
 
     fn into_iter(self) -> Self::IntoIter {
         IdStructIter::from_live(&self.dense[..self.live_count])

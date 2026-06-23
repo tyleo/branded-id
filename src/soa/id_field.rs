@@ -1,5 +1,5 @@
 use crate::{
-    Id, IdVec,
+    Id, IdVec, Scalar,
     soa::{IdFieldIter, IdFieldIterMut, IdStruct},
 };
 use std::{mem, mem::MaybeUninit, ptr::write_bytes};
@@ -51,7 +51,7 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn clear(&mut self, ids: &IdStruct<impl Id<Brand = TBrand>>) {
+    pub unsafe fn clear<TNum: Scalar>(&mut self, ids: &IdStruct<TBrand, TNum>) {
         // SAFETY: `ids` must be the in-sync pool for this field.
         unsafe { self.release_all(ids) };
         self.items.as_mut_vec().clear();
@@ -84,10 +84,10 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn iter<'a, TId: Id<Brand = TBrand>>(
+    pub unsafe fn iter<'a, TNum: Scalar>(
         &'a self,
-        ids: &'a IdStruct<TId>,
-    ) -> IdFieldIter<'a, TId, TValue> {
+        ids: &'a IdStruct<TBrand, TNum>,
+    ) -> IdFieldIter<'a, TNum::Id<TBrand>, TValue> {
         IdFieldIter::new(self.items.as_vec(), ids.into_iter())
     }
 
@@ -98,10 +98,10 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn iter_mut<'a, TId: Id<Brand = TBrand>>(
+    pub unsafe fn iter_mut<'a, TNum: Scalar>(
         &'a mut self,
-        ids: &'a IdStruct<TId>,
-    ) -> IdFieldIterMut<'a, TId, TValue> {
+        ids: &'a IdStruct<TBrand, TNum>,
+    ) -> IdFieldIterMut<'a, TNum::Id<TBrand>, TValue> {
         let len = self.items.len();
         let items = self.items.as_mut_vec().as_mut_ptr();
         IdFieldIterMut::new(items, len, ids.into_iter())
@@ -122,7 +122,7 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn release_all(&mut self, ids: &IdStruct<impl Id<Brand = TBrand>>) {
+    pub unsafe fn release_all<TNum: Scalar>(&mut self, ids: &IdStruct<TBrand, TNum>) {
         for id in ids {
             // SAFETY: by contract, every id live in `ids` has a value here.
             unsafe { self.release(id) };
@@ -136,7 +136,7 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// `ids` must be the id pool this field is paired with, in sync with
     /// it: every id retained by `ids` must have a value `retain`'d in this
     /// field that has not since been released.
-    pub unsafe fn release_all_zeroed(&mut self, ids: &IdStruct<impl Id<Brand = TBrand>>) {
+    pub unsafe fn release_all_zeroed<TNum: Scalar>(&mut self, ids: &IdStruct<TBrand, TNum>) {
         for id in ids {
             // SAFETY: by contract, every id live in `ids` has a value here.
             unsafe { self.release_zeroed(id) };
