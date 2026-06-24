@@ -23,3 +23,6 @@ mod u32_id;
 mod u64_id;
 mod u8_id;
 mod usize_id;
+
+#[cfg(feature = "uuid")]
+mod uuid_id;

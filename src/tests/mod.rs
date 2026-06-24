@@ -12,3 +12,6 @@ pub mod extends;
 
 #[cfg(feature = "soa")]
 pub mod soa;
+
+#[cfg(feature = "uuid")]
+mod uuid_ids;

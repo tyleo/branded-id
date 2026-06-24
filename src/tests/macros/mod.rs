@@ -23,3 +23,6 @@ mod u32_id_tests;
 mod u64_id_tests;
 mod u8_id_tests;
 mod usize_id_tests;
+
+#[cfg(feature = "uuid")]
+mod uuid_id_tests;
