@@ -1,6 +1,6 @@
 use crate::{
     Id, IdVec, Scalar,
-    soa::{IdFieldIter, IdFieldIterMut, IdStruct},
+    soa::{IdFieldIter, IdFieldIterMut, IdRemap, IdStruct},
 };
 use std::{
     fmt::{self, Debug},
@@ -60,6 +60,45 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         // SAFETY: `ids` must be the in-sync pool for this field.
         unsafe { self.release_all(ids) };
         self.items.as_mut_vec().clear();
+    }
+
+    /// Compacts the field to match a pool that has just been
+    /// [`gc`](IdStruct::gc)'d, moving each live value to its relabeled id and
+    /// releasing the now-unused trailing storage.
+    ///
+    /// Every value live before the gc is moved from its old id to
+    /// `remap.`[`new_id`](IdRemap::new_id)`(old)`, leaving the field reserving
+    /// exactly [`new_len`](IdRemap::new_len) slots. The value's *contents* are
+    /// not rewritten, so any ids it stores are still pre-gc ids; translate
+    /// those through [`IdRemap::new_id`] yourself afterward if needed.
+    ///
+    /// # Safety
+    /// `remap` must be the value returned by [`IdStruct::gc`] on the pool this
+    /// field is paired with, with the field still in sync with the pool's
+    /// pre-gc state: every id live before the gc must have a value `retain`'d
+    /// in this field that has not since been released, and no id may have been
+    /// retained or released in between.
+    pub unsafe fn gc<TNum: Scalar>(&mut self, remap: &IdRemap<TBrand, TNum>) {
+        // Build the compacted column in a fresh buffer, then swap it in. The
+        // allocation happens before any value is moved, so an allocation
+        // failure leaves the field untouched rather than half-compacted.
+        let new_len = remap.new_len();
+        let mut new_items: Vec<MaybeUninit<TValue>> = Vec::with_capacity(new_len);
+        new_items.resize_with(new_len, MaybeUninit::uninit);
+
+        let old_items = self.items.as_vec();
+        for (old, new) in remap.new_ids().as_vec().iter().enumerate() {
+            let Some(new) = new else { continue };
+            // SAFETY: by contract every id live before the gc has an
+            // initialized value at its old slot; read it once and move it to
+            // its relabeled slot. The old buffer is dropped below without
+            // dropping its `MaybeUninit` elements, so the value is not freed
+            // twice and the vacated old slots are not read again.
+            let value = unsafe { old_items[old].assume_init_read() };
+            new_items[new.to_usize_id().to_usize()].write(value);
+        }
+
+        *self.items.as_mut_vec() = new_items;
     }
 
     /// # Safety

@@ -1,6 +1,6 @@
 use crate::{
-    Id, IdVec, Scalar,
-    soa::{IdStructIter, IdStructRawParts},
+    Id, IdVec, Scalar, UsizeId,
+    soa::{IdRemap, IdStructIter, IdStructRawParts},
 };
 use std::{
     fmt::{self, Debug},
@@ -63,6 +63,49 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.dense.clear();
         self.sparse.as_mut_vec().clear();
         self.live_count = 0;
+    }
+
+    /// Compacts the pool so its retained ids become the contiguous range
+    /// `0..len`, and returns an [`IdRemap`] recording where each old id went.
+    ///
+    /// The id currently iterated `i`-th is relabeled to id `i`, so iteration
+    /// order is preserved, just renumbered. The recycled ids waiting in the
+    /// free region are discarded, so afterward the pool holds no released ids
+    /// and the next [`retain`](Self::retain) hands out [`len`](Self::len).
+    ///
+    /// Because the live ids are renumbered, any id stored outside the pool is
+    /// now stale. Translate each one through [`IdRemap::new_id`], and pass the
+    /// returned remap to [`IdField::gc`](super::IdField::gc) on every paired
+    /// field to move its values to the relabeled ids. Do this before retaining
+    /// or releasing any further ids, while the fields are still in sync with
+    /// the pre-gc layout the remap describes.
+    pub fn gc(&mut self) -> IdRemap<TBrand, TNum> {
+        let new_len = self.live_count;
+        let old_len = self.sparse.len();
+
+        // Record, per old id, the id it is relabeled to: the id at live index
+        // `i` becomes id `i`. Ids not in the live region stay `None`.
+        let mut new_ids: Vec<Option<TNum::Id<TBrand>>> = vec![None; old_len];
+        for i in 0..new_len {
+            let old = self.dense[i].to_usize_id().to_usize();
+            let new = <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(i));
+            new_ids[old] = Some(new);
+        }
+
+        // Rebuild `dense` and `sparse` as the identity over `0..new_len`,
+        // dropping the recycled free region: every live id now sits at its own
+        // index, so both lists read `0, 1, .., new_len - 1`.
+        self.dense.clear();
+        let sparse = self.sparse.as_mut_vec();
+        sparse.clear();
+        for i in 0..new_len {
+            self.dense.push(<TNum::Id<TBrand> as Id>::from_usize_id(
+                UsizeId::from_usize(i),
+            ));
+            sparse.push(TNum::from_usize(i));
+        }
+
+        IdRemap::from_parts(IdVec::from_vec(new_ids), new_len)
     }
 
     /// Whether the pool currently has no retained ids.
