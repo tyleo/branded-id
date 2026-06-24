@@ -1,5 +1,7 @@
 use crate::{
-    I32Id, IsizeId, U32Id, UsizeId, i32_id, isize_id, tests::util::BTest, u32_id as id, usize_id,
+    I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId, i8_id,
+    i16_id, i32_id, i64_id, i128_id, isize_id, tests::util::BTest, u8_id, u16_id, u32_id as id,
+    u64_id, u128_id, usize_id,
 };
 use std::{
     cmp::Ordering,
@@ -48,6 +50,78 @@ fn to_usize_id_test() {
 
     let actual: UsizeId<BTest> = id.to_usize_id();
     let expected = usize_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_i8_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: I8Id<BTest> = id.to_i8_id();
+    let expected = i8_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_i16_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: I16Id<BTest> = id.to_i16_id();
+    let expected = i16_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_i64_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: I64Id<BTest> = id.to_i64_id();
+    let expected = i64_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_i128_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: I128Id<BTest> = id.to_i128_id();
+    let expected = i128_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_u8_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: U8Id<BTest> = id.to_u8_id();
+    let expected = u8_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_u16_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: U16Id<BTest> = id.to_u16_id();
+    let expected = u16_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_u64_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: U64Id<BTest> = id.to_u64_id();
+    let expected = u64_id!(BTest; 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn to_u128_id_test() {
+    let id = id!(BTest; 1);
+
+    let actual: U128Id<BTest> = id.to_u128_id();
+    let expected = u128_id!(BTest; 1);
     assert_eq!(actual, expected);
 }
 

@@ -13,4 +13,4 @@ let id: UsizeId<BApples> = usize_id!(BApples; 2);
 assert_eq!(id.to_usize(), 2);
 ```
 
-The crate provides brand-typed integer ids (`UsizeId`, `I32Id`, `U32Id`, `IsizeId`), the containers they index (`IdSlice`, `IdArray`, `IdVec`) and pointers (`IdPtr`, `MutIdPtr`), plus optional `extends` (brand conversions) and `soa` (columnar id pools) modules. The `*_id!`, `id_array!`, `id_vec!`, and `id_slice!` macros build them concisely.
+The crate provides a brand-typed integer id for each primitive integer width (for example `UsizeId` and `I32Id`), the containers they index (`IdSlice`, `IdArray`, `IdVec`) and pointers (`IdPtr`, `MutIdPtr`), plus optional `extends` (brand conversions) and `soa` (columnar id pools) modules. The `*_id!`, `id_array!`, `id_vec!`, and `id_slice!` macros build them concisely.
