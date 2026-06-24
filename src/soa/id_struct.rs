@@ -117,7 +117,7 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// never handed out or have already been released.
     pub fn is_retained(&self, id: TNum::Id<TBrand>) -> bool {
         let id = id.to_usize_id();
-        id.to_usize() < self.sparse.len() && Self::index_of(self.sparse[id]) < self.live_count
+        id.to_usize() < self.sparse.len() && self.sparse[id].to_usize() < self.live_count
     }
 
     /// Iterates the retained ids in their packed `live` order, the same as
@@ -156,7 +156,7 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     pub fn release(&mut self, id: TNum::Id<TBrand>) {
         let usize_id = id.to_usize_id();
         let index_backing = self.sparse[usize_id];
-        let index = Self::index_of(index_backing);
+        let index = index_backing.to_usize();
 
         let last_live = self
             .live_count
@@ -205,11 +205,6 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.live_count += 1;
 
         id
-    }
-
-    /// Decodes a position stored in `sparse` back into a `usize` index.
-    fn index_of(backing: TNum) -> usize {
-        backing.to_usize()
     }
 }
 
