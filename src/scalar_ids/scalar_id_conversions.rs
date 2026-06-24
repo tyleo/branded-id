@@ -3,7 +3,7 @@
 ///
 /// Given one list of every id type, this emits an `impl` block per type with a
 /// `to_*_id` method for every *other* type, each performing an `as` cast. See
-/// the type-level docs produced by [`scalar_id`](crate::internal::scalar_id)
+/// the type-level docs produced by [`scalar_id_impl`](crate::scalar_ids::scalar_id_impl!)
 /// for how those casts truncate or sign-reinterpret out-of-range values.
 /// Keeping the whole matrix behind a single invocation means a new id width is
 /// wired into every conversion by adding one line to the list.
@@ -13,7 +13,7 @@
 /// converts *into* this type, and the indefinite article used for its doc.
 macro_rules! scalar_id_conversions {
     ( $( $spec:tt ),+ $(,)? ) => {
-        $crate::internal::scalar_id_conversions!(@outer [] [ $( $spec )+ ]);
+        $crate::scalar_ids::scalar_id_conversions!(@outer [] [ $( $spec )+ ]);
     };
 
     // No more sources to expand.
@@ -24,8 +24,8 @@ macro_rules! scalar_id_conversions {
     // seen list. Splitting the list around the source is what omits its own
     // identity conversion.
     (@outer [ $( $before:tt )* ] [ $src:tt $( $after:tt )* ]) => {
-        $crate::internal::scalar_id_conversions!(@impl $src [ $( $before )* $( $after )* ]);
-        $crate::internal::scalar_id_conversions!(@outer [ $( $before )* $src ] [ $( $after )* ]);
+        $crate::scalar_ids::scalar_id_conversions!(@impl $src [ $( $before )* $( $after )* ]);
+        $crate::scalar_ids::scalar_id_conversions!(@outer [ $( $before )* $src ] [ $( $after )* ]);
     };
 
     // Emit one source type's conversions to each listed target.

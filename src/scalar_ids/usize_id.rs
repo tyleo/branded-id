@@ -1,10 +1,10 @@
-use crate::{IdSlice, IdSliceIndex, internal};
+use crate::{IdSlice, IdSliceIndex, scalar_ids::scalar_id_impl};
 use std::{
     mem::transmute,
     ops::{Bound, Index, IndexMut, Range, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive},
 };
 
-internal::scalar_id! { UsizeId, usize, from_usize, to_usize }
+scalar_id_impl! { UsizeId, usize, from_usize, to_usize }
 
 impl<TBrand: ?Sized> UsizeId<TBrand> {
     /// Returns the id advanced by `value`, keeping the brand.

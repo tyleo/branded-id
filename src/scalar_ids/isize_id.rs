@@ -1,6 +1,6 @@
-use crate::internal;
+use crate::scalar_ids::scalar_id_impl;
 
-internal::scalar_id! { IsizeId, isize, from_isize, to_isize }
+scalar_id_impl! { IsizeId, isize, from_isize, to_isize }
 
 impl<TBrand: ?Sized> IsizeId<TBrand> {
     /// Returns the id advanced by `value`, keeping the brand.

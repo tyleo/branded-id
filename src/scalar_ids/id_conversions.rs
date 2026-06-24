@@ -1,11 +1,11 @@
 use crate::{
     I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
-    internal,
+    scalar_ids::scalar_id_conversions,
 };
 
 // Generates every `to_*_id` cross-width conversion between the branded scalar
 // ids from a single list. Adding a new id width means adding one line here.
-internal::scalar_id_conversions! {
+scalar_id_conversions! {
     (I8Id, i8, from_i8, to_i8, to_i8_id, "an"),
     (I16Id, i16, from_i16, to_i16, to_i16_id, "an"),
     (I32Id, i32, from_i32, to_i32, to_i32_id, "an"),

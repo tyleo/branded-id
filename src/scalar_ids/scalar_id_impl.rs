@@ -9,7 +9,7 @@
 ///
 /// Parameters: `$id` is the type name, `$prim` the primitive integer, `$from`
 /// the constructor name, and `$to` the accessor name.
-macro_rules! scalar_id {
+macro_rules! scalar_id_impl {
     ($id:ident, $prim:ty, $from:ident, $to:ident) => {
         /// A brand-typed integer id. The `TBrand` type parameter makes ids
         /// built for different domains distinct types, so they cannot be mixed
@@ -206,4 +206,4 @@ macro_rules! scalar_id {
     };
 }
 
-pub(crate) use scalar_id;
+pub(crate) use scalar_id_impl;
