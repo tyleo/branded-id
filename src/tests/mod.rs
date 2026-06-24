@@ -14,6 +14,7 @@ mod internal;
 mod isize_id_tests;
 mod macros;
 mod mut_id_ptr_tests;
+mod string_ids;
 mod u128_id_tests;
 mod u16_id_tests;
 mod u32_id_tests;

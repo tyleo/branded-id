@@ -9,6 +9,7 @@
 /// the `Base` brand through the cast methods on the id types.
 pub trait Extends<TBrand: ?Sized> {}
 
+mod c_str_id;
 mod i128_id;
 mod i16_id;
 mod i32_id;
@@ -20,6 +21,9 @@ mod id_slice;
 mod id_vec;
 mod isize_id;
 mod mut_id_ptr;
+mod os_str_id;
+mod path_id;
+mod str_id;
 mod u128_id;
 mod u16_id;
 mod u32_id;

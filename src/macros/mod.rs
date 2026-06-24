@@ -1,3 +1,5 @@
+mod c_str_id;
+mod c_string_id;
 mod i128_id;
 mod i16_id;
 mod i32_id;
@@ -9,6 +11,12 @@ mod id_slice;
 mod id_vec;
 mod isize_id;
 mod mut_id_ptr;
+mod os_str_id;
+mod os_string_id;
+mod path_buf_id;
+mod path_id;
+mod str_id;
+mod string_id;
 mod u128_id;
 mod u16_id;
 mod u32_id;

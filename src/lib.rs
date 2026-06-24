@@ -26,6 +26,13 @@
 //! [`MutIdPtr`]), plus the optional `extends` (brand conversions) and `soa`
 //! (columnar id pools) modules. The `*_id!`, [`id_array!`], [`id_vec!`], and
 //! [`id_slice!`] macros build them concisely.
+//!
+//! Where the integer ids are indices, the crate also provides brand-typed
+//! string ids that act as opaque keys: a borrowed/owned pair (like
+//! [`StrId`]/[`StringId`]) for each standard string type. The owned id derefs
+//! and borrows to its borrowed half, so a map keyed by the owned id can be
+//! looked up by a borrowed id without allocating. Build them with the
+//! [`str_id!`]/[`string_id!`] family of macros.
 
 #![warn(missing_docs)]
 
@@ -49,6 +56,7 @@ mod id_vec;
 mod isize_id;
 mod mut_id_ptr;
 mod scalar;
+mod string_ids;
 mod u128_id;
 mod u16_id;
 mod u32_id;
@@ -70,6 +78,7 @@ pub use id_vec::*;
 pub use isize_id::*;
 pub use mut_id_ptr::*;
 pub use scalar::*;
+pub use string_ids::*;
 pub use u8_id::*;
 pub use u16_id::*;
 pub use u32_id::*;
