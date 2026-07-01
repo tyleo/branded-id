@@ -44,6 +44,27 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         }
     }
 
+    /// Creates a field of `count` slots with a clone of `value` written into
+    /// each, as if the ids `0..count` had each been [`retain`](Self::retain)'d
+    /// in turn. [`reserved_count`](Self::reserved_count) is `count`.
+    ///
+    /// Because liveness lives in the paired [`IdStruct`] (see the type docs),
+    /// this only lines up with a pool that has exactly those `count` ids
+    /// retained; the accessors are safe only for ids that pool keeps live.
+    /// Dropping the field does not drop the `count` values, so pair it with
+    /// such a pool and [`clear`](Self::clear) or
+    /// [`release_all`](Self::release_all) through it to avoid leaking them.
+    pub fn filled(count: usize, value: TValue) -> Self
+    where
+        TValue: Clone,
+    {
+        let mut items: Vec<MaybeUninit<TValue>> = Vec::with_capacity(count);
+        items.resize_with(count, || MaybeUninit::new(value.clone()));
+        Self {
+            items: IdVec::from_vec(items),
+        }
+    }
+
     /// Drops the value for every id retained by `ids`, then resets the
     /// field to empty, releasing its storage.
     ///

@@ -243,6 +243,32 @@ fn with_capacity_test() {
 }
 
 #[test]
+fn filled_test() {
+    let mut ids = U32IdStruct::<BTest>::new();
+    // A pool with three live ids matching the three filled slots.
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+
+    let mut field = IdField::<BTest, u32>::filled(3, 7);
+
+    // Every filled slot is reserved and reads back the fill value.
+    assert_eq!(field.reserved_count(), 3);
+    assert_eq!(*unsafe { field.get(id_0) }, 7);
+    assert_eq!(*unsafe { field.get(id_1) }, 7);
+    assert_eq!(*unsafe { field.get(id_2) }, 7);
+
+    // Tidy up so the filled values aren't leaked.
+    unsafe { field.clear(&ids) };
+}
+
+#[test]
+fn filled_empty_test() {
+    let field = IdField::<BTest, u32>::filled(0, 7);
+    assert_eq!(field.reserved_count(), 0);
+}
+
+#[test]
 fn release_test() {
     let mut obj = U32IdStruct::<BTest>::new();
     let mut health = IdField::new();
