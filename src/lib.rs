@@ -88,14 +88,13 @@
 
 #![warn(missing_docs)]
 
+mod containers;
 mod internal;
 mod macros;
-
-pub mod ext;
-
-mod containers;
 mod scalar_ids;
 mod string_ids;
+
+pub mod ext;
 
 pub use containers::*;
 pub use scalar_ids::*;
