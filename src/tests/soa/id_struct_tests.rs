@@ -38,7 +38,7 @@ fn usize_width_retain_release_test() {
     assert_eq!(ids.peek_next_fresh(), usize_id!(BTest; 2));
 }
 
-// gc relabels the live ids to a contiguous 0.. range in iteration order,
+// gc relabels the live ids to a contiguous 0.. range in ascending id order,
 // discards the recycled ids, and reports the old->new mapping.
 #[test]
 fn gc_relabels_live_to_contiguous_test() {
@@ -48,8 +48,7 @@ fn gc_relabels_live_to_contiguous_test() {
     let id_2 = ids.retain();
     let id_3 = ids.retain();
 
-    // Releasing 1 and 3 leaves a sparse live set whose iteration order is
-    // [id_0, id_2].
+    // Releasing 1 and 3 leaves the sparse live set [id_0, id_2].
     ids.release(id_1);
     ids.release(id_3);
 
@@ -59,7 +58,7 @@ fn gc_relabels_live_to_contiguous_test() {
     assert_eq!(remap.new_len(), 2);
     assert_eq!(remap.old_len(), 4);
 
-    // Live ids are renumbered in iteration order; released ids have no
+    // Live ids are renumbered in ascending id order. Released ids have no
     // counterpart, and neither does an id never handed out.
     assert_eq!(remap.new_id(id_0), Some(u32_id!(BTest; 0)));
     assert_eq!(remap.new_id(id_2), Some(u32_id!(BTest; 1)));
@@ -140,6 +139,29 @@ fn gc_compact_pool_is_identity_test() {
     assert_eq!(remap.new_len(), 3);
 }
 
+// gc renumbers the survivors in ascending id order even after a mid-range
+// release scrambles the live iteration order.
+#[test]
+fn gc_preserves_relative_id_order_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+
+    // Swap-removal moves id_3 into id_1's slot, so the live iteration order is
+    // [id_0, id_3, id_2], out of ascending order.
+    ids.release(id_1);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_3, id_2]);
+
+    let remap = ids.gc();
+
+    assert_eq!(remap.new_id(id_0), Some(u32_id!(BTest; 0)));
+    assert_eq!(remap.new_id(id_2), Some(u32_id!(BTest; 1)));
+    assert_eq!(remap.new_id(id_3), Some(u32_id!(BTest; 2)));
+}
+
 // gc works the same for a non-default integer width, handing out UsizeId.
 #[test]
 fn gc_usize_width_test() {
@@ -149,11 +171,12 @@ fn gc_usize_width_test() {
     let id_2 = ids.retain();
     ids.release(id_0);
 
-    // Live iteration order is [id_2, id_1] after id_0 is swap-removed.
+    // Swap-removal leaves the live iteration order [id_2, id_1]. gc still
+    // renumbers in ascending id order.
     let remap = ids.gc();
 
-    assert_eq!(remap.new_id(id_2), Some(usize_id!(BTest; 0)));
-    assert_eq!(remap.new_id(id_1), Some(usize_id!(BTest; 1)));
+    assert_eq!(remap.new_id(id_1), Some(usize_id!(BTest; 0)));
+    assert_eq!(remap.new_id(id_2), Some(usize_id!(BTest; 1)));
     assert_eq!(remap.new_id(id_0), None);
 
     let live: Vec<_> = ids.iter().collect();

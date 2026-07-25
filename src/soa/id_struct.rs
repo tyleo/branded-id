@@ -68,10 +68,11 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Compacts the pool so its retained ids become the contiguous range
     /// `0..len`, and returns an [`IdRemap`] recording where each old id went.
     ///
-    /// The id currently iterated `i`-th is relabeled to id `i`, so iteration
-    /// order is preserved, just renumbered. The recycled ids waiting in the
-    /// free region are discarded, so afterward the pool holds no released ids
-    /// and the next [`retain`](Self::retain) hands out [`len`](Self::len).
+    /// The live ids are renumbered in ascending id order, so survivors keep
+    /// their relative order: if `a < b` are both live, the relabeled `a` is
+    /// still less than the relabeled `b`. The recycled ids waiting in the free
+    /// region are discarded, so afterward the pool holds no released ids and
+    /// the next [`retain`](Self::retain) hands out [`len`](Self::len).
     ///
     /// Because the live ids are renumbered, any id stored outside the pool is
     /// now stale. Translate each one through [`IdRemap::new_id`], and pass the
@@ -83,13 +84,19 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         let new_len = self.live_count;
         let old_len = self.sparse.len();
 
-        // Record, per old id, the id it is relabeled to: the id at live index
-        // `i` becomes id `i`. Ids not in the live region stay `None`.
+        // Record, per old id, the id it is relabeled to. Walking the old id
+        // space in ascending order packs the live ids into `0..new_len` in
+        // their relative order, independent of the swap-removal scrambling in
+        // `dense`. Released ids stay `None`.
         let mut new_ids: Vec<Option<TNum::Id<TBrand>>> = vec![None; old_len];
-        for i in 0..new_len {
-            let old = self.dense[i].to_usize_id().to_usize();
-            let new = <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(i));
+        let mut next = 0;
+        for (old, index) in self.sparse.as_vec().iter().enumerate() {
+            if index.to_usize() >= new_len {
+                continue;
+            }
+            let new = <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(next));
             new_ids[old] = Some(new);
+            next += 1;
         }
 
         // Rebuild `dense` and `sparse` as the identity over `0..new_len`,

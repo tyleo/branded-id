@@ -65,9 +65,9 @@ impl Drop for DropCount {
     }
 }
 
-// gc moves each live value to its relabeled id following the pool's iteration
-// order (not ascending old-id order), shrinks the field to the live count, and
-// neither leaks nor double-drops along the way.
+// gc moves each live value to its relabeled id, shrinks the field to the live
+// count, and neither leaks nor double-drops. The survivors keep their relative
+// order even though swap-removal scrambled the pool's iteration order.
 #[test]
 fn gc_test() {
     use std::cell::Cell;
@@ -85,9 +85,9 @@ fn gc_test() {
     let id_2 = ids.retain();
     field.retain(id_2, DropCount::new(30, &drops));
 
-    // Release the first id from both. Swap-remove leaves the live order [id_2,
-    // id_1], so gc genuinely reorders the survivors rather than leaving them in
-    // ascending old-id order.
+    // Release the first id from both. Swap-remove leaves the live iteration
+    // order [id_2, id_1], so this exercises renumbering where iteration order
+    // and id order disagree.
     unsafe { field.release(id_0) };
     ids.release(id_0);
     assert_eq!(drops.get(), 1);
@@ -99,19 +99,19 @@ fn gc_test() {
     // The move dropped nothing: only the earlier release is counted.
     assert_eq!(drops.get(), 1);
 
-    // Storage shrank to the two live ids, each placed at the pool's iteration
-    // index: id_2's value leads (new id 0), id_1's follows (new id 1).
+    // Storage shrank to the two live ids, renumbered in ascending old-id order:
+    // id_1's value takes new id 0 and id_2's takes new id 1.
     assert_eq!(field.reserved_count(), 2);
     let new_1 = remap.new_id(id_1).unwrap();
     let new_2 = remap.new_id(id_2).unwrap();
-    assert_eq!(new_2, u32_id!(BTest; 0));
-    assert_eq!(new_1, u32_id!(BTest; 1));
-    assert_eq!(unsafe { field.get(new_2) }.value, 30);
+    assert_eq!(new_1, u32_id!(BTest; 0));
+    assert_eq!(new_2, u32_id!(BTest; 1));
     assert_eq!(unsafe { field.get(new_1) }.value, 20);
+    assert_eq!(unsafe { field.get(new_2) }.value, 30);
 
-    // Iteration yields the live values in the relabeled order.
+    // Iteration yields the live values in their original relative order.
     let actual: Vec<u32> = unsafe { field.iter(&ids) }.map(|v| v.value).collect();
-    assert_eq!(actual, vec![30, 20]);
+    assert_eq!(actual, vec![20, 30]);
 
     // Clearing drops exactly the two survivors, bringing the total to three:
     // every value dropped once, so the move neither leaked nor double-dropped.
