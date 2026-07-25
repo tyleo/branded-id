@@ -38,6 +38,104 @@ fn usize_width_retain_release_test() {
     assert_eq!(ids.peek_next_fresh(), usize_id!(BTest; 2));
 }
 
+// release_stable keeps the surviving ids in their iteration order and recycles
+// the released id the same way release does.
+#[test]
+fn release_stable_preserves_live_order_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+
+    ids.release_stable(id_1);
+
+    assert!(!ids.is_retained(id_1));
+    assert_eq!(ids.len(), 3);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_2, id_3]);
+
+    // The released id is at the front of the free region, so it is handed back
+    // out before a fresh one and lands at the end of the live region.
+    assert_eq!(ids.peek_next(), id_1);
+    assert_eq!(ids.retain(), id_1);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_2, id_3, id_1]);
+
+    // Further releases keep the remaining order each time.
+    ids.release_stable(id_0);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_2, id_3, id_1]);
+
+    ids.release_stable(id_3);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_2, id_1]);
+}
+
+// Releasing the last retained id shifts nothing. Releasing down to empty works
+// from either end.
+#[test]
+fn release_stable_edges_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+
+    ids.release_stable(id_2);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_1]);
+
+    ids.release_stable(id_0);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_1]);
+
+    ids.release_stable(id_1);
+    assert!(ids.is_empty());
+
+    // The three released ids stack up in the free region, most recent first.
+    assert_eq!(ids.retain(), id_1);
+    assert_eq!(ids.retain(), id_0);
+    assert_eq!(ids.retain(), id_2);
+    assert_eq!(ids.peek_next_fresh(), u32_id!(BTest; 3));
+}
+
+// release_stable interoperates with the swap-removing release, preserving
+// whatever live order it finds.
+#[test]
+fn release_stable_after_release_test() {
+    let mut ids = IdStruct::<BTest, usize>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+
+    // Swap-removal moves id_3 into id_0's slot, leaving [id_3, id_1, id_2].
+    ids.release(id_0);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_3, id_1, id_2]);
+
+    ids.release_stable(id_1);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_3, id_2]);
+
+    // The sparse index still agrees with the shifted dense layout, so liveness
+    // reads correctly for the ids that moved.
+    assert!(ids.is_retained(id_3));
+    assert!(ids.is_retained(id_2));
+    assert!(!ids.is_retained(id_0));
+    assert!(!ids.is_retained(id_1));
+}
+
+#[test]
+#[should_panic(expected = "released an id from an empty pool")]
+fn release_stable_empty_pool_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.release_stable(id_0);
+
+    ids.release_stable(id_0);
+}
+
 // gc relabels the live ids to a contiguous 0.. range in ascending id order,
 // discards the recycled ids, and reports the old->new mapping.
 #[test]

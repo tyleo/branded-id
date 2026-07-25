@@ -13,8 +13,10 @@ use std::{
 /// [`release`](Self::release). Every id ever handed out lives in a single
 /// `dense` list partitioned by [`len`](Self::len): `dense[..len]` are the
 /// retained ids, packed, and `dense[len..]` are released ids waiting to be
-/// recycled. Releasing swap-removes from the retained region so iteration only
-/// ever visits retained ids.
+/// recycled. Releasing takes the id out of the retained region so iteration
+/// only ever visits retained ids. [`release`](Self::release) swap-removes in
+/// O(1) and [`release_stable`](Self::release_stable) shifts to keep the
+/// survivors in order.
 ///
 /// The pool is keyed by the brand `TBrand` alone; the integer width it stores
 /// indices in is the separate `TNum` parameter, which defaults to `u32`. So
@@ -186,6 +188,52 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
 
         self.dense[last_live] = id;
         self.sparse[usize_id] = last_live_backing;
+
+        self.live_count = last_live;
+    }
+
+    /// Releases `id`, recycling it for a future [`retain`](Self::retain) and
+    /// shifting the retained ids after it down one slot so the survivors keep
+    /// their iteration order.
+    ///
+    /// The shift costs O(n) in the number of retained ids after `id`, where
+    /// [`release`](Self::release) swap-removes in O(1).
+    ///
+    /// # Panics
+    /// Panics if `id` is not currently retained, including when the pool is
+    /// empty.
+    pub fn release_stable(&mut self, id: TNum::Id<TBrand>) {
+        let usize_id = id.to_usize_id();
+        let index_backing = self.sparse[usize_id];
+        let index = index_backing.to_usize();
+
+        let last_live = self
+            .live_count
+            .checked_sub(1)
+            .expect("released an id from an empty pool");
+
+        // Shift every retained id after `id` down one slot to keep
+        // `dense[..live_count]` packed and in order, then drop the released id
+        // into the vacated boundary slot so it sits at the front of the
+        // released region, where `release` leaves it too. Each shifted id takes
+        // over the stored position its predecessor gave up, so the `sparse`
+        // entries rotate as-is with no usize round-trip. When `id` is already
+        // the last retained id the loop body never runs and the trailing writes
+        // are self-assignments, so no special case is needed.
+        let mut slot_backing = index_backing;
+        for slot in index..last_live {
+            let next_id = self.dense[slot + 1];
+            let next_id_usize = next_id.to_usize_id();
+            let next_backing = self.sparse[next_id_usize];
+
+            self.dense[slot] = next_id;
+            self.sparse[next_id_usize] = slot_backing;
+
+            slot_backing = next_backing;
+        }
+
+        self.dense[last_live] = id;
+        self.sparse[usize_id] = slot_backing;
 
         self.live_count = last_live;
     }
