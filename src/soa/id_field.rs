@@ -9,20 +9,18 @@ use std::{
     ptr::write_bytes,
 };
 
-/// A sparse, columnar data store keyed by typed ids from an
-/// [`IdStruct`].
+/// A sparse, columnar data store keyed by typed ids from an [`IdStruct`].
 ///
-/// Liveness is tracked externally by the paired [`IdStruct`], so this
-/// is a thin per-id store backed by uninitialized storage:
-/// [`retain`](Self::retain) a value *after* retaining the id, and
-/// [`release`](Self::release) it *before* releasing the id. Reading a slot
-/// that has not been retained is undefined behavior, which is why the
-/// accessors are `unsafe`.
+/// Liveness is tracked externally by the paired [`IdStruct`], so this is a thin
+/// per-id store backed by uninitialized storage: [`retain`](Self::retain) a
+/// value *after* retaining the id, and [`release`](Self::release) it *before*
+/// releasing the id. Reading a slot that has not been retained is undefined
+/// behavior, which is why the accessors are `unsafe`.
 ///
 /// Because liveness lives in the paired [`IdStruct`], dropping an `IdField`
-/// does not drop the values still retained in it; call
-/// [`clear`](Self::clear) or [`release_all`](Self::release_all) first to
-/// avoid leaking them. Leaking is safe, just rarely intended.
+/// does not drop the values still retained in it; call [`clear`](Self::clear)
+/// or [`release_all`](Self::release_all) first to avoid leaking them. Leaking
+/// is safe, just rarely intended.
 pub struct IdField<TBrand: ?Sized, TValue> {
     items: IdVec<TBrand, MaybeUninit<TValue>>,
 }
@@ -65,18 +63,18 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         }
     }
 
-    /// Drops the value for every id retained by `ids`, then resets the
-    /// field to empty, releasing its storage.
+    /// Drops the value for every id retained by `ids`, then resets the field to
+    /// empty, releasing its storage.
     ///
-    /// `ids` supplies the liveness the field itself does not track, so the
-    /// live values are dropped rather than leaked. See
+    /// `ids` supplies the liveness the field itself does not track, so the live
+    /// values are dropped rather than leaked. See
     /// [`release_all`](Self::release_all) to drop the values but keep the
     /// reserved storage.
     ///
     /// # Safety
-    /// `ids` must be the id pool this field is paired with, in sync with
-    /// it: every id retained by `ids` must have a value `retain`'d in this
-    /// field that has not since been released.
+    /// `ids` must be the id pool this field is paired with, in sync with it:
+    /// every id retained by `ids` must have a value `retain`'d in this field
+    /// that has not since been released.
     pub unsafe fn clear<TNum: Scalar>(&mut self, ids: &IdStruct<TBrand, TNum>) {
         // SAFETY: `ids` must be the in-sync pool for this field.
         unsafe { self.release_all(ids) };
@@ -136,8 +134,8 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         unsafe { &mut *item.as_mut_ptr() }
     }
 
-    /// Whether the backing storage reserves a slot for `id`, not whether
-    /// a value has actually been written there.
+    /// Whether the backing storage reserves a slot for `id`, not whether a
+    /// value has actually been written there.
     pub fn is_reserved(&self, id: impl Id<Brand = TBrand>) -> bool {
         id.to_usize_id().to_usize() < self.reserved_count()
     }
@@ -146,9 +144,9 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// references in the order `ids` iterates.
     ///
     /// # Safety
-    /// `ids` must be the id pool this field is paired with, in sync with
-    /// it: every id retained by `ids` must have a value `retain`'d in this
-    /// field that has not since been released.
+    /// `ids` must be the id pool this field is paired with, in sync with it:
+    /// every id retained by `ids` must have a value `retain`'d in this field
+    /// that has not since been released.
     pub unsafe fn iter<'a, TNum: Scalar>(
         &'a self,
         ids: &'a IdStruct<TBrand, TNum>,
@@ -160,9 +158,9 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// references in the order `ids` iterates.
     ///
     /// # Safety
-    /// `ids` must be the id pool this field is paired with, in sync with
-    /// it: every id retained by `ids` must have a value `retain`'d in this
-    /// field that has not since been released.
+    /// `ids` must be the id pool this field is paired with, in sync with it:
+    /// every id retained by `ids` must have a value `retain`'d in this field
+    /// that has not since been released.
     pub unsafe fn iter_mut<'a, TNum: Scalar>(
         &'a mut self,
         ids: &'a IdStruct<TBrand, TNum>,
@@ -184,9 +182,9 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// backing storage.
     ///
     /// # Safety
-    /// `ids` must be the id pool this field is paired with, in sync with
-    /// it: every id retained by `ids` must have a value `retain`'d in this
-    /// field that has not since been released.
+    /// `ids` must be the id pool this field is paired with, in sync with it:
+    /// every id retained by `ids` must have a value `retain`'d in this field
+    /// that has not since been released.
     pub unsafe fn release_all<TNum: Scalar>(&mut self, ids: &IdStruct<TBrand, TNum>) {
         for id in ids {
             // SAFETY: by contract, every id live in `ids` has a value here.
@@ -194,13 +192,13 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         }
     }
 
-    /// Like [`release_all`](Self::release_all), but also clobbers each
-    /// dropped slot's backing bytes with zeros.
+    /// Like [`release_all`](Self::release_all), but also clobbers each dropped
+    /// slot's backing bytes with zeros.
     ///
     /// # Safety
-    /// `ids` must be the id pool this field is paired with, in sync with
-    /// it: every id retained by `ids` must have a value `retain`'d in this
-    /// field that has not since been released.
+    /// `ids` must be the id pool this field is paired with, in sync with it:
+    /// every id retained by `ids` must have a value `retain`'d in this field
+    /// that has not since been released.
     pub unsafe fn release_all_zeroed<TNum: Scalar>(&mut self, ids: &IdStruct<TBrand, TNum>) {
         for id in ids {
             // SAFETY: by contract, every id live in `ids` has a value here.
@@ -213,8 +211,8 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     /// undefined behavior.
     ///
     /// # Safety
-    /// A value must be `retain`'d at the id for `release_zeroed` to be safe
-    /// to call.
+    /// A value must be `retain`'d at the id for `release_zeroed` to be safe to
+    /// call.
     pub unsafe fn release_zeroed(&mut self, id: impl Id<Brand = TBrand>) {
         let item = &mut self.items[id.to_usize_id()];
         unsafe { MaybeUninit::assume_init_drop(item) }
@@ -227,8 +225,8 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
     }
 
     /// Ensures at least `count` id slots are reserved (so
-    /// [`reserved_count`](Self::reserved_count) is at least `count`),
-    /// growing with uninitialized storage if needed. Never shrinks.
+    /// [`reserved_count`](Self::reserved_count) is at least `count`), growing
+    /// with uninitialized storage if needed. Never shrinks.
     pub fn reserve(&mut self, count: usize) {
         while self.items.len() < count {
             self.items.push(MaybeUninit::uninit());

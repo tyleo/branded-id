@@ -49,8 +49,8 @@ impl<TBrand: ?Sized, TValue> IdSlice<TBrand, TValue> {
 
     /// Reinterprets a mutable `[TValue]` as a mutable [`IdSlice`].
     pub fn from_mut_slice(repr: &mut [TValue]) -> &mut Self {
-        // SAFETY: IdSlice is #[repr(transparent)] over [TValue], so &mut [TValue]
-        // and &mut IdSlice share a layout.
+        // SAFETY: IdSlice is #[repr(transparent)] over [TValue], so &mut
+        // [TValue] and &mut IdSlice share a layout.
         unsafe { transmute(repr) }
     }
 

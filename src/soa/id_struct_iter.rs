@@ -1,8 +1,8 @@
 use crate::Id;
 use std::{fmt, slice};
 
-/// Iterates the ids currently retained by an [`IdStruct`](super::IdStruct),
-/// in the order they appear in the packed `live` list.
+/// Iterates the ids currently retained by an [`IdStruct`](super::IdStruct), in
+/// the order they appear in the packed `live` list.
 pub struct IdStructIter<'a, TId> {
     live: slice::Iter<'a, TId>,
 }

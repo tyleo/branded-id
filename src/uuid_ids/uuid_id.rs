@@ -14,9 +14,9 @@ use uuid::Uuid;
 ///
 /// Like the string ids, and unlike the integer ids, a `UuidId` is an opaque
 /// branded key rather than an index: it does not implement [`Id`](crate::Id) or
-/// [`Scalar`](crate::Scalar) and cannot index a container. Convert to and from a
-/// raw [`Uuid`] with [`from_uuid`](Self::from_uuid) and [`to_uuid`](Self::to_uuid),
-/// or the equivalent `From` impls.
+/// [`Scalar`](crate::Scalar) and cannot index a container. Convert to and from
+/// a raw [`Uuid`] with [`from_uuid`](Self::from_uuid) and
+/// [`to_uuid`](Self::to_uuid), or the equivalent `From` impls.
 #[repr(transparent)]
 pub struct UuidId<TBrand: ?Sized> {
     phantom: PhantomData<TBrand>,
@@ -49,8 +49,8 @@ impl<TBrand: ?Sized> UuidId<TBrand> {
         self.repr
     }
 
-    /// Reinterprets the id as a [`U128Id`] of the same brand, reading the UUID's
-    /// 16 bytes as a big-endian `u128`. Lossless and the inverse of
+    /// Reinterprets the id as a [`U128Id`] of the same brand, reading the
+    /// UUID's 16 bytes as a big-endian `u128`. Lossless and the inverse of
     /// [`U128Id::to_uuid_id`].
     pub const fn to_u128_id(self) -> U128Id<TBrand> {
         U128Id::from_u128(self.to_uuid().as_u128())

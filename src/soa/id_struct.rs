@@ -11,10 +11,10 @@ use std::{
 ///
 /// Ids are allocated with [`retain`](Self::retain) and recycled with
 /// [`release`](Self::release). Every id ever handed out lives in a single
-/// `dense` list partitioned by [`len`](Self::len): `dense[..len]` are
-/// the retained ids, packed, and `dense[len..]` are released ids waiting to
-/// be recycled. Releasing swap-removes from the retained region so iteration
-/// only ever visits retained ids.
+/// `dense` list partitioned by [`len`](Self::len): `dense[..len]` are the
+/// retained ids, packed, and `dense[len..]` are released ids waiting to be
+/// recycled. Releasing swap-removes from the retained region so iteration only
+/// ever visits retained ids.
 ///
 /// The pool is keyed by the brand `TBrand` alone; the integer width it stores
 /// indices in is the separate `TNum` parameter, which defaults to `u32`. So
@@ -22,9 +22,9 @@ use std::{
 /// `IdStruct<BFoo, usize>` hands out [`UsizeId<BFoo>`](crate::UsizeId); see
 /// [`Scalar`] for the width-to-id mapping.
 pub struct IdStruct<TBrand: ?Sized, TNum: Scalar = u32> {
-    /// Every id ever handed out. `dense[..live_count]` are retained and
-    /// packed; `dense[live_count..]` are released, with the next id to be
-    /// recycled at `dense[live_count]`.
+    /// Every id ever handed out. `dense[..live_count]` are retained and packed;
+    /// `dense[live_count..]` are released, with the next id to be recycled at
+    /// `dense[live_count]`.
     dense: Vec<TNum::Id<TBrand>>,
 
     /// Per-id: its index in `dense`, stored in the pool's integer width `TNum`
@@ -165,11 +165,11 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
 
         // Move the last retained id into the released id's slot, keeping
         // `dense[..live_count]` packed, then drop the released id into the
-        // vacated boundary slot so it sits at the front of the released
-        // region. The two `sparse` writes swap the stored positions as-is, so
-        // no usize round-trip is needed; and when `id` is already the last
-        // retained id every write is a self-assignment, so no special case is
-        // needed either.
+        // vacated boundary slot so it sits at the front of the released region.
+        // The two `sparse` writes swap the stored positions as-is, so no usize
+        // round-trip is needed; and when `id` is already the last retained id
+        // every write is a self-assignment, so no special case is needed
+        // either.
         let last_id = self.dense[last_live];
         let last_id_usize = last_id.to_usize_id();
         let last_live_backing = self.sparse[last_id_usize];
@@ -183,18 +183,18 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.live_count = last_live;
     }
 
-    /// Retains and returns an id, reusing a previously released id when one
-    /// is available and otherwise allocating a fresh one.
+    /// Retains and returns an id, reusing a previously released id when one is
+    /// available and otherwise allocating a fresh one.
     pub fn retain(&mut self) -> TNum::Id<TBrand> {
         let id = if self.live_count < self.dense.len() {
             // Recycle the id at the front of the released region. Its `sparse`
-            // entry already points at this slot, so growing the retained
-            // region by one is all that is needed to mark it retained.
+            // entry already points at this slot, so growing the retained region
+            // by one is all that is needed to mark it retained.
             self.dense[self.live_count]
         } else {
-            // Allocate a brand-new id, growing both lists in lock-step. The
-            // new id lands at index `live_count`, and its own value is that
-            // index, so `sparse` records that index as the id's position.
+            // Allocate a brand-new id, growing both lists in lock-step. The new
+            // id lands at index `live_count`, and its own value is that index,
+            // so `sparse` records that index as the id's position.
             let index = self.sparse.end();
             let id = <TNum::Id<TBrand> as Id>::from_usize_id(index);
             self.sparse.push(TNum::from_usize(index.to_usize()));

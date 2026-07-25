@@ -26,8 +26,8 @@ impl<TBrand: ?Sized> CStringId<TBrand> {
         TExtendedBrand: Extends<TBrand> + ?Sized,
     {
         // SAFETY: CStringId is #[repr(transparent)] and the brand is a
-        // zero-sized PhantomData, so only the brand type parameter changes,
-        // not the layout.
+        // zero-sized PhantomData, so only the brand type parameter changes, not
+        // the layout.
         unsafe { ::std::mem::transmute::<&CStringId<TBrand>, &CStringId<TExtendedBrand>>(self) }
     }
 

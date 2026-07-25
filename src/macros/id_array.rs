@@ -1,6 +1,6 @@
-/// Builds an [`IdArray`](crate::IdArray), mirroring array literals. Takes an optional
-/// `Brand` and element type, then either `elem; count` or a comma-separated
-/// list of elements; the length `N` is inferred.
+/// Builds an [`IdArray`](crate::IdArray), mirroring array literals. Takes an
+/// optional `Brand` and element type, then either `elem; count` or a
+/// comma-separated list of elements; the length `N` is inferred.
 ///
 /// # Examples
 /// ```rust

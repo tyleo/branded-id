@@ -1,10 +1,10 @@
 //! Data structures that are *branded* so they only interoperate with similarly
 //! branded integer types.
 //!
-//! Every id and container in this crate carries a `TBrand` type parameter.
-//! Two ids built for different brands are distinct types, so the compiler
-//! rejects using one domain's id to index another domain's storage, even
-//! though both are just integers at runtime.
+//! Every id and container in this crate carries a `TBrand` type parameter. Two
+//! ids built for different brands are distinct types, so the compiler rejects
+//! using one domain's id to index another domain's storage, even though both
+//! are just integers at runtime.
 //!
 //! ```
 //! use branded_id::{UsizeId, usize_id};
@@ -41,8 +41,8 @@
 //! arrays, `Vec`, and raw pointers.
 //!
 //! # Brand Conversions (`extends`, default feature)
-//! When one brand extends another, ids and containers cast between the two
-//! with `upcast`/`downcast` methods.
+//! When one brand extends another, ids and containers cast between the two with
+//! `upcast`/`downcast` methods.
 //!
 //! # Struct of Arrays (`soa`, default feature)
 //! A columnar struct-of-arrays id pool. An `IdStruct` hands out and recycles

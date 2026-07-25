@@ -1,6 +1,6 @@
-/// Builds an [`IdVec`](crate::IdVec), mirroring the `vec!` macro. Takes an optional
-/// `Brand` and element type, then either `elem; count` or a comma-separated
-/// list of elements.
+/// Builds an [`IdVec`](crate::IdVec), mirroring the `vec!` macro. Takes an
+/// optional `Brand` and element type, then either `elem; count` or a
+/// comma-separated list of elements.
 ///
 /// # Examples
 /// ```rust

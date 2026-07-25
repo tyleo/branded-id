@@ -2,14 +2,14 @@
 /// trait impls they share, mirroring the standard `str`/`String` relationship.
 ///
 /// The impls are written by hand (rather than derived) so that no `TBrand:
-/// Trait` bound leaks onto the generated types, and forward to the inner
-/// string type's own impls. Kind-specific items (`Display`, `FromStr`, extra
-/// `From` conversions, `extends` casts) are added by the caller in separate
-/// `impl` blocks, because the inner types do not all support them.
+/// Trait` bound leaks onto the generated types, and forward to the inner string
+/// type's own impls. Kind-specific items (`Display`, `FromStr`, extra `From`
+/// conversions, `extends` casts) are added by the caller in separate `impl`
+/// blocks, because the inner types do not all support them.
 ///
 /// Unlike the integer ids, string ids are opaque branded keys rather than
-/// indices: they do not implement [`Id`](crate::Id) or [`Scalar`](crate::Scalar)
-/// and cannot index a container.
+/// indices: they do not implement [`Id`](crate::Id) or
+/// [`Scalar`](crate::Scalar) and cannot index a container.
 ///
 /// Parameters: `$bid`, `$binner`, `$bfrom`, `$bas` are the borrowed id, its
 /// unsized inner type, its constructor, and its accessor; `$oid`, `$oinner`,

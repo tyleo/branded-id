@@ -10,10 +10,12 @@ where
     /// The element or sub-slice this index selects.
     type Output: ?Sized;
 
-    /// Returns a shared reference to the selection, or [`None`] if out of bounds.
+    /// Returns a shared reference to the selection, or [`None`] if out of
+    /// bounds.
     fn get(self, slice: &T) -> Option<&Self::Output>;
 
-    /// Returns a mutable reference to the selection, or [`None`] if out of bounds.
+    /// Returns a mutable reference to the selection, or [`None`] if out of
+    /// bounds.
     fn get_mut(self, slice: &mut T) -> Option<&mut Self::Output>;
 
     /// Returns a shared reference to the selection.

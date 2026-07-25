@@ -3,10 +3,11 @@
 ///
 /// Given one list of every id type, this emits an `impl` block per type with a
 /// `to_*_id` method for every *other* type, each performing an `as` cast. See
-/// the type-level docs produced by [`scalar_id_impl`](crate::scalar_ids::scalar_id_impl!)
-/// for how those casts truncate or sign-reinterpret out-of-range values.
-/// Keeping the whole matrix behind a single invocation means a new id width is
-/// wired into every conversion by adding one line to the list.
+/// the type-level docs produced by
+/// [`scalar_id_impl`](crate::scalar_ids::scalar_id_impl!) for how those casts
+/// truncate or sign-reinterpret out-of-range values. Keeping the whole matrix
+/// behind a single invocation means a new id width is wired into every
+/// conversion by adding one line to the list.
 ///
 /// Each entry is `($id, $prim, $from, $to, $to_id, $article)`: the id type, its
 /// primitive, the constructor, the accessor, the name of the method that

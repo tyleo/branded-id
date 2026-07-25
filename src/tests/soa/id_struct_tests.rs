@@ -1,7 +1,7 @@
 use crate::{soa::IdStruct, tests::util::BTest, u32_id, usize_id};
 
-// The brand-only form defaults the integer width to `u32`, handing out
-// `U32Id`, so it is interchangeable with the `U32IdStruct` alias.
+// The brand-only form defaults the integer width to `u32`, handing out `U32Id`,
+// so it is interchangeable with the `U32IdStruct` alias.
 #[test]
 fn default_width_is_u32_test() {
     let mut ids = IdStruct::<BTest>::new();
@@ -11,8 +11,8 @@ fn default_width_is_u32_test() {
     assert_eq!(ids.peek_next_fresh(), u32_id!(BTest; 1));
 }
 
-// A non-default width keys the same pool by `usize`, handing out `UsizeId`,
-// and recycles ids the same way.
+// A non-default width keys the same pool by `usize`, handing out `UsizeId`, and
+// recycles ids the same way.
 #[test]
 fn usize_width_retain_release_test() {
     let mut ids = IdStruct::<BTest, usize>::new();
@@ -67,8 +67,8 @@ fn gc_relabels_live_to_contiguous_test() {
     assert_eq!(remap.new_id(id_3), None);
     assert_eq!(remap.new_id(u32_id!(BTest; 99)), None);
 
-    // The pool now holds the packed range with no recycled ids, so the next
-    // id is freshly allocated right after it.
+    // The pool now holds the packed range with no recycled ids, so the next id
+    // is freshly allocated right after it.
     let live: Vec<_> = ids.iter().collect();
     assert_eq!(live, vec![u32_id!(BTest; 0), u32_id!(BTest; 1)]);
     assert_eq!(ids.peek_next(), u32_id!(BTest; 2));
@@ -215,8 +215,8 @@ fn hash_test() {
     assert!(set.contains(&ids));
 }
 
-// Debug shows the retained (`live`) and recycled-next (`free`) ids; the released
-// id_0 was swap-removed to the front of `free`.
+// Debug shows the retained (`live`) and recycled-next (`free`) ids; the
+// released id_0 was swap-removed to the front of `free`.
 #[test]
 fn debug_test() {
     let mut ids = IdStruct::<BTest>::new();

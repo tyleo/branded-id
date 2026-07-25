@@ -43,8 +43,8 @@ fn clear_test() {
 }
 
 // A field value that records each drop in a shared counter, so the gc test can
-// prove it neither leaks nor double-drops a value without reading the
-// moved-out slots (which would itself be undefined behavior under a buggy gc).
+// prove it neither leaks nor double-drops a value without reading the moved-out
+// slots (which would itself be undefined behavior under a buggy gc).
 struct DropCount {
     value: u32,
     drops: std::rc::Rc<std::cell::Cell<usize>>,
@@ -85,9 +85,9 @@ fn gc_test() {
     let id_2 = ids.retain();
     field.retain(id_2, DropCount::new(30, &drops));
 
-    // Release the first id from both. Swap-remove leaves the live order
-    // [id_2, id_1], so gc genuinely reorders the survivors rather than leaving
-    // them in ascending old-id order.
+    // Release the first id from both. Swap-remove leaves the live order [id_2,
+    // id_1], so gc genuinely reorders the survivors rather than leaving them in
+    // ascending old-id order.
     unsafe { field.release(id_0) };
     ids.release(id_0);
     assert_eq!(drops.get(), 1);
@@ -401,8 +401,8 @@ fn clone_test() {
     let clone = field.clone();
 
     assert_eq!(clone.reserved_count(), field.reserved_count());
-    // SAFETY: `clone` is a faithful copy of `field`, which is in sync with `ids`,
-    // so id_0 and id_1 are initialized in the clone too.
+    // SAFETY: `clone` is a faithful copy of `field`, which is in sync with
+    // `ids`, so id_0 and id_1 are initialized in the clone too.
     assert_eq!(*unsafe { clone.get(id_0) }, 10);
     assert_eq!(*unsafe { clone.get(id_1) }, 20);
 }

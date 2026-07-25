@@ -60,7 +60,8 @@ impl<TBrand: ?Sized, TValue> MutIdPtr<TBrand, TValue> {
     }
 
     /// # Safety
-    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1>
+    /// See
+    /// <https://doc.rust-lang.org/std/primitive.pointer.html#method.read_unaligned-1>
     #[must_use]
     pub const unsafe fn read_unaligned(self) -> TValue {
         unsafe { self.to_mut_ptr().read_unaligned() }
@@ -73,7 +74,8 @@ impl<TBrand: ?Sized, TValue> MutIdPtr<TBrand, TValue> {
     }
 
     /// # Safety
-    /// See <https://doc.rust-lang.org/std/primitive.pointer.html#method.write_unaligned>
+    /// See
+    /// <https://doc.rust-lang.org/std/primitive.pointer.html#method.write_unaligned>
     pub unsafe fn write_unaligned(self, val: TValue) {
         unsafe { self.to_mut_ptr().write_unaligned(val) }
     }
@@ -110,8 +112,8 @@ impl<TBrand: ?Sized, TValue: ?Sized> Hash for MutIdPtr<TBrand, TValue> {
     where
         H: Hasher,
     {
-        // SAFETY: MutIdPtr is #[repr(transparent)] over *mut TValue, so &[MutIdPtr]
-        // and &[*mut TValue] share a layout.
+        // SAFETY: MutIdPtr is #[repr(transparent)] over *mut TValue, so
+        // &[MutIdPtr] and &[*mut TValue] share a layout.
         let data = unsafe { transmute::<&[MutIdPtr<TBrand, TValue>], &[*mut TValue]>(data) };
         <*mut TValue>::hash_slice(data, state)
     }

@@ -1,5 +1,5 @@
-/// Builds a [`U32Id`](crate::U32Id). Forms: `u32_id!(value)` (brand inferred) and
-/// `u32_id!(Brand; value)`.
+/// Builds a [`U32Id`](crate::U32Id). Forms: `u32_id!(value)` (brand inferred)
+/// and `u32_id!(Brand; value)`.
 ///
 /// # Examples
 /// ```rust

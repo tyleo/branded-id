@@ -1,7 +1,7 @@
 use crate::{soa::IdStruct, tests::util::BTest, u32_id};
 
-// Builds a remap by retaining 0, 1, 2 then releasing id_1, leaving the live
-// set [id_0, id_2] which gc relabels to 0 and 1.
+// Builds a remap by retaining 0, 1, 2 then releasing id_1, leaving the live set
+// [id_0, id_2] which gc relabels to 0 and 1.
 fn remap() -> crate::soa::IdRemap<BTest, u32> {
     let mut ids = IdStruct::<BTest>::new();
     ids.retain();

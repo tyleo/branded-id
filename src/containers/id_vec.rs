@@ -116,14 +116,16 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         self.repr.pop()
     }
 
-    /// Appends `value` and returns the [`UsizeId`] of the newly appended element.
+    /// Appends `value` and returns the [`UsizeId`] of the newly appended
+    /// element.
     pub fn push(&mut self, value: TValue) -> UsizeId<TBrand> {
         let res = self.end();
         self.repr.push(value);
         res
     }
 
-    /// Removes and returns the element at `index`, shifting the later elements down.
+    /// Removes and returns the element at `index`, shifting the later elements
+    /// down.
     ///
     /// # Panics
     /// Panics if `index` is out of bounds.
@@ -154,7 +156,8 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         self.repr.shrink_to_fit()
     }
 
-    /// Removes and returns the element at `index`, moving the last element into its place.
+    /// Removes and returns the element at `index`, moving the last element into
+    /// its place.
     ///
     /// # Panics
     /// Panics if `index` is out of bounds.
@@ -162,12 +165,14 @@ impl<TBrand: ?Sized, TValue> IdVec<TBrand, TValue> {
         self.repr.swap_remove(index.to_usize())
     }
 
-    /// Shortens to `len`, dropping the rest. Keeps the contents if already shorter.
+    /// Shortens to `len`, dropping the rest. Keeps the contents if already
+    /// shorter.
     pub fn truncate(&mut self, len: usize) {
         self.repr.truncate(len)
     }
 
-    /// Creates an empty vec with room for `capacity` elements reserved up front.
+    /// Creates an empty vec with room for `capacity` elements reserved up
+    /// front.
     pub fn with_capacity(capacity: usize) -> Self {
         Self::from_vec(Vec::with_capacity(capacity))
     }

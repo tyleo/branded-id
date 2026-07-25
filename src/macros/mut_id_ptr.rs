@@ -1,5 +1,6 @@
-/// Builds a [`MutIdPtr`](crate::MutIdPtr) from a raw pointer. Forms: `mut_id_ptr!(ptr)`,
-/// `mut_id_ptr!(Brand; ptr)`, and `mut_id_ptr!(Brand; Value; ptr)`.
+/// Builds a [`MutIdPtr`](crate::MutIdPtr) from a raw pointer. Forms:
+/// `mut_id_ptr!(ptr)`, `mut_id_ptr!(Brand; ptr)`, and `mut_id_ptr!(Brand;
+/// Value; ptr)`.
 ///
 /// # Examples
 /// ```rust

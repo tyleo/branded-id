@@ -1,6 +1,6 @@
 /// Generates the `IdSliceIndex` impl for a `std::ops` range type keyed by
-/// `UsizeId`, reinterpreting it as the matching primitive range before
-/// indexing the backing slice.
+/// `UsizeId`, reinterpreting it as the matching primitive range before indexing
+/// the backing slice.
 ///
 /// `$range` is the range type (e.g. `Range`) and `$converter` the `UsizeId`
 /// associated fn that reinterprets `$range<UsizeId<_>>` as `$range<usize>`.

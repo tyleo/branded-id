@@ -1,8 +1,7 @@
 //! Brand-subtyping conversions between id domains.
 //!
-//! When one brand [`Extends`] another, the id types and containers can be
-//! cast between the two brands via their `upcast_*` and `downcast_*`
-//! methods.
+//! When one brand [`Extends`] another, the id types and containers can be cast
+//! between the two brands via their `upcast_*` and `downcast_*` methods.
 
 /// Declares a brand-subtyping relationship: `impl Extends<Base> for Derived`
 /// says that ids and containers branded `Derived` may be converted to and from

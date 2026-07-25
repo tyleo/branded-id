@@ -1,5 +1,5 @@
-/// Builds an [`I64Id`](crate::I64Id). Forms: `i64_id!(value)` (brand inferred) and
-/// `i64_id!(Brand; value)`.
+/// Builds an [`I64Id`](crate::I64Id). Forms: `i64_id!(value)` (brand inferred)
+/// and `i64_id!(Brand; value)`.
 ///
 /// # Examples
 /// ```rust

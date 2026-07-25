@@ -48,15 +48,15 @@ impl<TBrand: ?Sized, TValue, const N: usize> IdArray<TBrand, TValue, N> {
 
     /// Reinterprets a `[TValue; N]` as an [`IdArray`].
     pub const fn from_array_ref(repr: &[TValue; N]) -> &Self {
-        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &[TValue; N]
-        // and &IdArray share a layout.
+        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so
+        // &[TValue; N] and &IdArray share a layout.
         unsafe { transmute(repr) }
     }
 
     /// Reinterprets a mutable `[TValue; N]` as a mutable [`IdArray`].
     pub fn from_mut_array(repr: &mut [TValue; N]) -> &mut Self {
-        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &mut [TValue; N]
-        // and &mut IdArray share a layout.
+        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &mut
+        // [TValue; N] and &mut IdArray share a layout.
         unsafe { transmute(repr) }
     }
 
@@ -161,8 +161,8 @@ where
     where
         H: Hasher,
     {
-        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so &[IdArray]
-        // and &[[TValue; N]] share a layout.
+        // SAFETY: IdArray is #[repr(transparent)] over [TValue; N], so
+        // &[IdArray] and &[[TValue; N]] share a layout.
         let data = unsafe { transmute::<&[IdArray<TBrand, TValue, N>], &[[TValue; N]]>(data) };
         <[TValue; N]>::hash_slice(data, state)
     }
