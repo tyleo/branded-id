@@ -18,6 +18,12 @@ use std::{
 /// O(1) and [`release_stable`](Self::release_stable) shifts to keep the
 /// survivors in order.
 ///
+/// The retained order is also readable and settable in place.
+/// [`index_of`](Self::index_of) and [`id_at`](Self::id_at) map between ids and
+/// their iteration positions, and [`move_to`](Self::move_to) and
+/// [`set_order`](Self::set_order) rearrange the retained ids without retaining
+/// or releasing anything.
+///
 /// The pool is keyed by the brand `TBrand` alone; the integer width it stores
 /// indices in is the separate `TNum` parameter, which defaults to `u32`. So
 /// `IdStruct<BFoo>` hands out [`U32Id<BFoo>`](crate::U32Id) while
@@ -121,6 +127,24 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         IdRemap::from_parts(IdVec::from_vec(new_ids), new_len)
     }
 
+    /// The id [`iter`](Self::iter) currently yields at position `index`, or
+    /// `None` if `index` is at or past [`len`](Self::len).
+    pub fn id_at(&self, index: usize) -> Option<TNum::Id<TBrand>> {
+        (index < self.live_count).then(|| self.dense[index])
+    }
+
+    /// The position [`iter`](Self::iter) currently yields `id` at. Safe and
+    /// `None` for ids that were never handed out or have already been
+    /// released.
+    pub fn index_of(&self, id: TNum::Id<TBrand>) -> Option<usize> {
+        let id = id.to_usize_id();
+        if id.to_usize() >= self.sparse.len() {
+            return None;
+        }
+        let index = self.sparse[id].to_usize();
+        (index < self.live_count).then_some(index)
+    }
+
     /// Whether the pool currently has no retained ids.
     pub fn is_empty(&self) -> bool {
         self.live_count == 0
@@ -129,8 +153,7 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Whether `id` is currently retained. Safe and `false` for ids that were
     /// never handed out or have already been released.
     pub fn is_retained(&self, id: TNum::Id<TBrand>) -> bool {
-        let id = id.to_usize_id();
-        id.to_usize() < self.sparse.len() && self.sparse[id].to_usize() < self.live_count
+        self.index_of(id).is_some()
     }
 
     /// Iterates the retained ids in their packed `live` order, the same as
@@ -142,6 +165,62 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// The number of ids currently retained from this pool.
     pub fn len(&self) -> usize {
         self.live_count
+    }
+
+    /// Moves `id` so it iterates at position `index`, shifting each id between
+    /// its old and new positions one slot toward the old one.
+    ///
+    /// Only the iteration order changes: no id is retained or released, and
+    /// the released region is untouched. Moving an id to the position it
+    /// already occupies is a no-op.
+    ///
+    /// The shift costs O(n) in the distance between the two positions.
+    ///
+    /// # Panics
+    /// Panics if `id` is not currently retained or if `index` is at or past
+    /// [`len`](Self::len).
+    pub fn move_to(&mut self, id: TNum::Id<TBrand>, index: usize) {
+        let usize_id = id.to_usize_id();
+        let from = self.index_of(id).expect("moved an id that is not retained");
+        assert!(
+            index < self.live_count,
+            "moved an id to an index past the retained region"
+        );
+
+        // Shift the ids between the two positions one slot toward `from`,
+        // walking up when `id` moves forward and down when it moves backward,
+        // then drop `id` into the vacated slot at `index`. As in
+        // `release_stable`, each shifted id takes over the stored position its
+        // neighbor gave up, so the `sparse` entries rotate as-is with no usize
+        // round-trip. When `index == from` neither loop runs and the trailing
+        // writes are self-assignments, so no special case is needed.
+        let mut slot_backing = self.sparse[usize_id];
+        if from < index {
+            for slot in from..index {
+                let next_id = self.dense[slot + 1];
+                let next_id_usize = next_id.to_usize_id();
+                let next_backing = self.sparse[next_id_usize];
+
+                self.dense[slot] = next_id;
+                self.sparse[next_id_usize] = slot_backing;
+
+                slot_backing = next_backing;
+            }
+        } else {
+            for slot in (index..from).rev() {
+                let prev_id = self.dense[slot];
+                let prev_id_usize = prev_id.to_usize_id();
+                let prev_backing = self.sparse[prev_id_usize];
+
+                self.dense[slot + 1] = prev_id;
+                self.sparse[prev_id_usize] = slot_backing;
+
+                slot_backing = prev_backing;
+            }
+        }
+
+        self.dense[index] = id;
+        self.sparse[usize_id] = slot_backing;
     }
 
     /// Peeks at the next id [`retain`](Self::retain) would return, without
@@ -167,14 +246,13 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Panics if `id` is not currently retained, including when the pool is
     /// empty.
     pub fn release(&mut self, id: TNum::Id<TBrand>) {
+        assert!(self.is_retained(id), "released an id that is not retained");
+
         let usize_id = id.to_usize_id();
         let index_backing = self.sparse[usize_id];
         let index = index_backing.to_usize();
 
-        let last_live = self
-            .live_count
-            .checked_sub(1)
-            .expect("released an id from an empty pool");
+        let last_live = self.live_count - 1;
 
         // Move the last retained id into the released id's slot, keeping
         // `dense[..live_count]` packed, then drop the released id into the
@@ -207,14 +285,13 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Panics if `id` is not currently retained, including when the pool is
     /// empty.
     pub fn release_stable(&mut self, id: TNum::Id<TBrand>) {
+        assert!(self.is_retained(id), "released an id that is not retained");
+
         let usize_id = id.to_usize_id();
         let index_backing = self.sparse[usize_id];
         let index = index_backing.to_usize();
 
-        let last_live = self
-            .live_count
-            .checked_sub(1)
-            .expect("released an id from an empty pool");
+        let last_live = self.live_count - 1;
 
         // Shift every retained id after `id` down one slot to keep
         // `dense[..live_count]` packed and in order, then drop the released id
@@ -264,6 +341,45 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.live_count += 1;
 
         id
+    }
+
+    /// Rewrites the retained iteration order to `new_order`, which must list
+    /// every currently retained id exactly once.
+    ///
+    /// Only the iteration order changes: no id is retained or released, and
+    /// the released region is untouched. Setting the current order is a no-op.
+    ///
+    /// # Panics
+    /// Panics if `new_order`'s length differs from [`len`](Self::len), if it
+    /// lists an id that is not currently retained, or if it lists any id more
+    /// than once. The pool is left unchanged when it panics.
+    pub fn set_order(&mut self, new_order: &[TNum::Id<TBrand>]) {
+        assert_eq!(
+            new_order.len(),
+            self.live_count,
+            "set an order whose length differs from the retained count"
+        );
+
+        // Every retained id occupies a distinct position in `0..live_count`,
+        // so checking that each listed id is retained and that no two listed
+        // ids occupy the same position proves `new_order` is a permutation of
+        // the retained ids: live_count distinct retained ids in a list of
+        // live_count cover them all.
+        let mut seen = vec![false; self.live_count];
+        for &id in new_order {
+            let position = self
+                .index_of(id)
+                .expect("set an order containing an id that is not retained");
+            assert!(!seen[position], "set an order containing a duplicate id");
+            seen[position] = true;
+        }
+
+        // Mutation starts only after validation, so a panic leaves the pool
+        // unchanged.
+        for (slot, &id) in new_order.iter().enumerate() {
+            self.dense[slot] = id;
+            self.sparse[id.to_usize_id()] = TNum::from_usize(slot);
+        }
     }
 }
 

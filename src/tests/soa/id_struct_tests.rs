@@ -127,13 +127,307 @@ fn release_stable_after_release_test() {
 }
 
 #[test]
-#[should_panic(expected = "released an id from an empty pool")]
+#[should_panic(expected = "released an id that is not retained")]
 fn release_stable_empty_pool_panics_test() {
     let mut ids = IdStruct::<BTest>::new();
     let id_0 = ids.retain();
     ids.release_stable(id_0);
 
     ids.release_stable(id_0);
+}
+
+// Releasing an already-released id in a non-empty pool panics. Its stale
+// sparse entry would otherwise swap a live id out in its place.
+#[test]
+#[should_panic(expected = "released an id that is not retained")]
+fn release_released_id_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.retain();
+    ids.release(id_0);
+
+    ids.release(id_0);
+}
+
+#[test]
+#[should_panic(expected = "released an id that is not retained")]
+fn release_stable_released_id_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.retain();
+    ids.release_stable(id_0);
+
+    ids.release_stable(id_0);
+}
+
+#[test]
+#[should_panic(expected = "released an id that is not retained")]
+fn release_unissued_id_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    ids.retain();
+
+    ids.release(u32_id!(BTest; 99));
+}
+
+// move_to repositions a retained id forward, backward, and to either end,
+// shifting only the ids between the old and new positions.
+#[test]
+fn move_to_forward_backward_and_ends_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+    let id_4 = ids.retain();
+
+    // Forward: id_1 walks from position 1 up to position 3.
+    ids.move_to(id_1, 3);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_2, id_3, id_1, id_4]);
+
+    // Backward: id_3 walks from position 2 back to position 1.
+    ids.move_to(id_3, 1);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_3, id_2, id_1, id_4]);
+
+    // To the front, then to the back.
+    ids.move_to(id_1, 0);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_1, id_0, id_3, id_2, id_4]);
+
+    ids.move_to(id_0, 4);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_1, id_3, id_2, id_4, id_0]);
+}
+
+// Moving an id to the position it already occupies leaves the pool untouched,
+// including the sparse index and the released region.
+#[test]
+fn move_to_same_position_is_noop_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    ids.release_stable(id_0);
+
+    let before = format!("{:?}", ids.as_raw_parts());
+
+    ids.move_to(id_1, 0);
+    ids.move_to(id_2, 1);
+
+    assert_eq!(format!("{:?}", ids.as_raw_parts()), before);
+}
+
+// set_order applies an arbitrary permutation of the retained ids, and
+// iteration follows it.
+#[test]
+fn set_order_applies_permutation_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+
+    ids.set_order(&[id_2, id_0, id_3, id_1]);
+
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_2, id_0, id_3, id_1]);
+    assert_eq!(ids.len(), 4);
+}
+
+// Setting the current order leaves the pool untouched, including the sparse
+// index and the released region.
+#[test]
+fn set_order_identity_is_noop_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.retain();
+    ids.retain();
+    ids.release_stable(id_0);
+
+    let before = format!("{:?}", ids.as_raw_parts());
+    let order: Vec<_> = ids.iter().collect();
+
+    ids.set_order(&order);
+
+    assert_eq!(format!("{:?}", ids.as_raw_parts()), before);
+}
+
+// The sparse index stays consistent through both reorder methods, so a
+// release_stable of a mid-order id afterward removes the right id and keeps
+// the rest in order.
+#[test]
+fn release_stable_after_reorder_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+    let id_4 = ids.retain();
+
+    ids.move_to(id_4, 0);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_4, id_0, id_1, id_2, id_3]);
+
+    ids.set_order(&[id_3, id_1, id_4, id_0, id_2]);
+
+    ids.release_stable(id_4);
+
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_3, id_1, id_0, id_2]);
+    assert_eq!(ids.peek_next(), id_4);
+}
+
+// Reordering leaves the released region alone, so retain still recycles from
+// its front and appends the recycled id to the end of the live region.
+#[test]
+fn retain_after_reorder_recycles_front_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+    let id_4 = ids.retain();
+
+    // The free region stacks up as [id_3, id_1], most recent first.
+    ids.release_stable(id_1);
+    ids.release(id_3);
+
+    ids.move_to(id_0, 2);
+    ids.set_order(&[id_2, id_0, id_4]);
+
+    assert_eq!(ids.peek_next(), id_3);
+    assert_eq!(ids.retain(), id_3);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_2, id_0, id_4, id_3]);
+
+    assert_eq!(ids.retain(), id_1);
+}
+
+// index_of reports the position iteration yields each retained id at, through
+// retains, both kinds of release, and both reorder methods.
+#[test]
+fn index_of_matches_iteration_position_test() {
+    fn assert_positions(ids: &IdStruct<BTest>) {
+        for (index, id) in ids.iter().enumerate() {
+            assert_eq!(ids.index_of(id), Some(index));
+        }
+    }
+
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    ids.retain();
+    let id_3 = ids.retain();
+    ids.retain();
+    assert_positions(&ids);
+
+    ids.release(id_0);
+    assert_positions(&ids);
+
+    ids.release_stable(id_1);
+    assert_positions(&ids);
+
+    ids.move_to(id_3, 0);
+    assert_positions(&ids);
+
+    let mut reversed: Vec<_> = ids.iter().collect();
+    reversed.reverse();
+    ids.set_order(&reversed);
+    assert_positions(&ids);
+}
+
+// index_of has no position for an id that was released, by either method, or
+// one that was never handed out.
+#[test]
+fn index_of_released_and_unissued_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    ids.retain();
+
+    ids.release(id_0);
+    assert_eq!(ids.index_of(id_0), None);
+
+    ids.release_stable(id_1);
+    assert_eq!(ids.index_of(id_1), None);
+
+    assert_eq!(ids.index_of(u32_id!(BTest; 99)), None);
+}
+
+// id_at round-trips with index_of over every position, and has no id past
+// len(), even where the dense list still holds a released id.
+#[test]
+fn id_at_round_trip_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    ids.release_stable(id_1);
+
+    for index in 0..ids.len() {
+        let id = ids.id_at(index).unwrap();
+        assert_eq!(ids.index_of(id), Some(index));
+    }
+    assert_eq!(ids.id_at(0), Some(id_0));
+    assert_eq!(ids.id_at(1), Some(id_2));
+
+    // Position 2 still holds the released id_1 in the dense list. It is past
+    // len(), so id_at does not expose it.
+    assert_eq!(ids.id_at(2), None);
+    assert_eq!(ids.id_at(99), None);
+}
+
+#[test]
+#[should_panic(expected = "moved an id that is not retained")]
+fn move_to_unretained_id_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.retain();
+    ids.release(id_0);
+
+    ids.move_to(id_0, 0);
+}
+
+#[test]
+#[should_panic(expected = "moved an id to an index past the retained region")]
+fn move_to_out_of_range_index_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+
+    ids.move_to(id_0, 1);
+}
+
+#[test]
+#[should_panic(expected = "set an order whose length differs from the retained count")]
+fn set_order_wrong_length_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.retain();
+
+    ids.set_order(&[id_0]);
+}
+
+#[test]
+#[should_panic(expected = "set an order containing a duplicate id")]
+fn set_order_duplicate_id_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    ids.retain();
+
+    ids.set_order(&[id_0, id_0]);
+}
+
+#[test]
+#[should_panic(expected = "set an order containing an id that is not retained")]
+fn set_order_released_id_panics_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    ids.retain();
+    ids.release(id_0);
+
+    ids.set_order(&[id_1, id_0]);
 }
 
 // gc relabels the live ids to a contiguous 0.. range in ascending id order,
@@ -281,6 +575,37 @@ fn gc_after_release_stable_preserves_id_order_test() {
     assert_eq!(remap.new_id(id_0), Some(u32_id!(BTest; 0)));
     assert_eq!(remap.new_id(id_2), Some(u32_id!(BTest; 1)));
     assert_eq!(remap.new_id(id_3), Some(u32_id!(BTest; 2)));
+}
+
+// gc renumbers the survivors in iteration order, so a reorder ahead of it
+// carries through: each id is relabeled to the position it was moved to.
+#[test]
+fn gc_after_reorder_renumbers_in_new_order_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+    ids.release(id_1);
+
+    // Reorder the live ids to [id_3, id_2, id_0] via both methods.
+    ids.set_order(&[id_2, id_0, id_3]);
+    ids.move_to(id_3, 0);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_3, id_2, id_0]);
+
+    let remap = ids.gc();
+
+    assert_eq!(remap.new_id(id_3), Some(u32_id!(BTest; 0)));
+    assert_eq!(remap.new_id(id_2), Some(u32_id!(BTest; 1)));
+    assert_eq!(remap.new_id(id_0), Some(u32_id!(BTest; 2)));
+    assert_eq!(remap.new_id(id_1), None);
+
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(
+        live,
+        vec![u32_id!(BTest; 0), u32_id!(BTest; 1), u32_id!(BTest; 2)]
+    );
 }
 
 // gc works the same for a non-default integer width, handing out UsizeId.
