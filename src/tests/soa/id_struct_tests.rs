@@ -156,8 +156,8 @@ fn gc_relabels_live_to_contiguous_test() {
     assert_eq!(remap.new_len(), 2);
     assert_eq!(remap.old_len(), 4);
 
-    // Live ids are renumbered in ascending id order. Released ids have no
-    // counterpart, and neither does an id never handed out.
+    // Live ids are renumbered in iteration order, here [id_0, id_2]. Released
+    // ids have no counterpart, and neither does an id never handed out.
     assert_eq!(remap.new_id(id_0), Some(u32_id!(BTest; 0)));
     assert_eq!(remap.new_id(id_2), Some(u32_id!(BTest; 1)));
     assert_eq!(remap.new_id(id_1), None);
@@ -237,10 +237,10 @@ fn gc_compact_pool_is_identity_test() {
     assert_eq!(remap.new_len(), 3);
 }
 
-// gc renumbers the survivors in ascending id order even after a mid-range
-// release scrambles the live iteration order.
+// gc renumbers the survivors in iteration order, so a mid-range release that
+// puts that order out of ascending id order carries through the gc.
 #[test]
-fn gc_preserves_relative_id_order_test() {
+fn gc_preserves_iteration_order_test() {
     let mut ids = IdStruct::<BTest>::new();
     let id_0 = ids.retain();
     let id_1 = ids.retain();
@@ -252,6 +252,29 @@ fn gc_preserves_relative_id_order_test() {
     ids.release(id_1);
     let live: Vec<_> = ids.iter().collect();
     assert_eq!(live, vec![id_0, id_3, id_2]);
+
+    let remap = ids.gc();
+
+    // Each survivor takes the position it iterated at, so id_3 lands before
+    // id_2.
+    assert_eq!(remap.new_id(id_0), Some(u32_id!(BTest; 0)));
+    assert_eq!(remap.new_id(id_3), Some(u32_id!(BTest; 1)));
+    assert_eq!(remap.new_id(id_2), Some(u32_id!(BTest; 2)));
+}
+
+// Releasing with release_stable keeps the live iteration order ascending, so
+// gc preserves relative id order.
+#[test]
+fn gc_after_release_stable_preserves_id_order_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    let id_3 = ids.retain();
+
+    ids.release_stable(id_1);
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, vec![id_0, id_2, id_3]);
 
     let remap = ids.gc();
 
@@ -269,12 +292,12 @@ fn gc_usize_width_test() {
     let id_2 = ids.retain();
     ids.release(id_0);
 
-    // Swap-removal leaves the live iteration order [id_2, id_1]. gc still
-    // renumbers in ascending id order.
+    // Swap-removal leaves the live iteration order [id_2, id_1], and gc
+    // renumbers in that order.
     let remap = ids.gc();
 
-    assert_eq!(remap.new_id(id_1), Some(usize_id!(BTest; 0)));
-    assert_eq!(remap.new_id(id_2), Some(usize_id!(BTest; 1)));
+    assert_eq!(remap.new_id(id_2), Some(usize_id!(BTest; 0)));
+    assert_eq!(remap.new_id(id_1), Some(usize_id!(BTest; 1)));
     assert_eq!(remap.new_id(id_0), None);
 
     let live: Vec<_> = ids.iter().collect();

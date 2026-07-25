@@ -70,11 +70,11 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Compacts the pool so its retained ids become the contiguous range
     /// `0..len`, and returns an [`IdRemap`] recording where each old id went.
     ///
-    /// The live ids are renumbered in ascending id order, so survivors keep
-    /// their relative order: if `a < b` are both live, the relabeled `a` is
-    /// still less than the relabeled `b`. The recycled ids waiting in the free
-    /// region are discarded, so afterward the pool holds no released ids and
-    /// the next [`retain`](Self::retain) hands out [`len`](Self::len).
+    /// The live ids are renumbered in the order [`iter`](Self::iter) yields
+    /// them, so the pool iterates the same sequence before and after the gc.
+    /// The recycled ids waiting in the free region are discarded, so afterward
+    /// the pool holds no released ids and the next [`retain`](Self::retain)
+    /// hands out [`len`](Self::len).
     ///
     /// Because the live ids are renumbered, any id stored outside the pool is
     /// now stale. Translate each one through [`IdRemap::new_id`], and pass the
@@ -86,19 +86,23 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         let new_len = self.live_count;
         let old_len = self.sparse.len();
 
-        // Record, per old id, the id it is relabeled to. Walking the old id
-        // space in ascending order packs the live ids into `0..new_len` in
-        // their relative order, independent of the swap-removal scrambling in
-        // `dense`. Released ids stay `None`.
+        // Record, per old id, the id it is relabeled to. A live id iterates at
+        // the slot it occupies in `dense`, so under iteration-order numbering
+        // that slot is its new id, and `sparse` already stores it. An id parked
+        // past the live region was released and stays `None`.
+        //
+        // Reading the slot off `sparse` keeps this a forward scan over both
+        // lists. Walking `dense[..new_len]` would visit only the live ids and
+        // scatter its writes across `new_ids` by old id. Once the id space
+        // outgrows the cache, those scattered writes cost far more than the
+        // skipped entries save.
         let mut new_ids: Vec<Option<TNum::Id<TBrand>>> = vec![None; old_len];
-        let mut next = 0;
         for (old, index) in self.sparse.as_vec().iter().enumerate() {
-            if index.to_usize() >= new_len {
-                continue;
+            let slot = index.to_usize();
+            if slot < new_len {
+                let new = <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(slot));
+                new_ids[old] = Some(new);
             }
-            let new = <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(next));
-            new_ids[old] = Some(new);
-            next += 1;
         }
 
         // Rebuild `dense` and `sparse` as the identity over `0..new_len`,

@@ -8,10 +8,12 @@ use std::{
 ///
 /// `gc` compacts a pool so its live ids become the contiguous range
 /// `0..new_len`, and returns this map from each pre-gc id to the id it was
-/// relabeled to. Use [`new_id`](Self::new_id) to translate any id stored
-/// outside the pool (including ids held *inside* [`IdField`](super::IdField)
-/// values), and pass the whole map to [`IdField::gc`](super::IdField::gc) to
-/// compact each paired field the same way.
+/// relabeled to, following the pool's iteration order: the id that iterated
+/// `k`th is relabeled to `k`. Use [`new_id`](Self::new_id) to translate any id
+/// stored outside the pool (including ids held *inside*
+/// [`IdField`](super::IdField) values), and pass the whole map to
+/// [`IdField::gc`](super::IdField::gc) to compact each paired field the same
+/// way.
 ///
 /// A released or never-allocated id has no relabeled counterpart;
 /// [`new_id`](Self::new_id) reports it as `None`.
