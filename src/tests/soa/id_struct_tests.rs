@@ -253,6 +253,47 @@ fn set_order_identity_is_noop_test() {
     assert_eq!(format!("{:?}", ids.as_raw_parts()), before);
 }
 
+// try_move_to reorders like move_to and reports a rejected move instead of
+// panicking, leaving the pool untouched.
+#[test]
+fn try_move_to_reorders_or_reports_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    ids.release_stable(id_1);
+
+    assert_eq!(ids.try_move_to(id_2, 0), Some(()));
+    assert_eq!(ids.iter().collect::<Vec<_>>(), vec![id_2, id_0]);
+
+    // A released id and an index past the retained region are both rejected.
+    let before = format!("{:?}", ids.as_raw_parts());
+    assert_eq!(ids.try_move_to(id_1, 0), None);
+    assert_eq!(ids.try_move_to(id_2, 2), None);
+    assert_eq!(format!("{:?}", ids.as_raw_parts()), before);
+}
+
+// try_set_order applies a permutation like set_order and reports one that is
+// not a permutation instead of panicking, leaving the pool untouched.
+#[test]
+fn try_set_order_applies_or_reports_test() {
+    let mut ids = IdStruct::<BTest>::new();
+    let id_0 = ids.retain();
+    let id_1 = ids.retain();
+    let id_2 = ids.retain();
+    ids.release_stable(id_1);
+
+    assert_eq!(ids.try_set_order(&[id_2, id_0]), Some(()));
+    assert_eq!(ids.iter().collect::<Vec<_>>(), vec![id_2, id_0]);
+
+    // A wrong length, a released id, and a duplicate are all rejected.
+    let before = format!("{:?}", ids.as_raw_parts());
+    assert_eq!(ids.try_set_order(&[id_2]), None);
+    assert_eq!(ids.try_set_order(&[id_2, id_1]), None);
+    assert_eq!(ids.try_set_order(&[id_2, id_2]), None);
+    assert_eq!(format!("{:?}", ids.as_raw_parts()), before);
+}
+
 // The sparse index stays consistent through both reorder methods, so a
 // release_stable of a mid-order id afterward removes the right id and keeps
 // the rest in order.

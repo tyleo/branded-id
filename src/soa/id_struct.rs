@@ -180,12 +180,31 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Panics if `id` is not currently retained or if `index` is at or past
     /// [`len`](Self::len).
     pub fn move_to(&mut self, id: TNum::Id<TBrand>, index: usize) {
-        let usize_id = id.to_usize_id();
         let from = self.index_of(id).expect("moved an id that is not retained");
         assert!(
             index < self.live_count,
             "moved an id to an index past the retained region"
         );
+        self.move_from_to(id, from, index);
+    }
+
+    /// Moves `id` to iteration position `index`, as [`move_to`](Self::move_to),
+    /// returning `None` instead of panicking when `id` is not retained or
+    /// `index` is at or past [`len`](Self::len). The pool is unchanged when it
+    /// returns `None`.
+    pub fn try_move_to(&mut self, id: TNum::Id<TBrand>, index: usize) -> Option<()> {
+        let from = self.index_of(id)?;
+        if index >= self.live_count {
+            return None;
+        }
+        self.move_from_to(id, from, index);
+        Some(())
+    }
+
+    /// Moves `id` from iteration position `from` to `index`, both already
+    /// checked to be within the retained region.
+    fn move_from_to(&mut self, id: TNum::Id<TBrand>, from: usize, index: usize) {
+        let usize_id = id.to_usize_id();
 
         // Shift the ids between the two positions one slot toward `from`,
         // walking up when `id` moves forward and down when it moves backward,
@@ -354,33 +373,68 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// lists an id that is not currently retained, or if it lists any id more
     /// than once. The pool is left unchanged when it panics.
     pub fn set_order(&mut self, new_order: &[TNum::Id<TBrand>]) {
-        assert_eq!(
-            new_order.len(),
-            self.live_count,
-            "set an order whose length differs from the retained count"
-        );
+        match self.check_order(new_order) {
+            Ok(()) => self.apply_order(new_order),
+            Err(OrderProblem::Length) => {
+                panic!("set an order whose length differs from the retained count")
+            }
+            Err(OrderProblem::NotRetained) => {
+                panic!("set an order containing an id that is not retained")
+            }
+            Err(OrderProblem::Duplicate) => panic!("set an order containing a duplicate id"),
+        }
+    }
 
-        // Every retained id occupies a distinct position in `0..live_count`,
-        // so checking that each listed id is retained and that no two listed
-        // ids occupy the same position proves `new_order` is a permutation of
-        // the retained ids: live_count distinct retained ids in a list of
-        // live_count cover them all.
+    /// Rewrites the retained iteration order to `new_order`, as
+    /// [`set_order`](Self::set_order), returning `None` instead of panicking
+    /// when `new_order` does not list every retained id exactly once. The pool
+    /// is unchanged when it returns `None`.
+    pub fn try_set_order(&mut self, new_order: &[TNum::Id<TBrand>]) -> Option<()> {
+        self.check_order(new_order).ok()?;
+        self.apply_order(new_order);
+        Some(())
+    }
+
+    /// Whether `new_order` lists every retained id exactly once.
+    ///
+    /// Every retained id occupies a distinct position in `0..live_count`, so
+    /// checking that each listed id is retained and that no two listed ids
+    /// occupy the same position proves `new_order` is a permutation of the
+    /// retained ids: live_count distinct retained ids in a list of live_count
+    /// cover them all.
+    fn check_order(&self, new_order: &[TNum::Id<TBrand>]) -> Result<(), OrderProblem> {
+        if new_order.len() != self.live_count {
+            return Err(OrderProblem::Length);
+        }
+
         let mut seen = vec![false; self.live_count];
         for &id in new_order {
-            let position = self
-                .index_of(id)
-                .expect("set an order containing an id that is not retained");
-            assert!(!seen[position], "set an order containing a duplicate id");
+            let position = self.index_of(id).ok_or(OrderProblem::NotRetained)?;
+            if seen[position] {
+                return Err(OrderProblem::Duplicate);
+            }
             seen[position] = true;
         }
 
-        // Mutation starts only after validation, so a panic leaves the pool
-        // unchanged.
+        Ok(())
+    }
+
+    /// Writes `new_order`, already checked to list every retained id exactly
+    /// once, as the retained iteration order.
+    fn apply_order(&mut self, new_order: &[TNum::Id<TBrand>]) {
         for (slot, &id) in new_order.iter().enumerate() {
             self.dense[slot] = id;
             self.sparse[id.to_usize_id()] = TNum::from_usize(slot);
         }
     }
+}
+
+/// Why an order handed to [`IdStruct::set_order`] is not a permutation of the
+/// retained ids.
+enum OrderProblem {
+    Length,
+    NotRetained,
+    Duplicate,
 }
 
 impl<TBrand: ?Sized, TNum: Scalar> Clone for IdStruct<TBrand, TNum> {
