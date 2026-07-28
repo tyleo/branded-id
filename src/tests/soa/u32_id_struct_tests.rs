@@ -211,6 +211,39 @@ fn peek_test() {
 }
 
 #[test]
+fn peek_nth_test() {
+    let mut id_struct = U32IdStruct::<BTest>::new();
+
+    // On an empty pool every peek is a fresh id, counting up from 0.
+    let actual: Vec<_> = (0..3).map(|offset| id_struct.peek_nth(offset)).collect();
+    let expected = vec![u32_id!(BTest; 0), u32_id!(BTest; 1), u32_id!(BTest; 2)];
+    assert_eq!(actual, expected);
+
+    let id_0 = id_struct.retain();
+    let id_1 = id_struct.retain();
+    let id_2 = id_struct.retain();
+    id_struct.retain();
+
+    // release swap-removes, so the released region is not in release order.
+    // Predicting a run therefore has to read the region rather than assume an
+    // order, which is what peek_nth is for.
+    id_struct.release(id_0);
+    id_struct.release(id_1);
+    id_struct.release(id_2);
+
+    // Offset 0 agrees with peek_next, and the run walks the three recycled ids
+    // before minting past the high-water mark.
+    assert_eq!(id_struct.peek_nth(0), id_struct.peek_next());
+    let predicted: Vec<_> = (0..5).map(|offset| id_struct.peek_nth(offset)).collect();
+    assert_eq!(predicted[3], u32_id!(BTest; 4));
+    assert_eq!(predicted[4], u32_id!(BTest; 5));
+
+    // The payoff: a run of retains hands back exactly what was predicted.
+    let retained: Vec<_> = (0..5).map(|_| id_struct.retain()).collect();
+    assert_eq!(retained, predicted);
+}
+
+#[test]
 fn clear_test() {
     let mut id_struct = U32IdStruct::<BTest>::new();
 

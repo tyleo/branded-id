@@ -245,17 +245,33 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// Peeks at the next id [`retain`](Self::retain) would return, without
     /// actually retaining it.
     pub fn peek_next(&self) -> TNum::Id<TBrand> {
-        if self.live_count < self.dense.len() {
-            self.dense[self.live_count]
-        } else {
-            self.peek_next_fresh()
-        }
+        self.peek_nth(0)
     }
 
     /// Peeks at the next id that would be freshly allocated, ignoring the
     /// released ids available for recycling.
     pub fn peek_next_fresh(&self) -> TNum::Id<TBrand> {
         <TNum::Id<TBrand> as Id>::from_usize_id(self.sparse.end())
+    }
+
+    /// Peeks at the id the `offset`-th future [`retain`](Self::retain) would
+    /// return, counting from 0, so `peek_nth(0)` is
+    /// [`peek_next`](Self::peek_next). Retaining recycles the released ids
+    /// before minting fresh ones, so a run of `n` retains hands back
+    /// `peek_nth(0)` through `peek_nth(n - 1)` in order. That lets a caller
+    /// name the ids a batch will take before inserting any of it.
+    ///
+    /// Only a run of consecutive retains is predicted: a
+    /// [`release`](Self::release) or [`release_stable`](Self::release_stable)
+    /// part-way through re-seeds the recycling pool and every later answer
+    /// with it.
+    pub fn peek_nth(&self, offset: usize) -> TNum::Id<TBrand> {
+        let recyclable = self.dense.len() - self.live_count;
+        if offset < recyclable {
+            self.dense[self.live_count + offset]
+        } else {
+            <TNum::Id<TBrand> as Id>::from_usize_id(self.sparse.end().offset(offset - recyclable))
+        }
     }
 
     /// Releases `id`, recycling it for a future [`retain`](Self::retain) and
