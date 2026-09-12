@@ -85,6 +85,12 @@
 //! # UUID Ids (`uuid`, optional feature)
 //! Adds `UuidId`, an opaque brand-typed `Uuid` key with `from_uuid`/`to_uuid`
 //! conversions and a `uuid_id!` macro.
+//!
+//! # Serde (`serde`, optional feature)
+//! Implements `Serialize` and `Deserialize` for every scalar id as its bare
+//! integer, and for `UuidId` as its `Uuid` when `uuid` is on too. The brand
+//! never reaches the wire, so a branded id reads and writes as the unbranded
+//! value would, as a value or as a map key.
 
 #![warn(missing_docs)]
 
@@ -105,6 +111,9 @@ pub mod extends;
 
 #[cfg(feature = "soa")]
 pub mod soa;
+
+#[cfg(feature = "serde")]
+mod serde_ids;
 
 #[cfg(feature = "uuid")]
 mod uuid_ids;

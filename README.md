@@ -74,6 +74,23 @@ unsafe {
 }
 ```
 
+## Serde (`serde`, optional feature)
+
+Implements `Serialize` and `Deserialize` for every scalar id as its bare integer, and for `UuidId` as its `Uuid` when `uuid` is on too. Enable it with `branded-id = { version = "...", features = ["serde"] }`. The brand never reaches the wire, so a branded id reads and writes as the unbranded value would, as a value or as a map key.
+
+```rust
+use branded_id::{u32_id, U32Id};
+use std::collections::BTreeMap;
+
+struct BUser;
+
+let id: U32Id<BUser> = u32_id!(BUser; 7);
+assert_eq!(serde_json::to_string(&id).unwrap(), "7");
+
+let by_id = BTreeMap::from([(id, "ada")]);
+assert_eq!(serde_json::to_string(&by_id).unwrap(), r#"{"7":"ada"}"#);
+```
+
 ## UUID Ids (`uuid`, optional feature)
 
 Adds `UuidId`, an opaque brand-typed `Uuid` key. Enable it with `branded-id = { version = "...", features = ["uuid"] }`, then convert to and from a raw `Uuid` with `from_uuid`/`to_uuid` (or the matching `From` impls).

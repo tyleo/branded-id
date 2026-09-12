@@ -10,6 +10,9 @@ mod string_ids;
 #[cfg(feature = "extends")]
 pub mod extends;
 
+#[cfg(feature = "serde")]
+mod serde_ids;
+
 #[cfg(feature = "soa")]
 pub mod soa;
 

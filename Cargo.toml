@@ -1,6 +1,6 @@
 [package]
 name = "branded-id"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2024"
 license-file = "LICENSE"
 description = "Provides data structures which can be branded such that they only work with similarly branded integer data types."
@@ -12,8 +12,13 @@ categories = ["data-structures", "rust-patterns"]
 [features]
 default = ["extends", "soa"]
 extends = []
+serde = ["dep:serde", "uuid?/serde"]
 soa = []
 uuid = ["dep:uuid"]
 
 [dependencies]
+serde = { version = "1", optional = true }
 uuid = { version = "1", optional = true }
+
+[dev-dependencies]
+serde_test = "1"
