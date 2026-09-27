@@ -412,6 +412,43 @@ fn clone_test() {
     assert_eq!(*unsafe { clone.get(id_1) }, 20);
 }
 
+// clone_retained clones each live non-Copy value through the pool and leaves a
+// released id's slot unwritten.
+#[test]
+fn clone_retained_test() {
+    use std::rc::Rc;
+
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, Rc<u32>>::new();
+
+    let token = Rc::new(7);
+
+    let id_0 = ids.retain();
+    field.retain(id_0, Rc::clone(&token));
+    let id_1 = ids.retain();
+    field.retain(id_1, Rc::new(9));
+
+    // SAFETY: `field` and `ids` are in sync.
+    unsafe { field.release(id_1) };
+    ids.release(id_1);
+
+    // SAFETY: `field` and `ids` are in sync.
+    let mut clone = unsafe { field.clone_retained(&ids) };
+
+    // token + the stored value + its clone.
+    assert_eq!(Rc::strong_count(&token), 3);
+    assert_eq!(clone.reserved_count(), field.reserved_count());
+    // SAFETY: id_0 is retained in `ids`, so the clone wrote it.
+    assert_eq!(**unsafe { clone.get(id_0) }, 7);
+
+    // Tidy up so the stored values aren't leaked.
+    unsafe {
+        clone.clear(&ids);
+        field.clear(&ids);
+    }
+    assert_eq!(Rc::strong_count(&token), 1);
+}
+
 // Debug reports only the reserved-slot count: the values aren't shown because
 // liveness lives in the paired IdStruct, not the field.
 #[test]

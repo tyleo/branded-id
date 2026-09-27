@@ -81,6 +81,35 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         self.items.as_mut_vec().clear();
     }
 
+    /// A deep copy of the field, cloning the value at every id retained by
+    /// `ids`. The copy reserves as many slots as this field and leaves the
+    /// slots of released ids unwritten. It pairs with a clone of `ids`.
+    ///
+    /// The [`Clone`] impl covers only `Copy` values because the field cannot
+    /// tell its written slots apart without the pool.
+    ///
+    /// # Safety
+    /// `ids` must be the id pool this field is paired with, in sync with it:
+    /// every id retained by `ids` must have a value `retain`'d in this field
+    /// that has not since been released.
+    pub unsafe fn clone_retained<TNum: Scalar>(&self, ids: &IdStruct<TBrand, TNum>) -> Self
+    where
+        TValue: Clone,
+    {
+        let mut items: Vec<MaybeUninit<TValue>> = Vec::with_capacity(self.items.len());
+        items.resize_with(self.items.len(), MaybeUninit::uninit);
+
+        for id in ids {
+            // SAFETY: by contract, every id live in `ids` has a value here.
+            let value = unsafe { self.get(id) }.clone();
+            items[id.to_usize_id().to_usize()].write(value);
+        }
+
+        Self {
+            items: IdVec::from_vec(items),
+        }
+    }
+
     /// Compacts the field to match a pool that has just been
     /// [`gc`](IdStruct::gc)'d, moving each live value to its relabeled id and
     /// releasing the now-unused trailing storage.
@@ -264,7 +293,7 @@ impl<TBrand: ?Sized, TValue: Copy> Clone for IdField<TBrand, TValue> {
         // (including any still-uninitialized ones) and the live values. A
         // non-`Copy` value can't be cloned here because liveness lives in the
         // paired `IdStruct`, so this type can't tell which slots are
-        // initialized; a deep clone would have to be a method taking the pool.
+        // initialized; `clone_retained` takes the pool for that.
         Self {
             items: self.items.clone(),
         }
