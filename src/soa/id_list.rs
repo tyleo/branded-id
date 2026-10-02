@@ -51,7 +51,7 @@ impl<TBrand: ?Sized, TValue, TNum: Scalar> IdList<TBrand, TValue, TNum> {
     where
         TValue: PartialEq,
     {
-        self.ids == other.ids && self.eq_values(other)
+        self.ids.eq_state(&other.ids) && self.eq_values(other)
     }
 
     /// Whether both lists hold equal values in the same order, whatever their

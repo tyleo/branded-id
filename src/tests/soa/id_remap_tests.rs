@@ -34,14 +34,15 @@ fn lengths_test() {
     assert!(!remap.is_empty());
 }
 
-// A clone is an independent, equal copy.
+// A clone relabels every id the same way.
 #[test]
 fn clone_test() {
-    let remap = remap();
-    let clone = remap.clone();
+    let clone = remap().clone();
 
-    assert_eq!(remap, clone);
+    assert_eq!(clone.new_id(u32_id!(BTest; 0)), Some(u32_id!(BTest; 0)));
+    assert_eq!(clone.new_id(u32_id!(BTest; 1)), None);
     assert_eq!(clone.new_id(u32_id!(BTest; 2)), Some(u32_id!(BTest; 1)));
+    assert_eq!((clone.new_len(), clone.old_len()), (2, 3));
 }
 
 // Default is the empty remap, covering nothing.
@@ -61,31 +62,4 @@ fn debug_test() {
     let actual = format!("{:?}", remap());
     let expected = "IdRemap { new_ids: BTest[Some(BTest(0)), None, Some(BTest(1))], new_len: 2 }";
     assert_eq!(actual, expected);
-}
-
-// Hash agrees with Eq, so a clone is found in a set keyed by the remap itself.
-#[test]
-fn hash_test() {
-    use std::collections::HashSet;
-
-    let remap = remap();
-
-    let mut set = HashSet::new();
-    set.insert(remap.clone());
-    assert!(set.contains(&remap));
-}
-
-// Equality is structural: remaps from the same history are equal, a different
-// release history is not.
-#[test]
-fn eq_test() {
-    assert_eq!(remap(), remap());
-
-    let mut ids = IdStruct::<BTest>::new();
-    ids.retain();
-    ids.retain();
-    ids.retain();
-    let different = ids.gc();
-
-    assert_ne!(remap(), different);
 }

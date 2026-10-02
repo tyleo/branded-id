@@ -5,10 +5,7 @@ use crate::{
         IdStructViewMut,
     },
 };
-use std::{
-    fmt::{self, Debug},
-    hash::{Hash, Hasher},
-};
+use std::fmt::{self, Debug};
 
 /// An id pool that hands out and recycles typed integer handles.
 ///
@@ -74,6 +71,18 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.dense.clear();
         self.sparse.as_mut_vec().clear();
         self.live_count = 0;
+    }
+
+    /// Whether both pools retain the same ids in the same order. Released ids
+    /// do not count.
+    pub fn eq_ids(&self, other: &Self) -> bool {
+        self.dense[..self.live_count] == other.dense[..other.live_count]
+    }
+
+    /// Whether both pools match in [`eq_ids`](Self::eq_ids) and queue the same
+    /// released ids in the same order for reuse.
+    pub fn eq_state(&self, other: &Self) -> bool {
+        self.live_count == other.live_count && self.dense == other.dense
     }
 
     /// Compacts the pool so its retained ids become the contiguous range
@@ -518,40 +527,11 @@ impl<TBrand: ?Sized, TNum: Scalar> Default for IdStruct<TBrand, TNum> {
     }
 }
 
-impl<TBrand: ?Sized, TNum: Scalar> Eq for IdStruct<TBrand, TNum> {}
-
-impl<TBrand: ?Sized, TNum: Scalar> Hash for IdStruct<TBrand, TNum>
-where
-    TNum::Id<TBrand>: Hash,
-{
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        // Hash the same data `PartialEq` compares; `sparse` is derived from
-        // `dense` so omitting it keeps Hash and Eq in agreement.
-        self.dense.hash(state);
-        self.live_count.hash(state);
-    }
-}
-
 impl<'a, TBrand: ?Sized, TNum: Scalar> IntoIterator for &'a IdStruct<TBrand, TNum> {
     type Item = TNum::Id<TBrand>;
     type IntoIter = IdStructIter<'a, TNum::Id<TBrand>>;
 
     fn into_iter(self) -> Self::IntoIter {
         IdStructIter::from_live(&self.dense[..self.live_count])
-    }
-}
-
-impl<TBrand: ?Sized, TNum: Scalar> PartialEq for IdStruct<TBrand, TNum> {
-    fn eq(&self, other: &Self) -> bool {
-        // Structural equality over the full internal layout: `dense` (whose
-        // inverse `sparse` is redundant) plus the live/free boundary. Two pools
-        // that retain the same ids but reached that state through a different
-        // release history compare unequal.
-        self.live_count == other.live_count && self.dense == other.dense
-    }
-
-    #[allow(clippy::partialeq_ne_impl)]
-    fn ne(&self, other: &Self) -> bool {
-        self.live_count != other.live_count || self.dense != other.dense
     }
 }

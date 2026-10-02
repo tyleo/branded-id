@@ -681,7 +681,7 @@ fn clone_test() {
 
     let clone = ids.clone();
 
-    assert_eq!(ids, clone);
+    assert!(ids.eq_state(&clone));
     let actual: Vec<_> = clone.iter().collect();
     let expected: Vec<_> = ids.iter().collect();
     assert_eq!(actual, expected);
@@ -689,40 +689,44 @@ fn clone_test() {
     // Retaining on the clone recycles id_0 and leaves the original untouched.
     let mut clone = clone;
     assert_eq!(clone.retain(), id_0);
-    assert_ne!(ids, clone);
+    assert!(!ids.eq_state(&clone));
     assert_eq!(ids.len(), 1);
 }
 
-// Equality is structural over the internal layout: same retain/release history
-// is equal, and any divergence is not.
+// `eq_ids` compares the retained ids in order. Released ids do not count.
 #[test]
-fn eq_test() {
+fn eq_ids_test() {
     let mut a = IdStruct::<BTest>::new();
     a.retain();
     a.retain();
 
-    let mut b = IdStruct::<BTest>::new();
-    b.retain();
-    b.retain();
+    let mut b = a.clone();
+    let released = b.retain();
+    b.release(released);
 
-    assert_eq!(a, b);
+    assert!(a.eq_ids(&b));
 
-    a.release(u32_id!(BTest; 0));
-    assert_ne!(a, b);
+    b.move_to(u32_id!(BTest; 1), 0);
+
+    assert!(!a.eq_ids(&b));
 }
 
-// Hash agrees with Eq, so a clone is found in a set keyed by the pool itself.
+// `eq_state` also compares the released ids.
 #[test]
-fn hash_test() {
-    use std::collections::HashSet;
+fn eq_state_test() {
+    let mut a = IdStruct::<BTest>::new();
+    a.retain();
+    a.retain();
 
-    let mut ids = IdStruct::<BTest>::new();
-    ids.retain();
-    ids.retain();
+    let mut b = a.clone();
 
-    let mut set = HashSet::new();
-    set.insert(ids.clone());
-    assert!(set.contains(&ids));
+    assert!(a.eq_state(&b));
+
+    let released = b.retain();
+    b.release(released);
+
+    assert!(a.eq_ids(&b));
+    assert!(!a.eq_state(&b));
 }
 
 // Debug shows the retained (`live`) and recycled-next (`free`) ids; the
@@ -777,7 +781,7 @@ fn raw_parts_traits_test() {
 
     let parts = ids.as_raw_parts();
     let copy = parts;
-    assert_eq!(parts, copy);
+    assert_eq!(copy.live, parts.live);
 
     let actual = format!("{:?}", parts);
     let expected = "IdStructRawParts { live: [BTest(1)], sparse: BTest[1, 0], free: [BTest(0)] }";

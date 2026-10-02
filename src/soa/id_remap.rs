@@ -1,8 +1,5 @@
 use crate::{Id, IdVec, Scalar};
-use std::{
-    fmt::{self, Debug},
-    hash::{Hash, Hasher},
-};
+use std::fmt::{self, Debug};
 
 /// The relabeling produced by [`IdStruct::gc`](super::IdStruct::gc).
 ///
@@ -95,30 +92,5 @@ where
 impl<TBrand: ?Sized, TNum: Scalar> Default for IdRemap<TBrand, TNum> {
     fn default() -> Self {
         Self::from_parts(IdVec::new(), 0)
-    }
-}
-
-impl<TBrand: ?Sized, TNum: Scalar> Eq for IdRemap<TBrand, TNum> {}
-
-impl<TBrand: ?Sized, TNum: Scalar> Hash for IdRemap<TBrand, TNum>
-where
-    TNum::Id<TBrand>: Hash,
-{
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.new_ids.hash(state);
-        self.new_len.hash(state);
-    }
-}
-
-impl<TBrand: ?Sized, TNum: Scalar> PartialEq for IdRemap<TBrand, TNum> {
-    fn eq(&self, other: &Self) -> bool {
-        // `new_len` is redundant with `new_ids` (it counts its `Some` entries),
-        // but comparing it too keeps this in step with `Hash` and is cheap.
-        self.new_len == other.new_len && self.new_ids == other.new_ids
-    }
-
-    #[allow(clippy::partialeq_ne_impl)]
-    fn ne(&self, other: &Self) -> bool {
-        self.new_len != other.new_len || self.new_ids != other.new_ids
     }
 }
