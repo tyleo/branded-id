@@ -1,4 +1,9 @@
-use crate::{U32Id, soa::IdList, tests::util::BTest, u32_id};
+use crate::{
+    U32Id,
+    soa::{IdField, IdList},
+    tests::util::BTest,
+    u32_id,
+};
 use std::rc::Rc;
 
 type Names = IdList<BTest, String>;
@@ -112,6 +117,63 @@ fn view_test() {
     let value = list.view().get(u32_id!(BTest; 1));
 
     assert_eq!(value, Some(&1));
+}
+
+// A view with a column kept elsewhere adds, removes and compacts rows across
+// both.
+#[test]
+fn view_mut_with_test() {
+    let mut names = Names::new();
+    let mut health = IdField::<BTest, u32>::new();
+
+    // SAFETY: `health` is the only other column of `names` and is in sync
+    // with it.
+    let mut view = unsafe { names.view_mut_with(&mut health) };
+
+    let goblin = view.retain(("goblin".to_owned(), 30));
+    let troll = view.retain(("troll".to_owned(), 80));
+
+    assert_eq!(view.release_stable(goblin), Some(("goblin".to_owned(), 30)));
+
+    let (name, health) = view.get_mut(troll).unwrap();
+    name.push('!');
+    *health += 1;
+
+    let troll = view.gc().new_id(troll).unwrap();
+
+    assert_eq!(troll, u32_id!(BTest; 0));
+    assert_eq!(view.get(troll), Some((&"troll!".to_owned(), &81)));
+
+    view.clear();
+
+    assert!(names.is_empty());
+}
+
+// A shared view with a column kept elsewhere reads the list's values and
+// writes that column.
+#[test]
+fn view_with_test() {
+    let mut names = Names::new();
+    let mut health = IdField::<BTest, u32>::new();
+
+    // SAFETY: `health` is the only other column of `names` and is in sync
+    // with it.
+    let mut view = unsafe { names.view_mut_with(&mut health) };
+
+    let goblin = view.retain(("goblin".to_owned(), 30));
+    let troll = view.retain(("troll".to_owned(), 80));
+
+    // SAFETY: `health` is in sync with `names`.
+    let mut view = unsafe { names.view_with(&mut health) };
+
+    for (_, (name, health)) in view.iter_mut() {
+        if name == "troll" {
+            *health += 1;
+        }
+    }
+
+    assert_eq!(view.get(goblin), Some((&"goblin".to_owned(), &30)));
+    assert_eq!(view.get(troll), Some((&"troll".to_owned(), &81)));
 }
 
 // A clone copies the values deeply and matches the original's state. Each list

@@ -101,23 +101,36 @@
 //! ```
 //!
 //! An `IdList` owns a pool and its one column, so it keeps them in sync itself
-//! and needs no `unsafe`.
+//! and needs no `unsafe`. `view_with` and `view_mut_with` view the list beside
+//! columns kept elsewhere. The caller makes the same promise as for `view` and
+//! `view_mut`.
 //!
 //! ```
 //! # #[cfg(feature = "soa")]
 //! # fn main() {
-//! use branded_id::soa::IdList;
+//! use branded_id::soa::{IdField, IdList};
 //!
 //! struct BItem;
 //!
 //! let mut items = IdList::<BItem, &str>::new();
 //!
 //! let sword = items.retain("sword");
-//! items.retain("shield");
+//! let shield = items.retain("shield");
 //!
 //! assert_eq!(items.get(sword), Some(&"sword"));
 //! assert_eq!(items.release(sword), Some("sword"));
 //! assert_eq!(items.len(), 1);
+//!
+//! // The shield is the list's one item, so it needs a weight.
+//! let mut weights = IdField::<BItem, u32>::new();
+//! weights.retain(shield, 8);
+//!
+//! // SAFETY: `weights` is the list's only other column and is in sync with it.
+//! let mut inventory = unsafe { items.view_mut_with(&mut weights) };
+//!
+//! let bow = inventory.retain(("bow", 3));
+//! assert_eq!(inventory.get(bow), Some((&"bow", &3)));
+//! assert_eq!(inventory.get(shield), Some((&"shield", &8)));
 //! # }
 //! # #[cfg(not(feature = "soa"))]
 //! # fn main() {}

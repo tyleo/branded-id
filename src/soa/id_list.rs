@@ -1,8 +1,8 @@
 use crate::{
     Scalar,
     soa::{
-        IdColumns, IdField, IdRemap, IdStruct, IdStructView, IdStructViewIter, IdStructViewIterMut,
-        IdStructViewMut,
+        IdColumns, IdColumnsMut, IdField, IdRemap, IdStruct, IdStructView, IdStructViewIter,
+        IdStructViewIterMut, IdStructViewMut,
     },
 };
 use std::fmt::{self, Debug};
@@ -14,8 +14,9 @@ use std::fmt::{self, Debug};
 /// released. A released id is recycled. The values list in the pool's
 /// iteration order, which [`move_to`](Self::move_to) and
 /// [`set_order`](Self::set_order) rearrange. The list owns its pool and its
-/// one column, so it keeps them in sync without `unsafe`. Several columns over
-/// one pool go through [`IdStruct::view_mut`] instead.
+/// one column, so it keeps them in sync without `unsafe`. Columns kept
+/// elsewhere and keyed by the list's ids join its column in a row through
+/// [`view_with`](Self::view_with) and [`view_mut_with`](Self::view_mut_with).
 pub struct IdList<TBrand: ?Sized, TValue, TNum: Scalar = u32> {
     ids: IdStruct<TBrand, TNum>,
 
@@ -185,6 +186,44 @@ impl<TBrand: ?Sized, TValue, TNum: Scalar> IdList<TBrand, TValue, TNum> {
         // SAFETY: the list keeps its column in sync with its pool, and that
         // column is the pool's only one.
         unsafe { self.ids.view_mut(&mut self.values) }
+    }
+
+    /// A mutable view of the list beside `columns` keyed by its ids. A row
+    /// reads as `(value, row of columns)`. Adding or removing a row touches
+    /// every column.
+    ///
+    /// The list's own [`retain`](Self::retain), [`release`](Self::release),
+    /// [`gc`](Self::gc) and [`clear`](Self::clear) touch only its column and
+    /// leave `columns` out of sync. Dropping the list drops only its own
+    /// values.
+    ///
+    /// # Safety
+    /// Every column in `columns` must be in sync with the list's pool, as
+    /// [`IdStruct::view`] requires. `columns` must also hold every other column
+    /// keyed by the list's ids, as [`IdStruct::view_mut`] requires.
+    pub unsafe fn view_mut_with<TColumns: IdColumnsMut<TBrand>>(
+        &mut self,
+        columns: TColumns,
+    ) -> IdStructViewMut<'_, TBrand, (&mut IdField<TBrand, TValue>, TColumns), TNum> {
+        // SAFETY: the list keeps its column in sync with its pool. The caller
+        // vouches for `columns`.
+        unsafe { self.ids.view_mut((&mut self.values, columns)) }
+    }
+
+    /// A shared view of the list beside `columns` keyed by its ids. A row
+    /// reads as `(value, row of columns)`. A mutable column in `columns` is
+    /// writable through the view.
+    ///
+    /// # Safety
+    /// Every column in `columns` must be in sync with the list's pool, as
+    /// [`IdStruct::view`] requires.
+    pub unsafe fn view_with<TColumns: IdColumns<TBrand>>(
+        &self,
+        columns: TColumns,
+    ) -> IdStructView<'_, TBrand, (&IdField<TBrand, TValue>, TColumns), TNum> {
+        // SAFETY: the list keeps its column in sync with its pool. The caller
+        // vouches for `columns`.
+        unsafe { self.ids.view((&self.values, columns)) }
     }
 }
 
