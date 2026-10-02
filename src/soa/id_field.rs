@@ -6,7 +6,7 @@ use std::{
     fmt::{self, Debug},
     mem,
     mem::MaybeUninit,
-    ptr::write_bytes,
+    ptr::{self, write_bytes},
 };
 
 /// A sparse, columnar data store keyed by typed ids from an [`IdStruct`].
@@ -199,6 +199,18 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         IdFieldIterMut::new(items, len, ids.into_iter())
     }
 
+    /// A read-only pointer to the storage, for views.
+    pub(super) fn raw_items(&self) -> *const [MaybeUninit<TValue>] {
+        ptr::slice_from_raw_parts(self.items.as_vec().as_ptr(), self.items.len())
+    }
+
+    /// A mutable pointer to the storage, for views that hand out values that
+    /// do not alias.
+    pub(super) fn raw_items_mut(&mut self) -> *mut [MaybeUninit<TValue>] {
+        let len = self.items.len();
+        ptr::slice_from_raw_parts_mut(self.items.as_mut_vec().as_mut_ptr(), len)
+    }
+
     /// # Safety
     /// A value must be `retain`'d at the id for `release` to be safe to call.
     pub unsafe fn release(&mut self, id: impl Id<Brand = TBrand>) {
@@ -246,11 +258,7 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         let item = &mut self.items[id.to_usize_id()];
         unsafe { MaybeUninit::assume_init_drop(item) }
 
-        let size = mem::size_of::<TValue>();
-        if size != 0 {
-            let p = item.as_mut_ptr() as *mut u8;
-            unsafe { write_bytes(p, 0, size) }
-        }
+        zero_bytes(item);
     }
 
     /// Ensures at least `count` id slots are reserved (so
@@ -284,6 +292,32 @@ impl<TBrand: ?Sized, TValue> IdField<TBrand, TValue> {
         unsafe { MaybeUninit::assume_init_drop(item) }
         item.write(value)
     }
+
+    /// Moves the value at `id` out and leaves the slot unwritten. Call it
+    /// *before* releasing the id, as with [`release`](Self::release), which
+    /// drops the value instead.
+    ///
+    /// # Safety
+    /// A value must be `retain`'d at the id for `take` to be safe to call.
+    pub unsafe fn take(&mut self, id: impl Id<Brand = TBrand>) -> TValue {
+        let item = &mut self.items[id.to_usize_id()];
+        unsafe { item.assume_init_read() }
+    }
+
+    /// Like [`take`](Self::take), but also clobbers the slot's backing bytes
+    /// with zeros. A debugger then shows no stale copy of the value.
+    ///
+    /// # Safety
+    /// A value must be `retain`'d at the id for `take_zeroed` to be safe to
+    /// call.
+    pub unsafe fn take_zeroed(&mut self, id: impl Id<Brand = TBrand>) -> TValue {
+        let item = &mut self.items[id.to_usize_id()];
+        let value = unsafe { item.assume_init_read() };
+
+        zero_bytes(item);
+
+        value
+    }
 }
 
 impl<TBrand: ?Sized, TValue: Copy> Clone for IdField<TBrand, TValue> {
@@ -316,5 +350,16 @@ impl<TBrand: ?Sized, TValue> Debug for IdField<TBrand, TValue> {
 impl<TBrand: ?Sized, TValue> Default for IdField<TBrand, TValue> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+fn zero_bytes<TValue>(item: &mut MaybeUninit<TValue>) {
+    let size = mem::size_of::<TValue>();
+    if size != 0 {
+        let p = item.as_mut_ptr() as *mut u8;
+
+        // SAFETY: `p` points at the slot's `size` bytes, which a
+        // `MaybeUninit` may hold in any state.
+        unsafe { write_bytes(p, 0, size) }
     }
 }

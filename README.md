@@ -74,6 +74,43 @@ unsafe {
 }
 ```
 
+A view reads columns by row without an `unsafe` per read. `view` borrows the pool beside any mix of shared and mutable columns. Building it is the one unsafe step: the caller vouches that the columns are in sync with the pool. `view_mut` takes every column, all mutable, so rows can be added and removed too.
+
+```rust
+// SAFETY: both columns are in sync with `enemies`.
+let mut fight = unsafe { enemies.view((&health, &mut attack)) };
+
+// Each enemy hits harder the healthier it is.
+for (_, (health, attack)) in fight.iter_mut() {
+    *attack += *health / 10;
+}
+
+assert_eq!(fight.get(troll), Some((&80, &20)));
+
+// SAFETY: both columns are every column of `enemies`, in sync with it.
+let mut roster = unsafe { enemies.view_mut((&mut health, &mut attack)) };
+
+let orc = roster.retain((50, 8));
+assert_eq!(roster.release(orc), Some((50, 8)));
+```
+
+An `IdList` owns a pool and its one column, so it keeps them in sync itself and needs no `unsafe`.
+
+```rust
+use branded_id::soa::IdList;
+
+struct BItem;
+
+let mut items = IdList::<BItem, &str>::new();
+
+let sword = items.retain("sword");
+items.retain("shield");
+
+assert_eq!(items.get(sword), Some(&"sword"));
+assert_eq!(items.release(sword), Some("sword"));
+assert_eq!(items.len(), 1);
+```
+
 ## Serde (`serde`, optional feature)
 
 Implements `Serialize` and `Deserialize` for every scalar id as its bare integer, and for `UuidId` as its `Uuid` when `uuid` is on too. Enable it with `branded-id = { version = "...", features = ["serde"] }`. The brand never reaches the wire, so a branded id reads and writes as the unbranded value would, as a value or as a map key.

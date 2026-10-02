@@ -235,6 +235,47 @@ fn iter_mut_out_of_range_panics_test() {
     let _ = iter.next();
 }
 
+// `take` moves the value out without dropping it, so the slot can be retained
+// again once its id is released.
+#[test]
+fn take_test() {
+    use std::rc::Rc;
+
+    let token = Rc::new(());
+
+    let mut ids = U32IdStruct::<BTest>::new();
+    let mut field = IdField::<BTest, Rc<()>>::new();
+
+    let id_0 = ids.retain();
+    field.retain(id_0, Rc::clone(&token));
+
+    // SAFETY: `id_0` holds a value, taken before the id is released.
+    let taken = unsafe { field.take(id_0) };
+    ids.release(id_0);
+
+    assert_eq!(Rc::strong_count(&token), 2);
+
+    drop(taken);
+
+    assert_eq!(Rc::strong_count(&token), 1);
+}
+
+#[test]
+fn take_zeroed_test() {
+    let mut field = IdField::<BTest, u32>::new();
+    let id_0 = u32_id!(BTest; 0);
+
+    field.retain(id_0, 7);
+
+    // SAFETY: `id_0` holds a value.
+    let taken = unsafe { field.take_zeroed(id_0) };
+
+    // The value moves out and leaves zeros in the slot.
+    assert_eq!(taken, 7);
+    assert_eq!(field.reserved_count(), 1);
+    assert_eq!(*unsafe { field.get(id_0) }, 0);
+}
+
 #[test]
 fn new_test() {
     IdField::<BTest, u32>::new();

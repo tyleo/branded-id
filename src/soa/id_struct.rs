@@ -1,6 +1,9 @@
 use crate::{
     Id, IdVec, Scalar, UsizeId,
-    soa::{IdRemap, IdStructIter, IdStructRawParts},
+    soa::{
+        IdColumns, IdColumnsMut, IdRemap, IdStructIter, IdStructRawParts, IdStructView,
+        IdStructViewMut,
+    },
 };
 use std::{
     fmt::{self, Debug},
@@ -409,6 +412,36 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.check_order(new_order).ok()?;
         self.apply_order(new_order);
         Some(())
+    }
+
+    /// Views `columns` beside this pool. The view reads and writes their values
+    /// by row without `unsafe`.
+    ///
+    /// # Safety
+    /// Every column in `columns` must be paired with this pool and in sync
+    /// with it: every id this pool retains must have a value `retain`'d in the
+    /// column that has not since been released.
+    pub unsafe fn view<TColumns: IdColumns<TBrand>>(
+        &self,
+        columns: TColumns,
+    ) -> IdStructView<'_, TBrand, TColumns, TNum> {
+        // SAFETY: forwarded to the caller.
+        unsafe { IdStructView::new(self, columns) }
+    }
+
+    /// Views `columns` beside this pool. The view can also add and remove
+    /// rows.
+    ///
+    /// # Safety
+    /// As [`view`](Self::view), and `columns` must be every column paired with
+    /// this pool. Adding or removing a row touches only these, so a column left
+    /// out would fall out of sync.
+    pub unsafe fn view_mut<TColumns: IdColumnsMut<TBrand>>(
+        &mut self,
+        columns: TColumns,
+    ) -> IdStructViewMut<'_, TBrand, TColumns, TNum> {
+        // SAFETY: forwarded to the caller.
+        unsafe { IdStructViewMut::new(self, columns) }
     }
 
     /// Whether `new_order` lists every retained id exactly once.

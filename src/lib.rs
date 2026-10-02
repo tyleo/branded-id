@@ -77,6 +77,47 @@
 //!     *health.get_mut(goblin) -= *attack.get(troll);
 //!     assert_eq!(*health.get(goblin), 18);
 //! }
+//!
+//! // A view reads by row without an `unsafe` per read.
+//! // SAFETY: both columns are in sync with `enemies`.
+//! let mut fight = unsafe { enemies.view((&health, &mut attack)) };
+//!
+//! // Each enemy hits harder the healthier it is.
+//! for (_, (health, attack)) in fight.iter_mut() {
+//!     *attack += *health / 10;
+//! }
+//!
+//! assert_eq!(fight.get(troll), Some((&80, &20)));
+//!
+//! // A view of every column, all mutable, adds and removes rows too.
+//! // SAFETY: both columns are every column of `enemies`, in sync with it.
+//! let mut roster = unsafe { enemies.view_mut((&mut health, &mut attack)) };
+//!
+//! let orc = roster.retain((50, 8));
+//! assert_eq!(roster.release(orc), Some((50, 8)));
+//! # }
+//! # #[cfg(not(feature = "soa"))]
+//! # fn main() {}
+//! ```
+//!
+//! An `IdList` owns a pool and its one column, so it keeps them in sync itself
+//! and needs no `unsafe`.
+//!
+//! ```
+//! # #[cfg(feature = "soa")]
+//! # fn main() {
+//! use branded_id::soa::IdList;
+//!
+//! struct BItem;
+//!
+//! let mut items = IdList::<BItem, &str>::new();
+//!
+//! let sword = items.retain("sword");
+//! items.retain("shield");
+//!
+//! assert_eq!(items.get(sword), Some(&"sword"));
+//! assert_eq!(items.release(sword), Some("sword"));
+//! assert_eq!(items.len(), 1);
 //! # }
 //! # #[cfg(not(feature = "soa"))]
 //! # fn main() {}
