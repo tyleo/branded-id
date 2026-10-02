@@ -49,6 +49,17 @@ macro_rules! scalar_id_impl {
             pub const fn $to(self) -> $prim {
                 self.repr
             }
+
+            /// The ids in `0..self`.
+            ///
+            /// # Panics
+            /// Panics if the id is negative or does not fit a `usize`.
+            pub fn range_from_zero(self) -> $crate::IdRange<Self> {
+                let end = <usize as ::std::convert::TryFrom<$prim>>::try_from(self.$to())
+                    .expect("an id range ends at an id that fits a usize");
+
+                $crate::IdRange::from_usize_range(0..end)
+            }
         }
 
         impl<TBrand: ?Sized> ::std::fmt::Binary for $id<TBrand> {

@@ -135,6 +135,21 @@ fn to_usize_id_test() {
 }
 
 #[test]
+fn range_from_zero_test() {
+    let id = id!(BTest; 3);
+
+    let actual: Vec<U128Id<BTest>> = id.range_from_zero().collect();
+    let expected = vec![id!(BTest; 0), id!(BTest; 1), id!(BTest; 2)];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+#[should_panic(expected = "an id range ends at an id that fits a usize")]
+fn range_from_zero_panics_past_usize_test() {
+    id!(BTest; u128::MAX).range_from_zero();
+}
+
+#[test]
 fn binary_fmt_test() {
     let id = id!(BTest; 2);
 

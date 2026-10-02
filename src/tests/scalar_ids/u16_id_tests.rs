@@ -135,6 +135,15 @@ fn to_usize_id_test() {
 }
 
 #[test]
+fn range_from_zero_test() {
+    let id = id!(BTest; 3);
+
+    let actual: Vec<U16Id<BTest>> = id.range_from_zero().collect();
+    let expected = vec![id!(BTest; 0), id!(BTest; 1), id!(BTest; 2)];
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn binary_fmt_test() {
     let id = id!(BTest; 2);
 

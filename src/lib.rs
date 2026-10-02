@@ -22,7 +22,8 @@
 //! # Integer Ids
 //! A brand-typed integer id for each primitive width (for example [`UsizeId`]
 //! and [`I32Id`]), built with the `*_id!` macros. [`UsizeId`] is the canonical
-//! width that indexes storage; the others convert through it.
+//! width that indexes storage; the others convert through it. An id's
+//! `range_from_zero` returns an [`IdRange`] over the ids from zero up to it.
 //!
 //! # Containers
 //! Brand-typed slices, arrays, vectors, and pointers that only accept ids of
