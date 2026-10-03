@@ -7,10 +7,9 @@ use std::{
 scalar_id_impl! { UsizeId, usize, from_usize, to_usize }
 
 impl<TBrand: ?Sized> UsizeId<TBrand> {
-    /// Returns the id advanced by `value`, keeping the brand.
-    ///
-    /// # Panics
-    /// Panics if the addition overflows `usize`.
+    /// Returns the id advanced by `value`, keeping the brand. Overflow behaves
+    /// as `usize` addition does: it panics when overflow checks are on, as in
+    /// debug builds, and wraps otherwise.
     pub const fn offset(self, value: usize) -> UsizeId<TBrand> {
         UsizeId::from_usize(self.to_usize() + value)
     }

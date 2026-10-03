@@ -150,6 +150,10 @@ impl<TBrand: ?Sized, TValue, TNum: Scalar> IdList<TBrand, TValue, TNum> {
     }
 
     /// Adds `value` under a newly retained id at the end of the order.
+    ///
+    /// # Panics
+    /// Panics if the list has no id left to hand out, as
+    /// [`IdStruct::retain`].
     pub fn retain(&mut self, value: TValue) -> TNum::Id<TBrand> {
         self.view_mut().retain(value)
     }

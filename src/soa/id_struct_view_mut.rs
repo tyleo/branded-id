@@ -182,6 +182,10 @@ impl<'a, TBrand: ?Sized, TColumns: IdColumnsMut<TBrand>, TNum: Scalar>
 
     /// Adds a row holding `values` under a newly retained id at the end of the
     /// order.
+    ///
+    /// # Panics
+    /// Panics if the pool has no id left to hand out, as
+    /// [`IdStruct::retain`].
     pub fn retain(&mut self, values: TColumns::Values) -> TNum::Id<TBrand> {
         let id = self.ids.retain();
 

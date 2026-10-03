@@ -1,6 +1,6 @@
 use crate::{
     I8Id, I16Id, I32Id, I64Id, I128Id, Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
-    internal::Sealed,
+    internal::{IdRepr, Sealed},
 };
 
 /// The primitive integer that backs a branded id, paired with the id type that
@@ -12,10 +12,10 @@ use crate::{
 /// keyed by a brand alone while choosing its integer width separately: an
 /// `IdStruct<BFoo>` stores indices as `u32` and hands out [`U32Id`], while
 /// `IdStruct<BFoo, usize>` stores them as `usize` and hands out [`UsizeId`].
-pub trait Scalar: Copy + Sealed {
+pub trait Scalar: Copy + Sealed + TryFrom<usize> {
     /// The branded id wrapping this integer for `TBrand` (e.g. [`U32Id`] for
     /// `u32`).
-    type Id<TBrand: ?Sized>: Id<Brand = TBrand>;
+    type Id<TBrand: ?Sized>: Id<Brand = TBrand> + IdRepr<Repr = Self>;
 
     /// Reconstructs the integer from a `usize` index.
     fn from_usize(index: usize) -> Self;

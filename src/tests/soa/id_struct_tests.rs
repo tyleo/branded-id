@@ -687,6 +687,90 @@ fn gc_full_width_pool_test() {
     assert_eq!(live, retained);
 }
 
+#[test]
+#[should_panic(expected = "retained an id past the pool's id width")]
+fn retain_panics_past_the_id_width_test() {
+    let mut ids = IdStruct::<BTest, u8>::new();
+
+    for _ in 0..256 {
+        ids.retain();
+    }
+
+    ids.retain();
+}
+
+// A signed width hands out only its non-negative ids.
+#[test]
+#[should_panic(expected = "retained an id past the pool's id width")]
+fn retain_panics_past_a_signed_id_width_test() {
+    let mut ids = IdStruct::<BTest, i8>::new();
+
+    for _ in 0..128 {
+        ids.retain();
+    }
+
+    ids.retain();
+}
+
+#[test]
+fn retain_recycles_in_a_full_pool_test() {
+    let mut ids = IdStruct::<BTest, u8>::new();
+
+    let retained: Vec<_> = (0..256).map(|_| ids.retain()).collect();
+
+    ids.release(retained[7]);
+
+    assert_eq!(ids.retain(), retained[7]);
+}
+
+#[test]
+#[should_panic(expected = "peeked at a fresh id past the pool's id width")]
+fn peek_next_fresh_panics_on_a_full_pool_test() {
+    let mut ids = IdStruct::<BTest, u8>::new();
+
+    for _ in 0..256 {
+        ids.retain();
+    }
+
+    ids.peek_next_fresh();
+}
+
+#[test]
+fn peek_nth_reaches_the_largest_id_test() {
+    let mut ids = IdStruct::<BTest, u8>::new();
+
+    for _ in 0..255 {
+        ids.retain();
+    }
+
+    assert_eq!(ids.peek_nth(0), U8Id::MAX);
+}
+
+#[test]
+#[should_panic(expected = "peeked at an id past the pool's id width")]
+fn peek_nth_panics_past_the_id_width_test() {
+    let mut ids = IdStruct::<BTest, u8>::new();
+
+    for _ in 0..255 {
+        ids.retain();
+    }
+
+    ids.peek_nth(1);
+}
+
+// An offset that overflows usize would wrap to a small index that fits the
+// width.
+#[test]
+#[should_panic(expected = "peeked at an id past the pool's id width")]
+fn peek_nth_panics_on_an_overflowing_offset_test() {
+    let mut ids = IdStruct::<BTest, usize>::new();
+
+    ids.retain();
+    ids.retain();
+
+    ids.peek_nth(usize::MAX);
+}
+
 // Cloning a pool copies its retained and recycled state, and the clone is
 // independent of the original.
 #[test]

@@ -1,5 +1,6 @@
 use crate::{
-    Id, IdVec, Scalar, UsizeId,
+    Id, IdVec, Scalar,
+    internal::IdRepr,
     soa::{
         IdColumns, IdColumnsMut, IdRemap, IdStructIter, IdStructRawParts, IdStructView,
         IdStructViewMut,
@@ -118,7 +119,7 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         for (old, index) in self.sparse.as_vec().iter().enumerate() {
             let slot = index.to_usize();
             if slot < new_len {
-                let new = <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(slot));
+                let new = <TNum::Id<TBrand> as IdRepr>::from_repr(TNum::from_usize(slot));
                 new_ids[old] = Some(new);
             }
         }
@@ -129,7 +130,7 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         self.dense.clear();
         self.dense.extend(
             (0..new_len)
-                .map(|index| <TNum::Id<TBrand> as Id>::from_usize_id(UsizeId::from_usize(index))),
+                .map(|index| <TNum::Id<TBrand> as IdRepr>::from_repr(TNum::from_usize(index))),
         );
 
         let sparse = self.sparse.as_mut_vec();
@@ -256,14 +257,25 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
 
     /// Peeks at the next id [`retain`](Self::retain) would return, without
     /// actually retaining it.
+    ///
+    /// # Panics
+    /// Panics if no released id is waiting and the pool has handed out every
+    /// id its width holds.
     pub fn peek_next(&self) -> TNum::Id<TBrand> {
         self.peek_nth(0)
     }
 
     /// Peeks at the next id that would be freshly allocated, ignoring the
     /// released ids available for recycling.
+    ///
+    /// # Panics
+    /// Panics if the pool has handed out every id its width holds.
     pub fn peek_next_fresh(&self) -> TNum::Id<TBrand> {
-        <TNum::Id<TBrand> as Id>::from_usize_id(self.sparse.end())
+        let Ok(repr) = TNum::try_from(self.sparse.len()) else {
+            panic!("peeked at a fresh id past the pool's id width");
+        };
+
+        <TNum::Id<TBrand> as IdRepr>::from_repr(repr)
     }
 
     /// Peeks at the id the `offset`-th future [`retain`](Self::retain) would
@@ -277,12 +289,23 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
     /// [`release`](Self::release) or [`release_stable`](Self::release_stable)
     /// part-way through re-seeds the recycling pool and every later answer
     /// with it.
+    ///
+    /// # Panics
+    /// Panics if the `offset`-th retain would pass the pool's id width.
     pub fn peek_nth(&self, offset: usize) -> TNum::Id<TBrand> {
         let recyclable = self.dense.len() - self.live_count;
         if offset < recyclable {
             self.dense[self.live_count + offset]
         } else {
-            <TNum::Id<TBrand> as Id>::from_usize_id(self.sparse.end().offset(offset - recyclable))
+            let Some(index) = self.sparse.len().checked_add(offset - recyclable) else {
+                panic!("peeked at an id past the pool's id width");
+            };
+
+            let Ok(repr) = TNum::try_from(index) else {
+                panic!("peeked at an id past the pool's id width");
+            };
+
+            <TNum::Id<TBrand> as IdRepr>::from_repr(repr)
         }
     }
 
@@ -368,6 +391,10 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
 
     /// Retains and returns an id, reusing a previously released id when one is
     /// available and otherwise allocating a fresh one.
+    ///
+    /// # Panics
+    /// Panics if no released id is waiting and the pool has handed out every
+    /// id its width holds. The pool is left unchanged when it panics.
     pub fn retain(&mut self) -> TNum::Id<TBrand> {
         let id = if self.live_count < self.dense.len() {
             // Recycle the id at the front of the released region. Its `sparse`
@@ -378,10 +405,16 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
             // Allocate a brand-new id, growing both lists in lock-step. The new
             // id lands at index `live_count`, and its own value is that index,
             // so `sparse` records that index as the id's position.
-            let index = self.sparse.end();
-            let id = <TNum::Id<TBrand> as Id>::from_usize_id(index);
-            self.sparse.push(TNum::from_usize(index.to_usize()));
+            let Ok(repr) = TNum::try_from(self.sparse.len()) else {
+                panic!("retained an id past the pool's id width");
+            };
+
+            let id = <TNum::Id<TBrand> as IdRepr>::from_repr(repr);
+
+            self.sparse.push(repr);
+
             self.dense.push(id);
+
             id
         };
 
