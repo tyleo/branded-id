@@ -41,27 +41,6 @@ fn into_string_test() {
 }
 
 #[test]
-fn from_str_ref_test() {
-    let actual: &StrId<BTest> = From::from("a");
-    let expected = str_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_string_value_test() {
-    let actual: StringId<BTest> = From::from(String::from("a"));
-    let expected = string_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_str_slice_test() {
-    let actual: StringId<BTest> = From::from("a");
-    let expected = string_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn borrowed_debug_fmt_test() {
     let id = str_id!(BTest; "a");
 
@@ -253,21 +232,8 @@ fn to_owned_test() {
 }
 
 #[test]
-fn borrowed_as_ref_test() {
-    let id = str_id!(BTest; "a");
-
-    let actual: &str = AsRef::<str>::as_ref(id);
-    let expected = "a";
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn owned_as_ref_test() {
     let id = string_id!(BTest; "a");
-
-    let actual: &str = AsRef::<str>::as_ref(&id);
-    let expected = "a";
-    assert_eq!(actual, expected);
 
     let actual: &StrId<BTest> = AsRef::<StrId<BTest>>::as_ref(&id);
     let expected = str_id!(BTest; "a");

@@ -3,9 +3,9 @@
 ///
 /// The impls are written by hand (rather than derived) so that no `TBrand:
 /// Trait` bound leaks onto the generated types, and forward to the inner string
-/// type's own impls. Kind-specific items (`Display`, `FromStr`, extra `From`
-/// conversions, `extends` casts) are added by the caller in separate `impl`
-/// blocks, because the inner types do not all support them.
+/// type's own impls. The caller adds kind-specific items, such as `Display`,
+/// `FromStr`, and `extends` casts, in separate `impl` blocks, because not every
+/// inner type supports them.
 ///
 /// Unlike the integer ids, string ids are opaque branded keys rather than
 /// indices: they do not implement [`Id`](crate::Id) or
@@ -107,23 +107,11 @@ macro_rules! string_id_impl {
             }
         }
 
-        impl<TBrand: ?Sized> ::std::convert::AsRef<$binner> for $bid<TBrand> {
-            fn as_ref(&self) -> &$binner {
-                &self.repr
-            }
-        }
-
         impl<TBrand: ?Sized> ::std::borrow::ToOwned for $bid<TBrand> {
             type Owned = $oid<TBrand>;
 
             fn to_owned(&self) -> $oid<TBrand> {
                 $oid::$ofrom(::std::borrow::ToOwned::to_owned(&self.repr))
-            }
-        }
-
-        impl<'a, TBrand: ?Sized> ::std::convert::From<&'a $binner> for &'a $bid<TBrand> {
-            fn from(value: &'a $binner) -> &'a $bid<TBrand> {
-                $bid::$bfrom(value)
             }
         }
 
@@ -232,18 +220,6 @@ macro_rules! string_id_impl {
         impl<TBrand: ?Sized> ::std::convert::AsRef<$bid<TBrand>> for $oid<TBrand> {
             fn as_ref(&self) -> &$bid<TBrand> {
                 self
-            }
-        }
-
-        impl<TBrand: ?Sized> ::std::convert::AsRef<$binner> for $oid<TBrand> {
-            fn as_ref(&self) -> &$binner {
-                ::std::convert::AsRef::<$binner>::as_ref(&self.repr)
-            }
-        }
-
-        impl<TBrand: ?Sized> ::std::convert::From<$oinner> for $oid<TBrand> {
-            fn from(value: $oinner) -> $oid<TBrand> {
-                $oid::$ofrom(value)
             }
         }
     };

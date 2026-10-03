@@ -1,7 +1,7 @@
 /// Builds an owned [`PathBufId`](crate::PathBufId). Forms:
 /// `path_buf_id!(value)` (brand inferred) and `path_buf_id!(Brand; value)`.
-/// Accepts anything [`PathBufId`](crate::PathBufId) is `From`, such as a string
-/// literal, a `String`, a `PathBuf`, or an `OsString`.
+/// Accepts anything `PathBuf::from` takes, such as a string literal, a
+/// `String`, a `PathBuf`, or an `OsString`.
 ///
 /// # Examples
 /// ```rust
@@ -14,9 +14,9 @@
 #[macro_export]
 macro_rules! path_buf_id {
     ($id:expr) => {
-        $crate::PathBufId::<_>::from($id)
+        $crate::PathBufId::<_>::from_path_buf(::std::path::PathBuf::from($id))
     };
     ($brand:ty; $id:expr) => {
-        $crate::PathBufId::<$brand>::from($id)
+        $crate::PathBufId::<$brand>::from_path_buf(::std::path::PathBuf::from($id))
     };
 }

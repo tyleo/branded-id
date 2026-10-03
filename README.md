@@ -147,7 +147,7 @@ assert_eq!(serde_json::to_string(&by_id).unwrap(), r#"{"7":"ada"}"#);
 
 ## UUID Ids (`uuid`, optional feature)
 
-Adds `UuidId`, an opaque brand-typed `Uuid` key. Enable it with `branded-id = { version = "...", features = ["uuid"] }`, then convert to and from a raw `Uuid` with `from_uuid`/`to_uuid` (or the matching `From` impls).
+Adds `UuidId`, an opaque brand-typed `Uuid` key. Enable it with `branded-id = { version = "...", features = ["uuid"] }`, then convert to and from a raw `Uuid` with `from_uuid`/`to_uuid`.
 
 ```rust
 use branded_id::{uuid_id, UuidId};

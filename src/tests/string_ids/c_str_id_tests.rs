@@ -41,27 +41,6 @@ fn into_c_string_test() {
 }
 
 #[test]
-fn from_c_str_ref_test() {
-    let actual: &CStrId<BTest> = From::from(c"a");
-    let expected = c_str_id!(BTest; c"a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_c_string_value_test() {
-    let actual: CStringId<BTest> = From::from(CString::from(c"a"));
-    let expected = c_string_id!(BTest; c"a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_c_str_owned_test() {
-    let actual: CStringId<BTest> = From::from(c"a");
-    let expected = c_string_id!(BTest; c"a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn borrowed_debug_fmt_test() {
     let id = c_str_id!(BTest; c"a");
 
@@ -206,21 +185,8 @@ fn to_owned_test() {
 }
 
 #[test]
-fn borrowed_as_ref_test() {
-    let id = c_str_id!(BTest; c"a");
-
-    let actual: &CStr = AsRef::<CStr>::as_ref(id);
-    let expected = c"a";
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn owned_as_ref_test() {
     let id = c_string_id!(BTest; c"a");
-
-    let actual: &CStr = AsRef::<CStr>::as_ref(&id);
-    let expected = c"a";
-    assert_eq!(actual, expected);
 
     let actual: &CStrId<BTest> = AsRef::<CStrId<BTest>>::as_ref(&id);
     let expected = c_str_id!(BTest; c"a");

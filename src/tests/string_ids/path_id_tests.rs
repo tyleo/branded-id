@@ -3,7 +3,6 @@ use std::{
     borrow::Borrow,
     cmp::Ordering,
     collections::{HashMap, hash_map::DefaultHasher},
-    ffi::OsString,
     hash::{Hash, Hasher},
     ops::Deref,
     path::{Path, PathBuf},
@@ -39,48 +38,6 @@ fn into_path_buf_test() {
 
     let actual: PathBuf = id.into_path_buf();
     let expected = PathBuf::from("a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_path_ref_test() {
-    let actual: &PathId<BTest> = From::from(Path::new("a"));
-    let expected = path_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_path_buf_value_test() {
-    let actual: PathBufId<BTest> = From::from(PathBuf::from("a"));
-    let expected = path_buf_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_str_slice_test() {
-    let actual: PathBufId<BTest> = From::from("a");
-    let expected = path_buf_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_string_test() {
-    let actual: PathBufId<BTest> = From::from(String::from("a"));
-    let expected = path_buf_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_os_string_test() {
-    let actual: PathBufId<BTest> = From::from(OsString::from("a"));
-    let expected = path_buf_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_path_owned_test() {
-    let actual: PathBufId<BTest> = From::from(Path::new("a"));
-    let expected = path_buf_id!(BTest; "a");
     assert_eq!(actual, expected);
 }
 
@@ -236,21 +193,8 @@ fn to_owned_test() {
 }
 
 #[test]
-fn borrowed_as_ref_test() {
-    let id = path_id!(BTest; "a");
-
-    let actual: &Path = AsRef::<Path>::as_ref(id);
-    let expected = Path::new("a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn owned_as_ref_test() {
     let id = path_buf_id!(BTest; "a");
-
-    let actual: &Path = AsRef::<Path>::as_ref(&id);
-    let expected = Path::new("a");
-    assert_eq!(actual, expected);
 
     let actual: &PathId<BTest> = AsRef::<PathId<BTest>>::as_ref(&id);
     let expected = path_id!(BTest; "a");

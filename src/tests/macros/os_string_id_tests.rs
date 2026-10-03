@@ -14,3 +14,10 @@ fn os_string_id_1_test() {
     let expected = OsStringId::from_os_string(OsString::from("a"));
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn os_string_id_of_a_string_test() {
+    let actual: OsStringId<BTest> = os_string_id!(BTest; String::from("a"));
+    let expected = OsStringId::from_os_string(OsString::from("a"));
+    assert_eq!(actual, expected);
+}

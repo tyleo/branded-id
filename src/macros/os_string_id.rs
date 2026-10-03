@@ -1,7 +1,7 @@
 /// Builds an owned [`OsStringId`](crate::OsStringId). Forms:
 /// `os_string_id!(value)` (brand inferred) and `os_string_id!(Brand; value)`.
-/// Accepts anything [`OsStringId`](crate::OsStringId) is `From`, such as a
-/// string literal, a `String`, or an `OsString`.
+/// Accepts anything `OsString::from` takes, such as a string literal, a
+/// `String`, or an `OsString`.
 ///
 /// # Examples
 /// ```rust
@@ -14,9 +14,9 @@
 #[macro_export]
 macro_rules! os_string_id {
     ($id:expr) => {
-        $crate::OsStringId::<_>::from($id)
+        $crate::OsStringId::<_>::from_os_string(::std::ffi::OsString::from($id))
     };
     ($brand:ty; $id:expr) => {
-        $crate::OsStringId::<$brand>::from($id)
+        $crate::OsStringId::<$brand>::from_os_string(::std::ffi::OsString::from($id))
     };
 }

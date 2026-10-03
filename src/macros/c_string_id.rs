@@ -1,7 +1,7 @@
 /// Builds an owned [`CStringId`](crate::CStringId). Forms:
 /// `c_string_id!(value)` (brand inferred) and `c_string_id!(Brand; value)`.
-/// Accepts anything [`CStringId`](crate::CStringId) is `From`, such as a
-/// `c"..."` literal or a `CString`.
+/// Accepts anything `CString::from` takes, such as a `c"..."` literal or a
+/// `CString`.
 ///
 /// Building a `CString` from arbitrary bytes is fallible (interior nul bytes),
 /// so unlike the other owned string ids this does not accept a plain `&str`;
@@ -17,9 +17,9 @@
 #[macro_export]
 macro_rules! c_string_id {
     ($id:expr) => {
-        $crate::CStringId::<_>::from($id)
+        $crate::CStringId::<_>::from_c_string(::std::ffi::CString::from($id))
     };
     ($brand:ty; $id:expr) => {
-        $crate::CStringId::<$brand>::from($id)
+        $crate::CStringId::<$brand>::from_c_string(::std::ffi::CString::from($id))
     };
 }

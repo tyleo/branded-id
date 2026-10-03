@@ -1,7 +1,6 @@
 /// Builds an owned [`StringId`](crate::StringId). Forms: `string_id!(value)`
 /// (brand inferred) and `string_id!(Brand; value)`. Accepts anything
-/// [`StringId`](crate::StringId) is `From`, such as a string literal or a
-/// `String`.
+/// `String::from` takes, such as a string literal or a `String`.
 ///
 /// # Examples
 /// ```rust
@@ -13,9 +12,9 @@
 #[macro_export]
 macro_rules! string_id {
     ($id:expr) => {
-        $crate::StringId::<_>::from($id)
+        $crate::StringId::<_>::from_string(::std::string::String::from($id))
     };
     ($brand:ty; $id:expr) => {
-        $crate::StringId::<$brand>::from($id)
+        $crate::StringId::<$brand>::from_string(::std::string::String::from($id))
     };
 }

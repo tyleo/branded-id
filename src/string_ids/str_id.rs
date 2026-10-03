@@ -27,9 +27,3 @@ impl<TBrand: ?Sized> FromStr for StringId<TBrand> {
         Ok(StringId::from_string(<String as FromStr>::from_str(s)?))
     }
 }
-
-impl<TBrand: ?Sized> From<&str> for StringId<TBrand> {
-    fn from(value: &str) -> StringId<TBrand> {
-        StringId::from_string(value.to_owned())
-    }
-}

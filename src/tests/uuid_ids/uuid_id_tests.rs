@@ -52,34 +52,9 @@ fn to_uuid_id_test() {
 }
 
 #[test]
-fn from_test() {
-    let actual: UuidId<BTest> = From::from(uuid_a());
-    let expected = id!(BTest; uuid_a());
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn into_uuid_test() {
-    let id = id!(BTest; uuid_a());
-
-    let actual: Uuid = Uuid::from(id);
-    let expected = uuid_a();
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn from_str_test() {
     let actual: UuidId<BTest> = <UuidId<BTest> as FromStr>::from_str(UUID_STR).unwrap();
     let expected = id!(BTest; uuid_a());
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn as_ref_test() {
-    let id = id!(BTest; uuid_a());
-
-    let actual: &Uuid = AsRef::<Uuid>::as_ref(&id);
-    let expected = &uuid_a();
     assert_eq!(actual, expected);
 }
 

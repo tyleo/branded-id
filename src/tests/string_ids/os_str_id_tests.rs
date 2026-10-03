@@ -41,41 +41,6 @@ fn into_os_string_test() {
 }
 
 #[test]
-fn from_os_str_ref_test() {
-    let actual: &OsStrId<BTest> = From::from(OsStr::new("a"));
-    let expected = os_str_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_os_string_value_test() {
-    let actual: OsStringId<BTest> = From::from(OsString::from("a"));
-    let expected = os_string_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_str_slice_test() {
-    let actual: OsStringId<BTest> = From::from("a");
-    let expected = os_string_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_string_test() {
-    let actual: OsStringId<BTest> = From::from(String::from("a"));
-    let expected = os_string_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn from_os_str_owned_test() {
-    let actual: OsStringId<BTest> = From::from(OsStr::new("a"));
-    let expected = os_string_id!(BTest; "a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn borrowed_debug_fmt_test() {
     let id = os_str_id!(BTest; "a");
 
@@ -220,21 +185,8 @@ fn to_owned_test() {
 }
 
 #[test]
-fn borrowed_as_ref_test() {
-    let id = os_str_id!(BTest; "a");
-
-    let actual: &OsStr = AsRef::<OsStr>::as_ref(id);
-    let expected = OsStr::new("a");
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn owned_as_ref_test() {
     let id = os_string_id!(BTest; "a");
-
-    let actual: &OsStr = AsRef::<OsStr>::as_ref(&id);
-    let expected = OsStr::new("a");
-    assert_eq!(actual, expected);
 
     let actual: &OsStrId<BTest> = AsRef::<OsStrId<BTest>>::as_ref(&id);
     let expected = os_str_id!(BTest; "a");
