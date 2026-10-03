@@ -85,14 +85,25 @@ impl<TBrand: ?Sized, TValue, TNum: Scalar> IdList<TBrand, TValue, TNum> {
         self.view_mut().into_mut(id)
     }
 
-    /// The pool of the list's ids, for order and membership queries.
+    /// The pool of the list's ids.
     pub fn ids(&self) -> &IdStruct<TBrand, TNum> {
         &self.ids
+    }
+
+    /// The position [`iter`](Self::iter) currently yields `id` at, as
+    /// [`IdStruct::index_of`].
+    pub fn index_of(&self, id: TNum::Id<TBrand>) -> Option<usize> {
+        self.ids.index_of(id)
     }
 
     /// Whether the list holds no values.
     pub fn is_empty(&self) -> bool {
         self.ids.is_empty()
+    }
+
+    /// Whether the list holds `id`, as [`IdStruct::is_retained`].
+    pub fn is_retained(&self, id: TNum::Id<TBrand>) -> bool {
+        self.ids.is_retained(id)
     }
 
     /// Iterates `(id, value)` in the list's order.

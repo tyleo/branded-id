@@ -28,6 +28,24 @@ fn retain_get_and_release_test() {
     assert_eq!(names.len(), 1);
 }
 
+#[test]
+fn index_of_and_is_retained_test() {
+    let mut names = Names::new();
+
+    let goblin = names.retain("goblin".to_owned());
+    let troll = names.retain("troll".to_owned());
+
+    assert_eq!(names.index_of(troll), Some(1));
+    assert!(names.is_retained(troll));
+
+    names.release(goblin);
+
+    assert_eq!(names.index_of(troll), Some(0));
+    assert_eq!(names.index_of(goblin), None);
+    assert!(!names.is_retained(goblin));
+    assert!(!names.is_retained(u32_id!(BTest; 9)));
+}
+
 // The zeroed removals hand the values back and reorder like `release` and
 // `release_stable`.
 #[test]
@@ -74,7 +92,7 @@ fn order_test() {
     assert_eq!(list.try_move_to(ids[1], 0), None);
     assert_eq!(list.try_set_order(&[ids[0]]), None);
     assert_eq!(list.try_move_to(ids[3], 0), Some(()));
-    assert_eq!(list.ids().index_of(ids[3]), Some(0));
+    assert_eq!(list.index_of(ids[3]), Some(0));
 }
 
 #[test]
