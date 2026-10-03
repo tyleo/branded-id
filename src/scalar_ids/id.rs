@@ -1,6 +1,6 @@
 use crate::{
     I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
-    internal::Sealed,
+    internal::{IdRepr, Sealed},
 };
 
 /// A branded integer id of any width, convertible to and from its canonical
@@ -13,7 +13,7 @@ use crate::{
 /// The `soa` id pools are one consumer, but `Id` is useful anywhere code needs
 /// to be generic over id width. See [`Scalar`](crate::Scalar) for the reverse
 /// mapping, from a primitive integer to the id type that wraps it.
-pub trait Id: Copy + Eq + Sealed {
+pub trait Id: Copy + Eq + IdRepr + Sealed {
     /// Brand that ties this id to a specific id domain.
     type Brand: ?Sized;
 

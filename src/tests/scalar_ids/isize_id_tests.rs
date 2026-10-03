@@ -1,7 +1,9 @@
 use crate::{
-    I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId, i8_id,
-    i16_id, i32_id, i64_id, i128_id, isize_id as id, tests::util::BTest, u8_id, u16_id, u32_id,
-    u64_id, u128_id, usize_id,
+    I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
+    ext::{RangeExt, RangeInclusiveExt},
+    i8_id, i16_id, i32_id, i64_id, i128_id, isize_id as id,
+    tests::util::BTest,
+    u8_id, u16_id, u32_id, u64_id, u128_id, usize_id,
 };
 use std::{
     cmp::Ordering,
@@ -139,18 +141,36 @@ fn to_u128_id_test() {
 }
 
 #[test]
-fn range_from_zero_test() {
-    let id = id!(BTest; 3);
+fn min_max_test() {
+    assert_eq!(IsizeId::<BTest>::MIN, id!(BTest; isize::MIN));
+    assert_eq!(IsizeId::<BTest>::MAX, id!(BTest; isize::MAX));
+}
 
-    let actual: Vec<IsizeId<BTest>> = id.range_from_zero().collect();
-    let expected = vec![id!(BTest; 0), id!(BTest; 1), id!(BTest; 2)];
+#[test]
+fn into_id_range_test() {
+    let range = id!(BTest; 1)..id!(BTest; 3);
+
+    let actual: Vec<IsizeId<BTest>> = range.into_id_range().collect();
+    let expected = vec![id!(BTest; 1), id!(BTest; 2)];
     assert_eq!(actual, expected);
 }
 
 #[test]
-#[should_panic(expected = "an id range ends at an id that fits a usize")]
-fn range_from_zero_panics_on_a_negative_id_test() {
-    id!(BTest; -1).range_from_zero();
+fn into_id_range_inclusive_reaches_the_largest_id_test() {
+    let range = id!(BTest; isize::MAX - 1)..=IsizeId::MAX;
+
+    let actual: Vec<IsizeId<BTest>> = range.into_id_range().collect();
+    let expected = vec![id!(BTest; isize::MAX - 1), IsizeId::MAX];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn into_id_range_of_negative_ids_test() {
+    let range = id!(BTest; -2)..id!(BTest; 0);
+
+    let actual: Vec<IsizeId<BTest>> = range.into_id_range().collect();
+    let expected = vec![id!(BTest; -2), id!(BTest; -1)];
+    assert_eq!(actual, expected);
 }
 
 #[test]

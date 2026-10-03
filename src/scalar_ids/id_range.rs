@@ -1,49 +1,46 @@
 use crate::{Id, UsizeId, internal::checked_id};
-use std::{fmt, iter::FusedIterator, marker::PhantomData, ops::Range};
+use std::{fmt, iter::FusedIterator, ops::Range};
 
-/// Iterates the ids from zero up to an end id. [`from_len`](Self::from_len),
-/// [`UsizeId::range_from_zero`] and the matching method on every other id width
-/// build one.
-pub struct IdRange<TId> {
-    phantom: PhantomData<TId>,
-    indices: Range<usize>,
-}
-
-impl<TId> IdRange<TId> {
-    pub(crate) fn from_usize_range(indices: Range<usize>) -> Self {
-        Self {
-            phantom: PhantomData,
-            indices,
-        }
-    }
+/// Iterates ids the way a `Range` of their integers iterates.
+/// [`RangeExt::into_id_range`](crate::ext::RangeExt::into_id_range) and
+/// [`from_len`](Self::from_len) build one.
+pub struct IdRange<TId: Id> {
+    range: TId::ReprRange,
 }
 
 impl<TId: Id> IdRange<TId> {
     /// The first `len` ids from zero.
     ///
     /// # Panics
-    /// Panics if the last id does not fit the id width.
+    /// Panics if `len` does not fit the id width.
     pub fn from_len(len: usize) -> Self {
-        if let Some(last) = len.checked_sub(1) {
-            assert!(
-                checked_id::<TId>(last).is_some(),
-                "an id range's last id fits its id width"
-            );
-        }
+        let start = TId::from_usize_id(UsizeId::from_usize(0));
 
-        Self::from_usize_range(0..len)
+        let end = checked_id(len).expect("an id range's end fits its id width");
+
+        Self::from(start..end)
     }
 }
 
-impl<TId> Clone for IdRange<TId> {
+impl<TId: Id> Clone for IdRange<TId> {
     fn clone(&self) -> Self {
-        Self::from_usize_range(self.indices.clone())
+        Self {
+            range: self.range.clone(),
+        }
     }
 }
 
-impl<TId> fmt::Debug for IdRange<TId> {
+impl<TId: Id> fmt::Debug for IdRange<TId> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_tuple("IdRange").field(&self.indices).finish()
+        f.debug_tuple("IdRange").field(&self.range).finish()
+    }
+}
+
+impl<TId: Id> From<Range<TId>> for IdRange<TId> {
+    fn from(range: Range<TId>) -> Self {
+        Self {
+            range: TId::repr_range(range),
+        }
     }
 }
 
@@ -51,22 +48,20 @@ impl<TId: Id> Iterator for IdRange<TId> {
     type Item = TId;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let index = self.indices.next()?;
-        Some(TId::from_usize_id(UsizeId::from_usize(index)))
+        self.range.next().map(TId::from_repr)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        self.indices.size_hint()
+        self.range.size_hint()
     }
 }
 
 impl<TId: Id> DoubleEndedIterator for IdRange<TId> {
     fn next_back(&mut self) -> Option<Self::Item> {
-        let index = self.indices.next_back()?;
-        Some(TId::from_usize_id(UsizeId::from_usize(index)))
+        self.range.next_back().map(TId::from_repr)
     }
 }
 
-impl<TId: Id> ExactSizeIterator for IdRange<TId> {}
+impl<TId: Id> ExactSizeIterator for IdRange<TId> where TId::ReprRange: ExactSizeIterator {}
 
 impl<TId: Id> FusedIterator for IdRange<TId> {}

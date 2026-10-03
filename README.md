@@ -15,7 +15,7 @@ assert_eq!(id.to_usize(), 2);
 
 ## Integer Ids and Containers
 
-A brand-typed integer id for each primitive width (for example `UsizeId` and `I32Id`), built with the `*_id!` macros. `UsizeId` is the canonical width that indexes storage; the others convert through it. An id's `range_from_zero` iterates the ids from zero up to it. `IdRange::from_len` covers the first `len` ids. Brand-typed containers and pointers only accept ids of their own brand, built with `id_array!`, `id_vec!`, and `id_slice!`.
+A brand-typed integer id for each primitive width (for example `UsizeId` and `I32Id`), built with the `*_id!` macros. `UsizeId` is the canonical width that indexes storage; the others convert through it. `(a..b).into_id_range()` iterates the ids the way `a..b` iterates integers, and `(a..=b).into_id_range()` does the same for `a..=b`. `IdRange::from_len` covers the first `len` ids. Brand-typed containers and pointers only accept ids of their own brand, built with `id_array!`, `id_vec!`, and `id_slice!`.
 
 ## String Ids
 

@@ -1,5 +1,5 @@
 use crate::{
-    I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
+    I8Id, I16Id, I32Id, I64Id, I128Id, Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
 };
 use std::ops::{Bound, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive};
 
@@ -41,9 +41,9 @@ impl<TBrand: ?Sized> Sealed for U64Id<TBrand> {}
 impl<TBrand: ?Sized> Sealed for U128Id<TBrand> {}
 impl<TBrand: ?Sized> Sealed for UsizeId<TBrand> {}
 
-impl<TBrand: ?Sized> Sealed for Range<UsizeId<TBrand>> {}
+impl<TId: Id> Sealed for Range<TId> {}
 impl<TBrand: ?Sized> Sealed for RangeFrom<UsizeId<TBrand>> {}
-impl<TBrand: ?Sized> Sealed for RangeInclusive<UsizeId<TBrand>> {}
+impl<TId: Id> Sealed for RangeInclusive<TId> {}
 impl<TBrand: ?Sized> Sealed for RangeTo<UsizeId<TBrand>> {}
 impl<TBrand: ?Sized> Sealed for RangeToInclusive<UsizeId<TBrand>> {}
 impl Sealed for RangeFull {}

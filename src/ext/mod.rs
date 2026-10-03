@@ -1,6 +1,7 @@
 //! Extension traits that add id-typed views to primitives, slices, arrays,
 //! `Vec`, and raw pointers (for example `as_id_slice` and `to_i32_id`), and id
-//! adapters to iterators. The traits are sealed or implemented for every
+//! adapters: `enumerate_ids` for iterators and `into_id_range` for ranges of
+//! ids. The traits are sealed or implemented for every
 //! iterator, so this crate provides every implementation.
 
 mod array_ext;
@@ -39,6 +40,8 @@ pub use isize_ext::*;
 pub use iterator_ext::*;
 pub use mut_ptr_ext::*;
 pub use ptr_ext::*;
+pub use range_ext::*;
+pub use range_inclusive_ext::*;
 pub use slice_ext::*;
 pub use u8_ext::*;
 pub use u16_ext::*;

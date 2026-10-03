@@ -1,4 +1,4 @@
-use crate::{soa::IdStruct, tests::util::BTest, u32_id, usize_id};
+use crate::{U8Id, soa::IdStruct, tests::util::BTest, u32_id, usize_id};
 
 // The brand-only form defaults the integer width to `u32`, handing out `U32Id`,
 // so it is interchangeable with the `U32IdStruct` alias.
@@ -668,6 +668,23 @@ fn gc_usize_width_test() {
 
     let live: Vec<_> = ids.iter().collect();
     assert_eq!(live, vec![usize_id!(BTest; 0), usize_id!(BTest; 1)]);
+}
+
+// The end of a full pool's id space does not fit its id width. gc still keeps
+// every id.
+#[test]
+fn gc_full_width_pool_test() {
+    let mut ids = IdStruct::<BTest, u8>::new();
+
+    let retained: Vec<_> = (0..256).map(|_| ids.retain()).collect();
+
+    let remap = ids.gc();
+
+    assert_eq!(remap.new_len(), 256);
+    assert_eq!(remap.new_id(retained[255]), Some(U8Id::MAX));
+
+    let live: Vec<_> = ids.iter().collect();
+    assert_eq!(live, retained);
 }
 
 // Cloning a pool copies its retained and recycled state, and the clone is

@@ -4,6 +4,7 @@ mod i16_id_tests;
 mod i32_id_tests;
 mod i64_id_tests;
 mod i8_id_tests;
+mod id_range_inclusive_tests;
 mod id_range_tests;
 mod isize_id_tests;
 mod u128_id_tests;

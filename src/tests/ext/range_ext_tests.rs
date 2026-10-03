@@ -1,4 +1,4 @@
-use crate::{IdSlice, id_slice, tests::util::BTest, usize_id as id};
+use crate::{IdSlice, UsizeId, ext::RangeExt, id_slice, tests::util::BTest, usize_id as id};
 use std::ops::{Index, IndexMut};
 
 #[test]
@@ -42,5 +42,14 @@ fn index_mut_test() {
     let actual = id_slice.index_mut(range);
     let mut expected = [1];
     let expected = IdSlice::from_mut_slice(&mut expected);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn into_id_range_test() {
+    let range = id!(BTest; 1)..id!(BTest; 3);
+
+    let actual: Vec<UsizeId<BTest>> = range.into_id_range().collect();
+    let expected = vec![id!(BTest; 1), id!(BTest; 2)];
     assert_eq!(actual, expected);
 }

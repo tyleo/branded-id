@@ -25,6 +25,12 @@ macro_rules! scalar_id_impl {
         }
 
         impl<TBrand: ?Sized> $id<TBrand> {
+            /// The smallest id the width holds.
+            pub const MIN: Self = Self::$from(<$prim>::MIN);
+
+            /// The largest id the width holds.
+            pub const MAX: Self = Self::$from(<$prim>::MAX);
+
             fn fmt_helper(
                 self,
                 fmt_repr: impl FnOnce(&$prim, &mut ::std::fmt::Formatter) -> ::std::fmt::Result,
@@ -49,16 +55,29 @@ macro_rules! scalar_id_impl {
             pub const fn $to(self) -> $prim {
                 self.repr
             }
+        }
 
-            /// The ids in `0..self`.
-            ///
-            /// # Panics
-            /// Panics if the id is negative or does not fit a `usize`.
-            pub fn range_from_zero(self) -> $crate::IdRange<Self> {
-                let end = <usize as ::std::convert::TryFrom<$prim>>::try_from(self.$to())
-                    .expect("an id range ends at an id that fits a usize");
+        impl<TBrand: ?Sized> $crate::internal::IdRepr for $id<TBrand> {
+            type Repr = $prim;
 
-                $crate::IdRange::from_usize_range(0..end)
+            type ReprRange = ::std::ops::Range<$prim>;
+
+            type ReprRangeInclusive = ::std::ops::RangeInclusive<$prim>;
+
+            fn from_repr(repr: $prim) -> Self {
+                Self::$from(repr)
+            }
+
+            fn repr_range(range: ::std::ops::Range<Self>) -> ::std::ops::Range<$prim> {
+                range.start.$to()..range.end.$to()
+            }
+
+            fn repr_range_inclusive(
+                range: ::std::ops::RangeInclusive<Self>,
+            ) -> ::std::ops::RangeInclusive<$prim> {
+                let (start, end) = range.into_inner();
+
+                start.$to()..=end.$to()
             }
         }
 
