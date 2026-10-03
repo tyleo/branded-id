@@ -2,7 +2,7 @@ use crate::Id;
 use std::{fmt, iter::FusedIterator, ops::RangeInclusive};
 
 /// Iterates ids the way a `RangeInclusive` of their integers iterates.
-/// [`RangeInclusiveExt::into_id_range`](crate::ext::RangeInclusiveExt::into_id_range)
+/// [`RangeInclusiveExt::into_id_range`](crate::RangeInclusiveExt::into_id_range)
 /// builds one.
 pub struct IdRangeInclusive<TId: Id> {
     range: TId::ReprRangeInclusive,

@@ -1,4 +1,4 @@
-use crate::{U32Id, ext::IteratorExt, tests::util::BTest, u32_id as id};
+use crate::{IteratorExt, U32Id, tests::util::BTest, u32_id as id};
 
 #[test]
 fn enumerate_ids_test() {

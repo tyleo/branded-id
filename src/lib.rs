@@ -41,10 +41,11 @@
 //! map keyed by the owned id can be looked up by a borrowed id without
 //! allocating.
 //!
-//! # Extension Traits (`ext`)
+//! # Extension Traits
 //! Sealed extension traits that add id-typed views to slices, arrays, `Vec`,
-//! and raw pointers. `IteratorExt::enumerate_ids` pairs each
-//! item of an iterator with an id counting from zero.
+//! and raw pointers. `IteratorExt::enumerate_ids` pairs each item of an
+//! iterator with an id counting from zero. `RangeExt` and `RangeInclusiveExt`
+//! iterate a range of ids with `into_id_range`.
 //!
 //! # Brand Conversions (`extends`, default feature)
 //! When one brand extends another, ids and containers cast between the two with
@@ -155,14 +156,14 @@
 #![warn(missing_docs)]
 
 mod containers;
+mod ext;
 mod internal;
 mod macros;
 mod scalar_ids;
 mod string_ids;
 
-pub mod ext;
-
 pub use containers::*;
+pub use ext::*;
 pub use scalar_ids::*;
 pub use string_ids::*;
 

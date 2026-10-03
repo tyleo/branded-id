@@ -2,7 +2,7 @@ use crate::{Id, UsizeId, internal::checked_id};
 use std::{fmt, iter::FusedIterator, ops::Range};
 
 /// Iterates ids the way a `Range` of their integers iterates.
-/// [`RangeExt::into_id_range`](crate::ext::RangeExt::into_id_range) and
+/// [`RangeExt::into_id_range`](crate::RangeExt::into_id_range) and
 /// [`from_len`](Self::from_len) build one.
 pub struct IdRange<TId: Id> {
     range: TId::ReprRange,

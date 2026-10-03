@@ -1,9 +1,6 @@
 use crate::{
-    IdPtr, IdSlice, IdVec, MutIdPtr, UsizeId,
-    ext::{MutPtrExt, PtrExt, SliceExt},
-    id_array, id_slice, id_vec,
-    tests::util::BTest,
-    usize_id as id,
+    IdPtr, IdSlice, IdVec, MutIdPtr, MutPtrExt, PtrExt, SliceExt, UsizeId, id_array, id_slice,
+    id_vec, tests::util::BTest, usize_id as id,
 };
 use std::{
     cmp::Ordering,

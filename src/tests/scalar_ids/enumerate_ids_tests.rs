@@ -1,4 +1,4 @@
-use crate::{U8Id, U32Id, ext::IteratorExt, tests::util::BTest, u32_id as id};
+use crate::{IteratorExt, U8Id, U32Id, tests::util::BTest, u32_id as id};
 
 #[test]
 fn clone_test() {

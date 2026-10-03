@@ -1,4 +1,4 @@
-use crate::{MutIdPtr, ext::MutPtrExt, mut_id_ptr, tests::util::BTest};
+use crate::{MutIdPtr, MutPtrExt, mut_id_ptr, tests::util::BTest};
 
 #[test]
 fn to_ptr_id_test() {

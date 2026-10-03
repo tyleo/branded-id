@@ -1,4 +1,4 @@
-use crate::{IdSlice, ext::SliceExt, id_slice, tests::util::BTest};
+use crate::{IdSlice, SliceExt, id_slice, tests::util::BTest};
 
 #[test]
 fn as_id_slice_test() {

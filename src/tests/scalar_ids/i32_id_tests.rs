@@ -1,9 +1,7 @@
 use crate::{
-    I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
-    ext::{RangeExt, RangeInclusiveExt},
-    i8_id, i16_id, i32_id as id, i64_id, i128_id, isize_id,
-    tests::util::BTest,
-    u8_id, u16_id, u32_id, u64_id, u128_id, usize_id,
+    I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, RangeExt, RangeInclusiveExt, U8Id, U16Id, U32Id,
+    U64Id, U128Id, UsizeId, i8_id, i16_id, i32_id as id, i64_id, i128_id, isize_id,
+    tests::util::BTest, u8_id, u16_id, u32_id, u64_id, u128_id, usize_id,
 };
 use std::{
     cmp::Ordering,

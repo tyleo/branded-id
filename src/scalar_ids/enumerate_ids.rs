@@ -2,7 +2,7 @@ use crate::{Id, internal::checked_id};
 use std::{fmt, iter::FusedIterator, marker::PhantomData};
 
 /// Pairs each item of an iterator with an id counting from zero.
-/// [`IteratorExt::enumerate_ids`](crate::ext::IteratorExt::enumerate_ids) builds
+/// [`IteratorExt::enumerate_ids`](crate::IteratorExt::enumerate_ids) builds
 /// one.
 pub struct EnumerateIds<TIter, TId> {
     phantom: PhantomData<TId>,

@@ -1,4 +1,4 @@
-use crate::{IdArray, ext::ArrayExt, id_array, tests::util::BTest};
+use crate::{ArrayExt, IdArray, id_array, tests::util::BTest};
 
 #[test]
 fn as_id_array_test() {

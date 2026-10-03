@@ -1,6 +1,4 @@
-use crate::{
-    IdSlice, UsizeId, ext::RangeInclusiveExt, id_slice, tests::util::BTest, usize_id as id,
-};
+use crate::{IdSlice, RangeInclusiveExt, UsizeId, id_slice, tests::util::BTest, usize_id as id};
 use std::ops::{Index, IndexMut};
 
 #[test]

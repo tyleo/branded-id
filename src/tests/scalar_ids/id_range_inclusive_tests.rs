@@ -1,6 +1,5 @@
 use crate::{
-    I8Id, IdRangeInclusive, U8Id, U32Id, ext::RangeInclusiveExt, i8_id, tests::util::BTest,
-    u32_id as id,
+    I8Id, IdRangeInclusive, RangeInclusiveExt, U8Id, U32Id, i8_id, tests::util::BTest, u32_id as id,
 };
 
 #[test]

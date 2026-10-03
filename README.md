@@ -34,9 +34,9 @@ users.insert(string_id!(BUser; "alice"), 1);
 assert_eq!(users.get(str_id!(BUser; "alice")), Some(&1));
 ```
 
-## Extension Traits (`ext`)
+## Extension Traits
 
-Sealed extension traits that add id-typed views to slices, arrays, `Vec`, and raw pointers. `IteratorExt::enumerate_ids` pairs each item of an iterator with an id counting from zero.
+Sealed extension traits that add id-typed views to slices, arrays, `Vec`, and raw pointers. `IteratorExt::enumerate_ids` pairs each item of an iterator with an id counting from zero. `RangeExt` and `RangeInclusiveExt` iterate a range of ids with `into_id_range`.
 
 ## Brand Conversions (`extends`, default feature)
 
