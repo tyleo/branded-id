@@ -1,17 +1,10 @@
-//! Extension traits that add id-typed views to primitives, slices, arrays,
-//! `Vec`, and raw pointers (for example `as_id_slice` and `to_i32_id`), and id
-//! adapters: `enumerate_ids` for iterators and `into_id_range` for ranges of
-//! ids. The traits are sealed or implemented for every
-//! iterator, so this crate provides every implementation.
+//! Extension traits that add id-typed views to slices, arrays, `Vec`, and raw
+//! pointers (for example `as_id_slice`), and id adapters: `enumerate_ids` for
+//! iterators and `into_id_range` for ranges of ids. The traits are sealed or
+//! implemented for every iterator, so this crate provides every implementation.
 
 mod array_ext;
 mod bound_pair_ext;
-mod i128_ext;
-mod i16_ext;
-mod i32_ext;
-mod i64_ext;
-mod i8_ext;
-mod isize_ext;
 mod iterator_ext;
 mod mut_ptr_ext;
 mod ptr_ext;
@@ -22,31 +15,13 @@ mod range_inclusive_ext;
 mod range_to_ext;
 mod range_to_inclusive_ext;
 mod slice_ext;
-mod u128_ext;
-mod u16_ext;
-mod u32_ext;
-mod u64_ext;
-mod u8_ext;
-mod usize_ext;
 mod vec_ext;
 
 pub use array_ext::*;
-pub use i8_ext::*;
-pub use i16_ext::*;
-pub use i32_ext::*;
-pub use i64_ext::*;
-pub use i128_ext::*;
-pub use isize_ext::*;
 pub use iterator_ext::*;
 pub use mut_ptr_ext::*;
 pub use ptr_ext::*;
 pub use range_ext::*;
 pub use range_inclusive_ext::*;
 pub use slice_ext::*;
-pub use u8_ext::*;
-pub use u16_ext::*;
-pub use u32_ext::*;
-pub use u64_ext::*;
-pub use u128_ext::*;
-pub use usize_ext::*;
 pub use vec_ext::*;

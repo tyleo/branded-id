@@ -282,13 +282,6 @@ fn display_fmt_test() {
 }
 
 #[test]
-fn from_test() {
-    let actual: U64Id<BTest> = From::from(1);
-    let expected = id!(BTest; 1);
-    assert_eq!(actual, expected);
-}
-
-#[test]
 fn from_str_test() {
     let actual: U64Id<BTest> = <U64Id<BTest> as FromStr>::from_str("1").unwrap();
     let expected = id!(BTest; 1);

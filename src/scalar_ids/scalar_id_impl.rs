@@ -15,9 +15,10 @@ macro_rules! scalar_id_impl {
         /// built for different domains distinct types, so they cannot be mixed
         /// even though they share an integer representation.
         ///
-        /// The `to_*_id` methods convert between id widths with an `as` cast,
-        /// which truncates or sign-reinterprets values that do not fit the
-        /// target width.
+        /// Ids convert between widths as their integers do: `From` where every
+        /// value fits, and `TryFrom` where one may not. The `to_*_id` methods
+        /// cast as `as` does, truncating or sign-reinterpreting values that do
+        /// not fit the target width.
         ///
         /// `Display` and the numeric formatters print the bare integer, and
         /// `Debug` wraps it in the brand's name, as in `BRow(3)`.
@@ -57,6 +58,10 @@ macro_rules! scalar_id_impl {
 
             fn from_repr(repr: $prim) -> Self {
                 Self::$from(repr)
+            }
+
+            fn to_repr(self) -> $prim {
+                self.$to()
             }
 
             fn repr_range(range: ::std::ops::Range<Self>) -> ::std::ops::Range<$prim> {
@@ -107,12 +112,6 @@ macro_rules! scalar_id_impl {
         }
 
         impl<TBrand: ?Sized> ::std::cmp::Eq for $id<TBrand> {}
-
-        impl<TBrand: ?Sized> ::std::convert::From<$prim> for $id<TBrand> {
-            fn from(val: $prim) -> Self {
-                Self::$from(val)
-            }
-        }
 
         impl<TBrand: ?Sized> ::std::str::FromStr for $id<TBrand> {
             type Err = <$prim as ::std::str::FromStr>::Err;

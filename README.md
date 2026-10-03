@@ -15,7 +15,7 @@ assert_eq!(id.to_usize(), 2);
 
 ## Integer Ids and Containers
 
-A brand-typed integer id for each primitive width (for example `UsizeId` and `I32Id`), built with the `*_id!` macros. `UsizeId` is the canonical width that indexes storage; the others convert through it. `(a..b).into_id_range()` iterates the ids the way `a..b` iterates integers, and `(a..=b).into_id_range()` does the same for `a..=b`. `IdRange::from_len` covers the first `len` ids. Brand-typed containers and pointers only accept ids of their own brand, built with `id_array!`, `id_vec!`, and `id_slice!`.
+A brand-typed integer id for each primitive width (for example `UsizeId` and `I32Id`), built with the `*_id!` macros. `UsizeId` is the canonical width that indexes storage; the others convert through it. Ids convert between widths as their integers do, with `From` and `TryFrom`, and the `to_*_id` methods cast as `as` does. `(a..b).into_id_range()` iterates the ids the way `a..b` iterates integers, and `(a..=b).into_id_range()` does the same for `a..=b`. `IdRange::from_len` covers the first `len` ids. Brand-typed containers and pointers only accept ids of their own brand, built with `id_array!`, `id_vec!`, and `id_slice!`.
 
 ## String Ids
 
@@ -36,7 +36,7 @@ assert_eq!(users.get(str_id!(BUser; "alice")), Some(&1));
 
 ## Extension Traits (`ext`)
 
-Sealed extension traits that add id-typed views to primitives, slices, arrays, `Vec`, and raw pointers. `IteratorExt::enumerate_ids` pairs each item of an iterator with an id counting from zero.
+Sealed extension traits that add id-typed views to slices, arrays, `Vec`, and raw pointers. `IteratorExt::enumerate_ids` pairs each item of an iterator with an id counting from zero.
 
 ## Brand Conversions (`extends`, default feature)
 

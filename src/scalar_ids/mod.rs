@@ -5,8 +5,9 @@
 //! different domains are distinct types even though they share an integer
 //! representation. [`UsizeId`] is the canonical width that indexes the
 //! containers directly; the other widths convert through it with the `to_*_id`
-//! methods. The [`Id`] and [`Scalar`] traits let generic code abstract over the
-//! width an id uses.
+//! methods. Widths convert to each other with `From` and `TryFrom` wherever
+//! their integers do. The [`Id`] and [`Scalar`] traits let generic code
+//! abstract over the width an id uses.
 
 mod enumerate_ids;
 mod i128_id;
@@ -21,7 +22,9 @@ mod id_range_inclusive;
 mod isize_id;
 mod scalar;
 mod scalar_id_conversions;
+mod scalar_id_from;
 mod scalar_id_impl;
+mod scalar_id_try_from;
 mod u128_id;
 mod u16_id;
 mod u32_id;
@@ -30,7 +33,9 @@ mod u8_id;
 mod usize_id;
 
 pub(crate) use scalar_id_conversions::scalar_id_conversions;
+pub(crate) use scalar_id_from::scalar_id_from;
 pub(crate) use scalar_id_impl::scalar_id_impl;
+pub(crate) use scalar_id_try_from::scalar_id_try_from;
 
 pub use enumerate_ids::*;
 pub use i8_id::*;

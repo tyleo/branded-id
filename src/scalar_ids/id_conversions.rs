@@ -1,6 +1,6 @@
 use crate::{
     I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId,
-    scalar_ids::scalar_id_conversions,
+    scalar_ids::{scalar_id_conversions, scalar_id_from, scalar_id_try_from},
 };
 
 // Generates every `to_*_id` cross-width conversion between the branded scalar
@@ -18,4 +18,32 @@ scalar_id_conversions! {
     (U64Id, u64, from_u64, to_u64, to_u64_id, "a"),
     (U128Id, u128, from_u128, to_u128, to_u128_id, "a"),
     (UsizeId, usize, from_usize, to_usize, to_usize_id, "a"),
+}
+
+// The widenings std's `From` covers between the primitives.
+scalar_id_from! {
+    I8Id => I16Id, I32Id, I64Id, I128Id, IsizeId;
+    I16Id => I32Id, I64Id, I128Id, IsizeId;
+    I32Id => I64Id, I128Id;
+    I64Id => I128Id;
+    U8Id => I16Id, I32Id, I64Id, I128Id, IsizeId, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    U16Id => I32Id, I64Id, I128Id, U32Id, U64Id, U128Id, UsizeId;
+    U32Id => I64Id, I128Id, U64Id, U128Id;
+    U64Id => I128Id, U128Id;
+}
+
+// Every other pair, which std's `TryFrom` covers between the primitives.
+scalar_id_try_from! {
+    I8Id => U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    I16Id => I8Id, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    I32Id => I8Id, I16Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    I64Id => I8Id, I16Id, I32Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    I128Id => I8Id, I16Id, I32Id, I64Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    IsizeId => I8Id, I16Id, I32Id, I64Id, I128Id, U8Id, U16Id, U32Id, U64Id, U128Id, UsizeId;
+    U8Id => I8Id;
+    U16Id => I8Id, I16Id, IsizeId, U8Id;
+    U32Id => I8Id, I16Id, I32Id, IsizeId, U8Id, U16Id, UsizeId;
+    U64Id => I8Id, I16Id, I32Id, I64Id, IsizeId, U8Id, U16Id, U32Id, UsizeId;
+    U128Id => I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, UsizeId;
+    UsizeId => I8Id, I16Id, I32Id, I64Id, I128Id, IsizeId, U8Id, U16Id, U32Id, U64Id, U128Id;
 }

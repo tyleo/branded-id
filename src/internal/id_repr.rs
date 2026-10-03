@@ -18,6 +18,8 @@ pub trait IdRepr: Sized {
 
     fn from_repr(repr: Self::Repr) -> Self;
 
+    fn to_repr(self) -> Self::Repr;
+
     fn repr_range(range: Range<Self>) -> Self::ReprRange;
 
     fn repr_range_inclusive(range: RangeInclusive<Self>) -> Self::ReprRangeInclusive;
