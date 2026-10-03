@@ -9,6 +9,7 @@
 //! their integers do. The [`Id`] and [`Scalar`] traits let generic code
 //! abstract over the width an id uses.
 
+mod display_ids;
 mod enumerate_ids;
 mod i128_id;
 mod i16_id;
@@ -37,6 +38,7 @@ pub(crate) use scalar_id_from::scalar_id_from;
 pub(crate) use scalar_id_impl::scalar_id_impl;
 pub(crate) use scalar_id_try_from::scalar_id_try_from;
 
+pub use display_ids::*;
 pub use enumerate_ids::*;
 pub use i8_id::*;
 pub use i16_id::*;
