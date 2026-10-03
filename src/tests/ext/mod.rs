@@ -6,6 +6,7 @@ mod i32_ext_tests;
 mod i64_ext_tests;
 mod i8_ext_tests;
 mod isize_ext_tests;
+mod iterator_ext_tests;
 mod mut_ptr_ext_tests;
 mod ptr_ext_tests;
 mod range_ext_tests;

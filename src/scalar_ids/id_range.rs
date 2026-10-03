@@ -1,8 +1,9 @@
-use crate::{Id, UsizeId};
+use crate::{Id, UsizeId, internal::checked_id};
 use std::{fmt, iter::FusedIterator, marker::PhantomData, ops::Range};
 
-/// Iterates the ids from zero up to an end id. [`UsizeId::range_from_zero`]
-/// and the matching method on every other id width build one.
+/// Iterates the ids from zero up to an end id. [`from_len`](Self::from_len),
+/// [`UsizeId::range_from_zero`] and the matching method on every other id width
+/// build one.
 pub struct IdRange<TId> {
     phantom: PhantomData<TId>,
     indices: Range<usize>,
@@ -14,6 +15,23 @@ impl<TId> IdRange<TId> {
             phantom: PhantomData,
             indices,
         }
+    }
+}
+
+impl<TId: Id> IdRange<TId> {
+    /// The first `len` ids from zero.
+    ///
+    /// # Panics
+    /// Panics if the last id does not fit the id width.
+    pub fn from_len(len: usize) -> Self {
+        if let Some(last) = len.checked_sub(1) {
+            assert!(
+                checked_id::<TId>(last).is_some(),
+                "an id range's last id fits its id width"
+            );
+        }
+
+        Self::from_usize_range(0..len)
     }
 }
 

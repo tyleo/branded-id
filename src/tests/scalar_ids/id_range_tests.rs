@@ -1,4 +1,4 @@
-use crate::{IdRange, U32Id, tests::util::BTest, u32_id as id};
+use crate::{IdRange, U8Id, U32Id, tests::util::BTest, u32_id as id};
 
 #[test]
 fn clone_test() {
@@ -56,4 +56,31 @@ fn range_from_zero_of_zero_is_empty_test() {
 
     assert_eq!(range.len(), 0);
     assert_eq!(range.next(), None);
+}
+
+#[test]
+fn from_len_test() {
+    let actual: Vec<U32Id<BTest>> = IdRange::from_len(2).collect();
+    let expected = vec![id!(BTest; 0), id!(BTest; 1)];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn from_len_of_zero_is_empty_test() {
+    let mut range = IdRange::<U32Id<BTest>>::from_len(0);
+
+    assert_eq!(range.next(), None);
+}
+
+#[test]
+fn from_len_fills_the_id_width_test() {
+    let mut range = IdRange::<U8Id<BTest>>::from_len(256);
+
+    assert_eq!(range.next_back(), Some(U8Id::from_u8(255)));
+}
+
+#[test]
+#[should_panic(expected = "an id range's last id fits its id width")]
+fn from_len_panics_past_the_id_width_test() {
+    IdRange::<U8Id<BTest>>::from_len(257);
 }

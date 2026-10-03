@@ -24,6 +24,7 @@
 //! and [`I32Id`]), built with the `*_id!` macros. [`UsizeId`] is the canonical
 //! width that indexes storage; the others convert through it. An id's
 //! `range_from_zero` returns an [`IdRange`] over the ids from zero up to it.
+//! [`IdRange::from_len`] covers the first `len` ids.
 //!
 //! # Containers
 //! Brand-typed slices, arrays, vectors, and pointers that only accept ids of
@@ -39,7 +40,8 @@
 //!
 //! # Extension Traits (`ext`)
 //! Sealed extension traits that add id-typed views to primitives, slices,
-//! arrays, `Vec`, and raw pointers.
+//! arrays, `Vec`, and raw pointers. `IteratorExt::enumerate_ids` pairs each
+//! item of an iterator with an id counting from zero.
 //!
 //! # Brand Conversions (`extends`, default feature)
 //! When one brand extends another, ids and containers cast between the two with

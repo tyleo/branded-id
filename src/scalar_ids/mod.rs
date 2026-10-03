@@ -8,6 +8,7 @@
 //! methods. The [`Id`] and [`Scalar`] traits let generic code abstract over the
 //! width an id uses.
 
+mod enumerate_ids;
 mod i128_id;
 mod i16_id;
 mod i32_id;
@@ -30,6 +31,7 @@ mod usize_id;
 pub(crate) use scalar_id_conversions::scalar_id_conversions;
 pub(crate) use scalar_id_impl::scalar_id_impl;
 
+pub use enumerate_ids::*;
 pub use i8_id::*;
 pub use i16_id::*;
 pub use i32_id::*;

@@ -1,5 +1,5 @@
 use crate::{
-    Id, IdVec, Scalar, UsizeId,
+    Id, IdRange, IdVec, Scalar, UsizeId,
     soa::{
         IdColumns, IdColumnsMut, IdRemap, IdStructIter, IdStructRawParts, IdStructView,
         IdStructViewMut,
@@ -127,14 +127,12 @@ impl<TBrand: ?Sized, TNum: Scalar> IdStruct<TBrand, TNum> {
         // dropping the recycled free region: every live id now sits at its own
         // index, so both lists read `0, 1, .., new_len - 1`.
         self.dense.clear();
+        self.dense
+            .extend(IdRange::<TNum::Id<TBrand>>::from_len(new_len));
+
         let sparse = self.sparse.as_mut_vec();
         sparse.clear();
-        for i in 0..new_len {
-            self.dense.push(<TNum::Id<TBrand> as Id>::from_usize_id(
-                UsizeId::from_usize(i),
-            ));
-            sparse.push(TNum::from_usize(i));
-        }
+        sparse.extend((0..new_len).map(TNum::from_usize));
 
         IdRemap::from_parts(IdVec::from_vec(new_ids), new_len)
     }
