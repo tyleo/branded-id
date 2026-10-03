@@ -9,3 +9,9 @@ impl<TBrand: ?Sized> U128Id<TBrand> {
         UuidId::from_uuid(Uuid::from_u128(self.to_u128()))
     }
 }
+
+impl<TBrand: ?Sized> From<U128Id<TBrand>> for UuidId<TBrand> {
+    fn from(id: U128Id<TBrand>) -> Self {
+        id.to_uuid_id()
+    }
+}

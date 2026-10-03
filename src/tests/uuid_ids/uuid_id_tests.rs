@@ -52,6 +52,20 @@ fn to_uuid_id_test() {
 }
 
 #[test]
+fn u128_id_from_test() {
+    let actual: U128Id<BTest> = U128Id::from(id!(BTest; uuid_a()));
+    let expected = u128_id!(BTest; 0x0123456789abcdef0123456789abcdef);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn uuid_id_from_test() {
+    let actual: UuidId<BTest> = UuidId::from(u128_id!(BTest; 0x0123456789abcdef0123456789abcdef));
+    let expected = id!(BTest; uuid_a());
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn from_str_test() {
     let actual: UuidId<BTest> = <UuidId<BTest> as FromStr>::from_str(UUID_STR).unwrap();
     let expected = id!(BTest; uuid_a());

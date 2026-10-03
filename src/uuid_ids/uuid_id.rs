@@ -16,7 +16,9 @@ use uuid::Uuid;
 /// branded key rather than an index: it does not implement [`Id`](crate::Id) or
 /// [`Scalar`](crate::Scalar) and cannot index a container. Convert to and from
 /// a raw [`Uuid`] with [`from_uuid`](Self::from_uuid) and
-/// [`to_uuid`](Self::to_uuid).
+/// [`to_uuid`](Self::to_uuid). `From` converts to and from a [`U128Id`] of the
+/// same brand, as do the `const` [`to_u128_id`](Self::to_u128_id) and
+/// [`U128Id::to_uuid_id`].
 ///
 /// `Display` prints the bare UUID, and `Debug` wraps it in the brand's name.
 #[repr(transparent)]
@@ -119,5 +121,11 @@ impl<TBrand: ?Sized> FromStr for UuidId<TBrand> {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self::from_uuid(<Uuid as FromStr>::from_str(s)?))
+    }
+}
+
+impl<TBrand: ?Sized> From<UuidId<TBrand>> for U128Id<TBrand> {
+    fn from(id: UuidId<TBrand>) -> Self {
+        id.to_u128_id()
     }
 }
