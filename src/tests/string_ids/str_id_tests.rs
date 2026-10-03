@@ -92,11 +92,15 @@ fn borrowed_display_fmt_test() {
     let id = str_id!(BTest; "a");
 
     let actual: String = format!("{}", id);
-    let expected = "BTest(a)";
+    let expected = "a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(a)";
+    let expected = "a";
+    assert_eq!(actual, expected);
+
+    let actual: String = format!("{:>3}", id);
+    let expected = "  a";
     assert_eq!(actual, expected);
 }
 
@@ -105,11 +109,15 @@ fn owned_display_fmt_test() {
     let id = string_id!(BTest; "a");
 
     let actual: String = format!("{}", id);
-    let expected = "BTest(a)";
+    let expected = "a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(a)";
+    let expected = "a";
+    assert_eq!(actual, expected);
+
+    let actual: String = format!("{:>3}", id);
+    let expected = "  a";
     assert_eq!(actual, expected);
 }
 

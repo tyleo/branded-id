@@ -178,35 +178,35 @@ fn binary_fmt_test() {
     let id = id!(BTest; 2);
 
     let actual: String = format!("{:b}", id);
-    let expected = "BTest(10)";
+    let expected = "10";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+b}", id);
-    let expected = "BTest(+10)";
+    let expected = "+10";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-b}", id);
-    let expected = "BTest(10)";
+    let expected = "10";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#b}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(0b10)";
+    let expected = "0b10";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25b}", id);
-    let expected = "BTest(                       10)";
+    let expected = "                       10";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25b}", id);
-    let expected = "BTest(10                       )";
+    let expected = "10                       ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25b}", id);
-    let expected = "BTest(                       10)";
+    let expected = "                       10";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25b}", id);
-    let expected = "BTest(           10            )";
+    let expected = "           10            ";
     assert_eq!(actual, expected);
 }
 
@@ -262,35 +262,35 @@ fn display_fmt_test() {
     let id = id!(BTest; 1);
 
     let actual: String = format!("{}", id);
-    let expected = "BTest(1)";
+    let expected = "1";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+}", id);
-    let expected = "BTest(+1)";
+    let expected = "+1";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-}", id);
-    let expected = "BTest(1)";
+    let expected = "1";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(1)";
+    let expected = "1";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25}", id);
-    let expected = "BTest(                        1)";
+    let expected = "                        1";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25}", id);
-    let expected = "BTest(1                        )";
+    let expected = "1                        ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25}", id);
-    let expected = "BTest(                        1)";
+    let expected = "                        1";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25}", id);
-    let expected = "BTest(            1            )";
+    let expected = "            1            ";
     assert_eq!(actual, expected);
 }
 
@@ -343,35 +343,35 @@ fn lower_exp_fmt_test() {
     let id = id!(BTest; 2);
 
     let actual: String = format!("{:e}", id);
-    let expected = "BTest(2e0)";
+    let expected = "2e0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+e}", id);
-    let expected = "BTest(+2e0)";
+    let expected = "+2e0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-e}", id);
-    let expected = "BTest(2e0)";
+    let expected = "2e0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#e}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(2e0)";
+    let expected = "2e0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25e}", id);
-    let expected = "BTest(                      2e0)";
+    let expected = "                      2e0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25e}", id);
-    let expected = "BTest(2e0                      )";
+    let expected = "2e0                      ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25e}", id);
-    let expected = "BTest(                      2e0)";
+    let expected = "                      2e0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25e}", id);
-    let expected = "BTest(           2e0           )";
+    let expected = "           2e0           ";
     assert_eq!(actual, expected);
 }
 
@@ -380,35 +380,35 @@ fn lower_hex_fmt_test() {
     let id = id!(BTest; 10);
 
     let actual: String = format!("{:x}", id);
-    let expected = "BTest(a)";
+    let expected = "a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+x}", id);
-    let expected = "BTest(+a)";
+    let expected = "+a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-x}", id);
-    let expected = "BTest(a)";
+    let expected = "a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#x}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(0xa)";
+    let expected = "0xa";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25x}", id);
-    let expected = "BTest(                        a)";
+    let expected = "                        a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25x}", id);
-    let expected = "BTest(a                        )";
+    let expected = "a                        ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25x}", id);
-    let expected = "BTest(                        a)";
+    let expected = "                        a";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25x}", id);
-    let expected = "BTest(            a            )";
+    let expected = "            a            ";
     assert_eq!(actual, expected);
 }
 
@@ -417,35 +417,35 @@ fn octal_fmt_test() {
     let id = id!(BTest; 10);
 
     let actual: String = format!("{:o}", id);
-    let expected = "BTest(12)";
+    let expected = "12";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+o}", id);
-    let expected = "BTest(+12)";
+    let expected = "+12";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-o}", id);
-    let expected = "BTest(12)";
+    let expected = "12";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#o}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(0o12)";
+    let expected = "0o12";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25o}", id);
-    let expected = "BTest(                       12)";
+    let expected = "                       12";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25o}", id);
-    let expected = "BTest(12                       )";
+    let expected = "12                       ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25o}", id);
-    let expected = "BTest(                       12)";
+    let expected = "                       12";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25o}", id);
-    let expected = "BTest(           12            )";
+    let expected = "           12            ";
     assert_eq!(actual, expected);
 }
 
@@ -625,35 +625,35 @@ fn upper_exp_fmt_test() {
     let id = id!(BTest; 2);
 
     let actual: String = format!("{:E}", id);
-    let expected = "BTest(2E0)";
+    let expected = "2E0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+E}", id);
-    let expected = "BTest(+2E0)";
+    let expected = "+2E0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-E}", id);
-    let expected = "BTest(2E0)";
+    let expected = "2E0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#E}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(2E0)";
+    let expected = "2E0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25E}", id);
-    let expected = "BTest(                      2E0)";
+    let expected = "                      2E0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25E}", id);
-    let expected = "BTest(2E0                      )";
+    let expected = "2E0                      ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25E}", id);
-    let expected = "BTest(                      2E0)";
+    let expected = "                      2E0";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25E}", id);
-    let expected = "BTest(           2E0           )";
+    let expected = "           2E0           ";
     assert_eq!(actual, expected);
 }
 
@@ -662,34 +662,34 @@ fn upper_hex_fmt_test() {
     let id = id!(BTest; 10);
 
     let actual: String = format!("{:X}", id);
-    let expected = "BTest(A)";
+    let expected = "A";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:+X}", id);
-    let expected = "BTest(+A)";
+    let expected = "+A";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:-X}", id);
-    let expected = "BTest(A)";
+    let expected = "A";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#X}", id);
-    let expected = "branded_id::tests::util::b_test::BTest(0xA)";
+    let expected = "0xA";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:25X}", id);
-    let expected = "BTest(                        A)";
+    let expected = "                        A";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:<25X}", id);
-    let expected = "BTest(A                        )";
+    let expected = "A                        ";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:>25X}", id);
-    let expected = "BTest(                        A)";
+    let expected = "                        A";
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:^25X}", id);
-    let expected = "BTest(            A            )";
+    let expected = "            A            ";
     assert_eq!(actual, expected);
 }

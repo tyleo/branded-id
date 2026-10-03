@@ -18,6 +18,9 @@ macro_rules! scalar_id_impl {
         /// The `to_*_id` methods convert between id widths with an `as` cast,
         /// which truncates or sign-reinterprets values that do not fit the
         /// target width.
+        ///
+        /// `Display` and the numeric formatters print the bare integer, and
+        /// `Debug` wraps it in the brand's name, as in `BRow(3)`.
         #[repr(transparent)]
         pub struct $id<TBrand: ?Sized> {
             phantom: ::std::marker::PhantomData<TBrand>,
@@ -30,18 +33,6 @@ macro_rules! scalar_id_impl {
 
             /// The largest id the width holds.
             pub const MAX: Self = Self::$from(<$prim>::MAX);
-
-            fn fmt_helper(
-                self,
-                fmt_repr: impl FnOnce(&$prim, &mut ::std::fmt::Formatter) -> ::std::fmt::Result,
-                f: &mut ::std::fmt::Formatter,
-            ) -> ::std::fmt::Result {
-                use ::std::fmt::Write as _;
-                $crate::internal::fmt_brand_name::<TBrand>(f)?;
-                f.write_char('(')?;
-                fmt_repr(&self.$to(), f)?;
-                f.write_char(')')
-            }
 
             /// Wraps a raw integer as a branded id.
             pub const fn $from(repr: $prim) -> Self {
@@ -83,7 +74,7 @@ macro_rules! scalar_id_impl {
 
         impl<TBrand: ?Sized> ::std::fmt::Binary for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::Binary::fmt, f)
+                ::std::fmt::Binary::fmt(&self.$to(), f)
             }
         }
 
@@ -97,13 +88,21 @@ macro_rules! scalar_id_impl {
 
         impl<TBrand: ?Sized> ::std::fmt::Debug for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::Debug::fmt, f)
+                use ::std::fmt::Write as _;
+
+                $crate::internal::fmt_brand_name::<TBrand>(f)?;
+
+                f.write_char('(')?;
+
+                ::std::fmt::Debug::fmt(&self.$to(), f)?;
+
+                f.write_char(')')
             }
         }
 
         impl<TBrand: ?Sized> ::std::fmt::Display for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::Display::fmt, f)
+                ::std::fmt::Display::fmt(&self.$to(), f)
             }
         }
 
@@ -144,19 +143,19 @@ macro_rules! scalar_id_impl {
 
         impl<TBrand: ?Sized> ::std::fmt::LowerExp for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::LowerExp::fmt, f)
+                ::std::fmt::LowerExp::fmt(&self.$to(), f)
             }
         }
 
         impl<TBrand: ?Sized> ::std::fmt::LowerHex for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::LowerHex::fmt, f)
+                ::std::fmt::LowerHex::fmt(&self.$to(), f)
             }
         }
 
         impl<TBrand: ?Sized> ::std::fmt::Octal for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::Octal::fmt, f)
+                ::std::fmt::Octal::fmt(&self.$to(), f)
             }
         }
 
@@ -224,13 +223,13 @@ macro_rules! scalar_id_impl {
 
         impl<TBrand: ?Sized> ::std::fmt::UpperExp for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::UpperExp::fmt, f)
+                ::std::fmt::UpperExp::fmt(&self.$to(), f)
             }
         }
 
         impl<TBrand: ?Sized> ::std::fmt::UpperHex for $id<TBrand> {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                self.fmt_helper(::std::fmt::UpperHex::fmt, f)
+                ::std::fmt::UpperHex::fmt(&self.$to(), f)
             }
         }
     };

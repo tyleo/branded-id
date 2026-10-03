@@ -111,11 +111,11 @@ fn display_fmt_test() {
     let id = id!(BTest; uuid_a());
 
     let actual: String = format!("{}", id);
-    let expected = format!("BTest({})", UUID_STR);
+    let expected = UUID_STR;
     assert_eq!(actual, expected);
 
     let actual: String = format!("{:#}", id);
-    let expected = format!("branded_id::tests::util::b_test::BTest({})", UUID_STR);
+    let expected = format!("{:#}", uuid_a());
     assert_eq!(actual, expected);
 }
 

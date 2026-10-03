@@ -17,6 +17,8 @@ use uuid::Uuid;
 /// [`Scalar`](crate::Scalar) and cannot index a container. Convert to and from
 /// a raw [`Uuid`] with [`from_uuid`](Self::from_uuid) and
 /// [`to_uuid`](Self::to_uuid), or the equivalent `From` impls.
+///
+/// `Display` prints the bare UUID, and `Debug` wraps it in the brand's name.
 #[repr(transparent)]
 pub struct UuidId<TBrand: ?Sized> {
     phantom: PhantomData<TBrand>,
@@ -73,7 +75,7 @@ impl<TBrand: ?Sized> fmt::Debug for UuidId<TBrand> {
 
 impl<TBrand: ?Sized> fmt::Display for UuidId<TBrand> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.fmt_helper(fmt::Display::fmt, f)
+        fmt::Display::fmt(&self.repr, f)
     }
 }
 

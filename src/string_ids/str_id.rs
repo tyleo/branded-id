@@ -6,15 +6,17 @@ string_id_impl! {
     StringId, String, from_string, into_string,
 }
 
+/// Prints the bare string. `Debug` wraps it in the brand's name.
 impl<TBrand: ?Sized> fmt::Display for StrId<TBrand> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.fmt_helper(fmt::Display::fmt, f)
+        fmt::Display::fmt(&self.repr, f)
     }
 }
 
+/// Prints the bare string. `Debug` wraps it in the brand's name.
 impl<TBrand: ?Sized> fmt::Display for StringId<TBrand> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.fmt_helper(fmt::Display::fmt, f)
+        fmt::Display::fmt(&self.repr, f)
     }
 }
 
